@@ -11,14 +11,14 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-
-        //AsciiAnimator.runIntro();
-
+        LoginScreen loginScreen = new LoginScreen(new service.AuthService());
+        // AsciiAnimator.runIntro();
+        loginScreen.start();
         System.out.println("=== TEST: UserDAO & ContactDAO ===");
 
-        testUsers();
+        // testUsers();
         System.out.println("\n---------------------------------\n");
-        testContacts();
+        // testContacts();
 
         System.out.println("\n=== TEST BİTTİ ===");
     }
@@ -31,14 +31,13 @@ public class Main {
         for (User u : users) {
             System.out.println(
                     "ID=" + u.getId() +
-                    ", username=" + u.getUsername() +
-                    ", name=" + u.getName() + " " + u.getSurname() +
-                    ", role=" + u.getRole()
-            );
+                            ", username=" + u.getUsername() +
+                            ", name=" + u.getName() + " " + u.getSurname() +
+                            ", role=" + u.getRole());
         }
 
         System.out.println("\n>>> Belirli username ile kullanıcı bul (örnek: 'bellingham' ya da kendi koyduğun biri):");
-        String testUsername = "bellingham";   // burada DB'de var olan bir username yaz
+        String testUsername = "bellingham"; // burada DB'de var olan bir username yaz
         User found = userDAO.findByUsername(testUsername);
         if (found != null) {
             System.out.println("Bulundu: " + found.getUsername() +
@@ -57,11 +56,10 @@ public class Main {
         for (Contact c : contacts) {
             System.out.println(
                     "ID=" + c.getContactId() +
-                    ", name=" + c.getFirstName() + " " + c.getLastName() +
-                    ", nick=" + c.getNickname() +
-                    ", phone=" + c.getPhoneNumber() +
-                    ", email=" + c.getEmail()
-            );
+                            ", name=" + c.getFirstName() + " " + c.getLastName() +
+                            ", nick=" + c.getNickname() +
+                            ", phone=" + c.getPhoneNumber() +
+                            ", email=" + c.getEmail());
         }
     }
 }
