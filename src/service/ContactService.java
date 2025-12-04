@@ -38,16 +38,18 @@ public class ContactService {
             return;
         }
         System.out.println("\n CONTACTS LIST");
-        System.out.printf("\n %-5s %-15s %-15s %-15s %-25s %-30s", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "ADDRESS");
+        System.out.printf("\n %-5s %-15s %-15s %-15s %-25s %-30s", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
         System.out.println("\n-----------------------------------------------------------------------------------------------");
         
         for (Contact contact : contacts) {
+            int id = contact.getContactId();
             String firstName = contact.getFirstName() != null ? contact.getFirstName() : "-";
             String lastName = contact.getLastName() != null ? contact.getLastName() : "-";
             String phone = contact.getPhoneNumber() != null ? contact.getPhoneNumber() : "-";
             String email = contact.getEmail() != null ? contact.getEmail() : "-";
+            String url = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "-";
 
-            System.out.printf(" %-5d %-15s %-15s %-15s %-25s %-30s",contact.getContactId(), firstName, lastName, phone, email);
+            System.out.printf(" %-5d %-15s %-15s %-15s %-25s %-30s", id, firstName, lastName, phone, email, url);
 
             System.out.println("\n Total " + contacts.size() + " contact(s) found.");
         }
