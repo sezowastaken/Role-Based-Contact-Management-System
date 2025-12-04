@@ -1,4 +1,4 @@
-//package ui.screen;
+package ui.screen;
 public class AsciiAnimator {
     // === ANSI Colors ===
     private static final String RESET = "\u001B[0m";
