@@ -4,6 +4,7 @@ import dao.ContactDAO;
 import dao.UserDAO;
 import model.Contact;
 import model.User;
+import service.AuthService;
 import ui.screen.*;
 
 import java.util.List;
@@ -11,13 +12,14 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        LoginScreen loginScreen = new LoginScreen(new service.AuthService());
-        // AsciiAnimator.runIntro();
-        //loginScreen.start();
+        AuthService authService = new AuthService();
+        LoginScreen loginScreen = new LoginScreen(authService);
+        loginScreen.start();
 
-         testUsers();
-        System.out.println("\n---------------------------------\n");
-         testContacts();
+
+        // testUsers();
+        // System.out.println("\n---------------------------------\n");
+        // testContacts();
 
     }
 

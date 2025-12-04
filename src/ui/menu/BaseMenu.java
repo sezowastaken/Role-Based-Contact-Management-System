@@ -1,88 +1,115 @@
 package ui.menu;
 
-import java.util.Scanner;
 import model.User;
+import util.InputHelper;
 
+import java.util.Scanner;
+
+/**
+ * BaseMenu provides a common console menu framework for all role-based menus.
+ *
+ * It is responsible for:
+ *  - Showing the menu in a loop
+ *  - Displaying the header and logged-in user info
+ *  - Safely reading user input (no crashes on bad input)
+ *  - Handling the generic "0 - Logout" option
+ *
+ * Concrete menus only need to:
+ *  - Provide a title via getTitle()
+ *  - Print their own options via printOptions()
+ *  - Implement behavior for each choice in handleOption()
+ */
 public abstract class BaseMenu {
 
     protected final User currentUser;
     protected final Scanner scanner;
 
-    public BaseMenu(User currentUser, Scanner scanner) {
+    protected BaseMenu(User currentUser, Scanner scanner) {
         this.currentUser = currentUser;
         this.scanner = scanner;
     }
 
     /**
-     * Menü ana döngüsü.
-     * 0 - Logout seçilene kadar devam eder.
-     * Sayı olmayan veya tanımsız bir giriş geldiğinde hata fırlatmaz,
-     * sadece uyarı verip tekrar seçim ister.
+     * Main loop of the menu.
+     * Shows the menu until the user chooses to logout (option "0").
      */
-    public void show() {
-        boolean logout = false;
-
-        while (!logout) {
+    public final void show() {
+        while (true) {
             clearScreen();
             printHeader();
+            printUserInfo();
             printOptions();
 
-            System.out.print("Seçiminiz: ");
-            String choice = scanner.nextLine().trim();
+            System.out.println(); // spacing
+            String choice = InputHelper.readLine(scanner, "Select an option: ");
 
-            // Logout
             if ("0".equals(choice)) {
-                System.out.println("\nLogout ediliyor, giriş ekranına dönülüyor...");
-                logout = true;
-                continue;
+                System.out.println("\nLogging out... See you soon, "
+                        + currentUser.getName() + "!");
+                pause();
+                return;
             }
 
-            // Boş ya da sayı olmayan girişler
-            if (choice.isEmpty() || !choice.matches("\\d+")) {
-                System.out.println("\nGeçersiz seçim! Lütfen listede olan bir sayı girin.");
-                pressEnterToContinue();
-                continue;
-            }
-
-            // Buraya geldiysek giriş sayısal, ama hangi menüde geçerli olduğunu
-            // alt sınıflar (TesterMenu, JuniorDevMenu vs.) belirleyecek.
             handleOption(choice);
-            pressEnterToContinue();
+            pause();
         }
     }
 
     /**
-     * Menü başlığı (örn. "Tester Menu").
+     * Title that will be displayed at the top of the menu.
      */
     protected abstract String getTitle();
 
     /**
-     * Rol'e özel menü seçeneklerini yazdırır.
+     * Prints the role-specific options of the menu (including "0 - Logout").
+     * Implementations should only print, not read input.
      */
     protected abstract void printOptions();
 
     /**
-     * Alt sınıflar isterse override eder.
-     * Override etmezse burada sadece placeholder mesajı gösterilir.
-     * Geçersiz değeri de burada yakalayabiliriz.
+     * Handles the selected option (except "0", which is handled by BaseMenu).
+     *
+     * @param choice the user input representing the selected option
      */
-    protected void handleOption(String choice) {
-        System.out.println("Bu menü seçeneği henüz implemente edilmedi. (placeholder) Seçim: " + choice);
-    }
+    protected abstract void handleOption(String choice);
+
+    // ----------------- Helper methods for subclasses -----------------
 
     protected void printHeader() {
-        System.out.println("===========================================");
-        System.out.println(" " + getTitle());
-        System.out.println("===========================================");
+        String title = getTitle();
+        String line = "=".repeat(Math.max(10, title.length() + 8));
+
+        System.out.println(line);
+        System.out.println("  " + title);
+        System.out.println(line);
+        System.out.println();
     }
 
-    protected void pressEnterToContinue() {
-        System.out.print("\nDevam etmek için Enter'a basın...");
+    protected void printUserInfo() {
+        System.out.println("Logged in as : " + currentUser.getUsername());
+        System.out.println("Role         : " + currentUser.getRole());
+        System.out.println();
+    }
+
+    /**
+     * Waits for the user to press Enter before continuing.
+     * Useful after executing an action, so the user can read the message.
+     */
+    protected void pause() {
+        System.out.print("\nPress Enter to continue...");
         scanner.nextLine();
     }
 
-    private void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+    /**
+     * Tries to clear the console screen. On unsupported terminals,
+     * it will simply behave like several empty lines.
+     */
+    protected void clearScreen() {
+        try {
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        } catch (Exception ignored) {
+            // Fallback: do nothing, it's not critical
+        }
     }
 }
