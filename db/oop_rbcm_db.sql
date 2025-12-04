@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1
--- Üretim Zamanı: 04 Ara 2025, 14:54:02
+-- Üretim Zamanı: 04 Ara 2025, 18:24:46
 -- Sunucu sürümü: 10.4.32-MariaDB
 -- PHP Sürümü: 8.2.12
 
@@ -121,14 +121,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password_hash`, `name`, `surname`, `role`, `created_at`) VALUES
-(1, 'bellingham', 'd96d530c92b0ebb871ca52b6d6f31e48fc06c83cecc0c17a4202b76770544392', 'Ayhan', 'Öner', 'Tester', '2025-12-04 16:00:04'),
-(2, 'tester', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', 'Okan', 'Buruk', 'Tester', '2025-12-04 16:00:04'),
-(3, 'terminatör', '6e7b21d1178f415c69ab23e7330355943a6ef8bb71c047bca0391643997cc760', 'Bilal', 'Keleş', 'Junior_Dev', '2025-12-04 16:00:04'),
-(4, 'junior', '8fdd880f097cddfef86895d2c48f649e943bed14639f0ad29671508b536c9fc1', 'Fatih', 'Tekke', 'Junior_Dev', '2025-12-04 16:00:04'),
-(5, 'dede', 'bfccfeb7726160d74f8a18407853846aab2ebd57db1dc32409acd6aefc7c4b33', 'Tunahan', 'Tuze', 'Senior_Dev', '2025-12-04 16:00:04'),
-(6, 'senior', '2161403032b8314a5249774f9418acf04317a84cc1dddba989d108e763d557ac', 'Dominico', 'Tedesco', 'Senior_Dev', '2025-12-04 16:00:04'),
-(7, 'sezo', '9ad3e9023704376a56cceb23c7486186507546991c151ea63fe274f1f3f4e734', 'Sezai', 'Araplarlı', 'Manager', '2025-12-04 16:00:04'),
-(8, 'manager', '6ee4a469cd4e91053847f5d3fcb61dbcc91e8f0ef10be7748da4c4a1ba382d17', 'Sergen', 'Yalçın', 'Manager', '2025-12-04 16:00:04');
+(1, 'bellingham', 'd96d530c92b0ebb871ca52b6d6f31e48fc06c83cecc0c17a4202b76770544392', 'Ayhan', 'Öner', 'TESTER', '2025-12-04 16:00:04'),
+(2, 'tester', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', 'Okan', 'Buruk', 'TESTER', '2025-12-04 16:00:04'),
+(3, 'terminatör', '6e7b21d1178f415c69ab23e7330355943a6ef8bb71c047bca0391643997cc760', 'Bilal', 'Keleş', 'JUNIOR_DEV', '2025-12-04 16:00:04'),
+(4, 'junior', '8fdd880f097cddfef86895d2c48f649e943bed14639f0ad29671508b536c9fc1', 'Fatih', 'Tekke', 'JUNIOR_DEV', '2025-12-04 16:00:04'),
+(5, 'dede', 'bfccfeb7726160d74f8a18407853846aab2ebd57db1dc32409acd6aefc7c4b33', 'Tunahan', 'Tuze', 'SENIOR_DEV', '2025-12-04 16:00:04'),
+(6, 'senior', '2161403032b8314a5249774f9418acf04317a84cc1dddba989d108e763d557ac', 'Dominico', 'Tedesco', 'SENIOR_DEV', '2025-12-04 16:00:04'),
+(7, 'sezo', '9ad3e9023704376a56cceb23c7486186507546991c151ea63fe274f1f3f4e734', 'Sezai', 'Araplarlı', 'MANAGER', '2025-12-04 16:00:04'),
+(8, 'manager', '6ee4a469cd4e91053847f5d3fcb61dbcc91e8f0ef10be7748da4c4a1ba382d17', 'Sergen', 'Yalçın', 'MANAGER', '2025-12-04 16:00:04');
 
 --
 -- Dökümü yapılmış tablolar için indeksler
