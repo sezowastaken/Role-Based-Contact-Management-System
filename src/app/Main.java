@@ -6,6 +6,8 @@ import model.Contact;
 import model.User;
 import service.AuthService;
 import ui.screen.*;
+import service.UserService;
+import model.Role;
 
 import java.util.List;
 
@@ -21,6 +23,90 @@ public class Main {
         // System.out.println("\n---------------------------------\n");
         // testContacts();
 
+
+        // ======================================================
+        // === USER SERVICE TEST BLOĞU (AÇ/KAPA) ================
+        // ======================================================
+        
+        try {
+            System.out.println("\n=== USER SERVICE TEST BAŞLIYOR ===");
+
+            UserDAO userDAO = new UserDAO();
+            UserService userService = new UserService(userDAO);
+
+            // -----------------------------
+            // 1) CREATE USER TEST
+            // -----------------------------
+            System.out.println("\n[CREATE USER]");
+            userService.createUser(
+                    "servicetest",
+                    "1234",
+                    "Service",
+                    "Tester",
+                    Role.TESTER
+            );
+
+            User u = userService.findUserByUsername("servicetest");
+            System.out.println("Created user ID = " + u.getId());
+            System.out.println("Full name = " + u.getFullName());
+            System.out.println("Role = " + u.getRole());
+
+
+            // -----------------------------
+            // 2) UPDATE USER TEST
+            // -----------------------------
+            System.out.println("\n[UPDATE USER]");
+            userService.updateUser(
+                    u.getId(),
+                    "servicetest_updated",
+                    "ServiceUpdated",
+                    "TesterUpdated",
+                    Role.MANAGER
+            );
+
+            User updated = userService.findUserByUsername("servicetest_updated");
+            System.out.println("Updated username = " + updated.getUsername());
+            System.out.println("Updated name = " + updated.getFullName());
+            System.out.println("Updated role = " + updated.getRole());
+
+
+            // -----------------------------
+            // 3) CHANGE PASSWORD TEST
+            // -----------------------------
+            System.out.println("\n[CHANGE PASSWORD]");
+            userService.changePassword(updated, "1234", "abcd1234");
+            System.out.println("Password changed successfully!");
+
+
+            // -----------------------------
+            // 4) LIST USERS TEST
+            // -----------------------------
+            System.out.println("\n[LIST USERS]");
+            for (User user : userService.findAllUsers()) {
+                System.out.println(user);
+            }
+
+
+            // -----------------------------
+            // 5) DELETE USER TEST
+            // -----------------------------
+            /*System.out.println("\n[DELETE USER]");
+            userService.deleteUser(updated.getId(), 999999); // manager id farklı olacak
+            System.out.println("User deleted!");*/
+
+
+            System.out.println("\n=== USER SERVICE TEST BİTTİ ===");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // ======================================================
+        // === USER SERVICE TEST BLOĞU SONU =====================
+        // ======================================================
+
+
+        System.out.println("\n=== TEST BİTTİ ===");
     }
 
     private static void testUsers() {
@@ -62,4 +148,6 @@ public class Main {
                             ", email=" + c.getEmail());
         }
     }
+
+    
 }
