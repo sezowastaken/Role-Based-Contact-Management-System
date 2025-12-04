@@ -1,8 +1,9 @@
 package model;
 
-public enum Role { // neden enum kullandık? -> sabit roller olduğu için
+public enum Role {
     TESTER,
-    JUNIOR_DEVELOPER,
-    SENIOR_DEVELOPER,
-    MANAGER;
+    JUNIOR_DEV,
+    SENIOR_DEV,
+    MANAGER
 }
+

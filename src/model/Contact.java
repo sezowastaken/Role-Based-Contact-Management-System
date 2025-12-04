@@ -3,21 +3,15 @@ package model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Rehberdeki kişiyi temsil eder.
- * Tablodaki karşılığı: contacts
- */
 public class Contact {
 
     private int contactId;
     private String firstName;
-    private String middleName; // optional
     private String lastName;
-    private String nickname; // optional
-    private String phonePrimary;
-    private String phoneSecondary; // optional
+    private String nickname;
+    private String phoneNumber;
     private String email;
-    private String linkedinUrl; // optional
+    private String linkedinUrl;
     private LocalDate birthDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -27,11 +21,9 @@ public class Contact {
 
     public Contact(int contactId,
             String firstName,
-            String middleName,
             String lastName,
             String nickname,
-            String phonePrimary,
-            String phoneSecondary,
+            String phoneNumber,
             String email,
             String linkedinUrl,
             LocalDate birthDate,
@@ -39,19 +31,15 @@ public class Contact {
             LocalDateTime updatedAt) {
         this.contactId = contactId;
         this.firstName = firstName;
-        this.middleName = middleName;
         this.lastName = lastName;
         this.nickname = nickname;
-        this.phonePrimary = phonePrimary;
-        this.phoneSecondary = phoneSecondary;
+        this.phoneNumber = phoneNumber;
         this.email = email;
         this.linkedinUrl = linkedinUrl;
         this.birthDate = birthDate;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    // Getter & Setter'lar
 
     public int getContactId() {
         return contactId;
@@ -67,14 +55,6 @@ public class Contact {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
     }
 
     public String getLastName() {
@@ -93,20 +73,12 @@ public class Contact {
         this.nickname = nickname;
     }
 
-    public String getPhonePrimary() {
-        return phonePrimary;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhonePrimary(String phonePrimary) {
-        this.phonePrimary = phonePrimary;
-    }
-
-    public String getPhoneSecondary() {
-        return phoneSecondary;
-    }
-
-    public void setPhoneSecondary(String phoneSecondary) {
-        this.phoneSecondary = phoneSecondary;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -155,7 +127,7 @@ public class Contact {
                 "contactId=" + contactId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", phonePrimary='" + phonePrimary + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

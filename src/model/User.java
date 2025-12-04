@@ -2,10 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-/**
- * Sisteme giriş yapan kullanıcıyı temsil eder.
- * Tablodaki karşılığı: users
- */
+
 public class User {
 
     private int id;
@@ -34,8 +31,6 @@ public class User {
         this.role = role;
         this.createdAt = createdAt;
     }
-
-    // Getter & Setter'lar
 
     public int getId() {
         return id;
