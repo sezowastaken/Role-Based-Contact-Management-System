@@ -13,14 +13,12 @@ public class Main {
     public static void main(String[] args) {
         LoginScreen loginScreen = new LoginScreen(new service.AuthService());
         // AsciiAnimator.runIntro();
-        loginScreen.start();
-        System.out.println("=== TEST: UserDAO & ContactDAO ===");
+        //loginScreen.start();
 
-        // testUsers();
+         testUsers();
         System.out.println("\n---------------------------------\n");
-        // testContacts();
+         testContacts();
 
-        System.out.println("\n=== TEST BİTTİ ===");
     }
 
     private static void testUsers() {

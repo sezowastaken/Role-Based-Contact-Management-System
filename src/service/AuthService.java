@@ -41,7 +41,7 @@ public class AuthService {
             return new Tester(
                     1, // id
                     "tester", // username
-                    "demoHashTester", // passwordHash (gerçekte hash olacak)
+                    "123", // passwordHash (gerçekte hash olacak)
                     "Demo", // name
                     "Tester", // surname
                     now // createdAt
