@@ -10,6 +10,6 @@ public class JuniorDeveloper extends User {
             String name,
             String surname,
             LocalDateTime createdAt) {
-        super(id, username, passwordHash, name, surname, Role.JUNIOR_DEVELOPER, createdAt);
+        super(id, username, passwordHash, name, surname, Role.JUNIOR_DEV, createdAt);
     }
 }
