@@ -26,11 +26,18 @@ public class TesterMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - List all contacts");
-        System.out.println("3 - Search contacts by selected field(s)");
-        System.out.println("4 - Sort contacts by selected field (ascending / descending)");
-        System.out.println("0 - Logout");
+        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│                             TESTER MENU                              │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ 1 - Change password                                                  │");
+        System.out.println("│ 2 - List all contacts                                                │");
+        System.out.println("│ 3 - Search contacts by selected field(s)                             │");
+        System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
+        if (isUndoAvailable()) {
+            System.out.println("│ U - Undo last operation                                              │");
+        }
+        System.out.println("│ 0 - Logout                                                           │");
+        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
     }
 
     @Override
@@ -53,7 +60,8 @@ public class TesterMenu extends BaseMenu {
             case "0":
                 return;
             default:
-                System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above." + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
         }
     }
 
@@ -62,7 +70,7 @@ public class TesterMenu extends BaseMenu {
     // ==========================================
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
-        
+
         // InputHelper ile güvenli okuma
         String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password: ");
         String newPass = InputHelper.readNonEmptyLine(scanner, "New Password: ");

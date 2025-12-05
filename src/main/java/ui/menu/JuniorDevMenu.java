@@ -27,12 +27,33 @@ public class JuniorDevMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - List all contacts");
-        System.out.println("3 - Search contacts");
-        System.out.println("4 - Sort contacts");
-        System.out.println("5 - Update existing contact"); // Junior yetkisi
-        System.out.println("0 - Logout");
+        System.out.println(
+                ConsoleColors.BLUE + "┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│ " + ConsoleColors.WHITE
+                + "                       JUNIOR DEVELOPER MENU                       " + ConsoleColors.BLUE + "  │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println(
+                "│" + ConsoleColors.WHITE + " 1 - Change password    " + ConsoleColors.BLUE
+                        + "                                              │");
+        System.out.println(
+                "│" + ConsoleColors.WHITE + " 2 - List all contacts                                "
+                        + ConsoleColors.BLUE + "                │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "3 - Search contacts by selected field(s)   " + ConsoleColors.BLUE
+                        + "                          │");
+        System.out.println("│" + ConsoleColors.WHITE + " 4 - Sort results by selected field (ascending / descending)  "
+                + ConsoleColors.BLUE + "        │");
+        System.out.println("│ " + ConsoleColors.WHITE + "5 - Update existing contact    " + ConsoleColors.BLUE
+                + "                                      │");
+        if (isUndoAvailable()) {
+            System.out.println("│ " + ConsoleColors.WHITE + "U - Undo last operation     " + ConsoleColors.BLUE
+                    + "                                         │");
+        }
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "0 - Logout    " + ConsoleColors.BLUE
+                        + "                                                       │");
+        System.out.println(
+                "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
     @Override
@@ -58,14 +79,15 @@ public class JuniorDevMenu extends BaseMenu {
             case "0":
                 return;
             default:
-                System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above." + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
         }
     }
 
     // Şifre değiştirme işlemini burada InputHelper ile yapıyoruz
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
-        
+
         String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password: ");
         String newPass = InputHelper.readNonEmptyLine(scanner, "New Password: ");
 
