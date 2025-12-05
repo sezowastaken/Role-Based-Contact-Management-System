@@ -1,5 +1,7 @@
 # Maven build output
 target/
+.target/
+
 
 # Eski manuel derleme çıktıları
 out/

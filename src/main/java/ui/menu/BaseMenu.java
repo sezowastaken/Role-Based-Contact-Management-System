@@ -1,6 +1,7 @@
 package ui.menu;
 
 import model.User;
+import util.ConsoleColors;
 import util.InputHelper;
 
 import java.util.Scanner;
@@ -9,15 +10,15 @@ import java.util.Scanner;
  * BaseMenu provides a common console menu framework for all role-based menus.
  *
  * It is responsible for:
- *  - Showing the menu in a loop
- *  - Displaying the header and logged-in user info
- *  - Safely reading user input (no crashes on bad input)
- *  - Handling the generic "0 - Logout" option
+ * - Showing the menu in a loop
+ * - Displaying the header and logged-in user info
+ * - Safely reading user input (no crashes on bad input)
+ * - Handling the generic "0 - Logout" option
  *
  * Concrete menus only need to:
- *  - Provide a title via getTitle()
- *  - Print their own options via printOptions()
- *  - Implement behavior for each choice in handleOption()
+ * - Provide a title via getTitle()
+ * - Print their own options via printOptions()
+ * - Implement behavior for each choice in handleOption()
  */
 public abstract class BaseMenu {
 
@@ -35,17 +36,18 @@ public abstract class BaseMenu {
      */
     public final void show() {
         while (true) {
-            clearScreen();
+            InputHelper.clearScreen();
             printHeader();
             printUserInfo();
             printOptions();
 
             System.out.println(); // spacing
-            String choice = InputHelper.readLine(scanner, "Select an option: ");
-
+            String choice = InputHelper.readLine(scanner,
+                    ConsoleColors.CYAN + "Select an option: " + ConsoleColors.RESET);
+            InputHelper.clearScreen();
             if ("0".equals(choice)) {
-                System.out.println("\nLogging out... See you soon, "
-                        + currentUser.getName() + "!");
+                System.out.println(ConsoleColors.GREEN + "\nLogging out... See you soon, "
+                        + currentUser.getName() + "!" + ConsoleColors.RESET);
                 pause();
                 return;
             }
@@ -77,17 +79,17 @@ public abstract class BaseMenu {
 
     protected void printHeader() {
         String title = getTitle();
-        String line = "=".repeat(Math.max(10, title.length() + 8));
+        String line = (ConsoleColors.YELLOW + "=".repeat(Math.max(10, title.length() + 8)) + ConsoleColors.RESET);
 
         System.out.println(line);
-        System.out.println("  " + title);
+        System.out.println(ConsoleColors.YELLOW + "  " + title + ConsoleColors.RESET);
         System.out.println(line);
         System.out.println();
     }
 
     protected void printUserInfo() {
-        System.out.println("Logged in as : " + currentUser.getUsername());
-        System.out.println("Role         : " + currentUser.getRole());
+        System.out.println(ConsoleColors.BLUE + "Logged in as : " + currentUser.getUsername() + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.MAGENTA + "Role         : " + currentUser.getRole() + ConsoleColors.RESET);
         System.out.println();
     }
 
@@ -96,7 +98,7 @@ public abstract class BaseMenu {
      * Useful after executing an action, so the user can read the message.
      */
     protected void pause() {
-        System.out.print("\nPress Enter to continue...");
+        System.out.print(ConsoleColors.YELLOW + "\nPress Enter to continue..." + ConsoleColors.RESET);
         scanner.nextLine();
     }
 
@@ -104,12 +106,4 @@ public abstract class BaseMenu {
      * Tries to clear the console screen. On unsupported terminals,
      * it will simply behave like several empty lines.
      */
-    protected void clearScreen() {
-        try {
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
-        } catch (Exception ignored) {
-            // Fallback: do nothing, it's not critical
-        }
-    }
 }

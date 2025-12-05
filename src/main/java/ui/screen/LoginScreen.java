@@ -12,6 +12,7 @@ import util.ConsoleColors;
 import ui.menu.JuniorDevMenu;
 import ui.menu.SeniorDevMenu;
 import ui.menu.ManagerMenu;
+import util.InputHelper;
 
 public class LoginScreen {
 
@@ -29,14 +30,15 @@ public class LoginScreen {
      */
     public void start() {
         while (true) {
-            clearScreen();
-            System.out.println(ConsoleColors.MAGENTA + "===========================================");
+            InputHelper.clearScreen();
+            System.out.println(ConsoleColors.GREEN + "===========================================");
             System.out.println("  ROLE-BASED CONTACT MANAGEMENT SYSTEM");
             System.out.println("===========================================\n" + ConsoleColors.RESET);
-            System.out.println("Enter your username and password to log in.");
-            System.out.println("(To exit, type 'q' as the username.)\n");
+            System.out
+                    .println(ConsoleColors.CYAN + "Enter your username and password to log in." + ConsoleColors.RESET);
+            System.out.println(ConsoleColors.YELLOW + "(To exit, type 'q' as the username.)\n" + ConsoleColors.RESET);
 
-            System.out.print("Username: ");
+            System.out.print(ConsoleColors.WHITE + "Username: " + ConsoleColors.RESET);
             String username = scanner.nextLine();
             if (username == null) {
                 username = "";
@@ -44,17 +46,20 @@ public class LoginScreen {
             username = username.trim();
 
             if (username.equalsIgnoreCase("q")) {
-                System.out.println("\nExiting the application. See you next time!");
+                InputHelper.clearScreen();
+                System.out.println(
+                        ConsoleColors.GREEN + "\nExiting the application. See you next time!" + ConsoleColors.RESET);
                 return;
             }
 
             if (username.isEmpty()) {
-                System.out.println("\n Username cannot be empty. Please try again.");
+                System.out.println(
+                        ConsoleColors.RED + "\nUsername cannot be empty. Please try again." + ConsoleColors.RESET);
                 pressEnterToContinue();
                 continue;
             }
 
-            System.out.print("Password: ");
+            System.out.print(ConsoleColors.WHITE + "Password: " + ConsoleColors.RESET);
             String password = scanner.nextLine();
             if (password == null) {
                 password = "";
@@ -62,13 +67,14 @@ public class LoginScreen {
 
             User loggedIn = authService.login(username, password);
             if (loggedIn == null) {
-                System.out.println("\n Login failed. Incorrect username or password.");
+                System.out.println(
+                        ConsoleColors.RED + "\nLogin failed. Incorrect username or password." + ConsoleColors.RESET);
                 pressEnterToContinue();
                 continue;
             }
 
-            System.out.println("\n Login successful. Welcome, "
-                    + loggedIn.getName() + " " + loggedIn.getSurname() + "!");
+            System.out.println(ConsoleColors.GREEN + "\nLogin successful. Welcome, "
+                    + loggedIn.getName() + " " + loggedIn.getSurname() + "!" + ConsoleColors.RESET);
             pressEnterToContinue();
 
             // Open role-specific menu
@@ -78,10 +84,12 @@ public class LoginScreen {
     }
 
     private void openMenuForUser(User user) {
+        InputHelper.clearScreen();
         Role role = user.getRole();
 
         if (role == null) {
-            System.out.println(" The user's role is undefined. Cannot navigate to menus.");
+            System.out.println(ConsoleColors.WHITE + "The user's role is undefined. Cannot navigate to menus."
+                    + ConsoleColors.RESET);
             pressEnterToContinue();
             return;
         }
@@ -101,23 +109,19 @@ public class LoginScreen {
                 menu = new ManagerMenu(user, scanner);
                 break;
             default:
-                System.out.println(" Unsupported role: " + role);
+                System.out.println(ConsoleColors.RED + "Unsupported role: " + ConsoleColors.RESET + role);
                 pressEnterToContinue();
                 return;
         }
 
         // Start role menu
         menu.show();
+
     }
 
     private void pressEnterToContinue() {
-        System.out.print("\nPress Enter to continue...");
+        System.out.print(ConsoleColors.YELLOW + "\nPress Enter to continue..." + ConsoleColors.RESET);
         scanner.nextLine();
     }
 
-    private void clearScreen() {
-        // Console clear – acts like empty lines on unsupported environments
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
 }

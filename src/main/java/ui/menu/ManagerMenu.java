@@ -2,6 +2,7 @@ package ui.menu;
 
 import java.util.Scanner;
 import model.User;
+import util.ConsoleColors;
 
 public class ManagerMenu extends BaseMenu {
 
@@ -16,13 +17,13 @@ public class ManagerMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
+        System.out.println(ConsoleColors.WHITE + "1 - Change password");
         System.out.println("2 - View contacts statistical info");
         System.out.println("3 - List all users");
         System.out.println("4 - Update existing user");
         System.out.println("5 - Add/employ new user");
         System.out.println("6 - Delete/fire existing user");
-        System.out.println("0 - Logout");
+        System.out.println("0 - Logout" + ConsoleColors.RESET);
     }
 
     @Override
@@ -47,7 +48,8 @@ public class ManagerMenu extends BaseMenu {
                 handleDeleteUser();
                 break;
             default:
-                System.out.println("\nInvalid choice. Please select one of the options above.");
+                System.out.println(ConsoleColors.RED + "\nInvalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
         }
     }
 
