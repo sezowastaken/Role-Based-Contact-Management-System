@@ -10,6 +10,7 @@ import service.UserService;
 import model.Role;
 
 import java.util.List;
+import java.nio.charset.Charset;
 
 public class Main {
 
@@ -17,6 +18,7 @@ public class Main {
         AuthService authService = new AuthService();
         LoginScreen loginScreen = new LoginScreen(authService);
         loginScreen.start();
+        //System.out.println("Default charset = " + Charset.defaultCharset());
     }
     
 }

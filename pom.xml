@@ -24,7 +24,6 @@
     </dependencies>
 
     <build>
-
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -32,9 +31,16 @@
                 <version>3.2.0</version>
                 <configuration>
                     <mainClass>app.Main</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>file.encoding</key>
+                            <value>Cp857</value>
+                        </systemProperty>
+                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 
 </project>

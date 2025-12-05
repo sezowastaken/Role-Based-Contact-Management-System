@@ -8,6 +8,8 @@ import java.util.Scanner;
 import util.ConsoleColors;
 
 import javax.management.Query;
+
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -116,6 +118,12 @@ public class ContactService {
                 return;
             case 1: {
                 String first = InputHelper.readNonEmptyLine(scanner, "First name contains: ");
+                System.out.println("Default charset = " + Charset.defaultCharset());
+                System.out.println("Query = " + first);
+                System.out.println("Length = " + first.length());
+                for (int i = 0; i < first.length(); i++) {
+                    System.out.println(i + " -> " + (int) first.charAt(i));
+                }
                 results = searchByFirstName(first);
                 break;
             }
