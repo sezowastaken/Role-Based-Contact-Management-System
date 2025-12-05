@@ -24,7 +24,6 @@
     </dependencies>
 
     <build>
-        <!-- Java source files are under src instead of src/main/java -->
 
         <plugins>
             <plugin>
