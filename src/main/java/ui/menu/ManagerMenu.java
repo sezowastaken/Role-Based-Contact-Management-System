@@ -87,11 +87,10 @@ public class ManagerMenu extends BaseMenu {
         var users = userService.findAllUsers();
         for (User u : users) {
             System.out.println(
-                "ID=" + u.getId() +
-                ", username=" + u.getUsername() +
-                ", name=" + u.getFullName() +
-                ", role=" + u.getRole()
-            );
+                    "ID=" + u.getId() +
+                            ", username=" + u.getUsername() +
+                            ", name=" + u.getFullName() +
+                            ", role=" + u.getRole());
         }
         printSuccess("Total users: " + users.size());
     }
@@ -115,16 +114,24 @@ public class ManagerMenu extends BaseMenu {
         }
 
         String newUsername = InputHelper.readNonEmptyLine(scanner, "New username: ");
-        String newFirstname = InputHelper.readValidName(scanner, "New first name: ");   // ✅ sadece harf
-        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");      // ✅ sadece harf
+        String newFirstname = InputHelper.readValidName(scanner, "New first name: "); // ✅ sadece harf
+        String newLastname = InputHelper.readValidName(scanner, "New lastname: "); // ✅ sadece harf
         String r = InputHelper.readNonEmptyLine(scanner, "Role (1=Tester,2=Junior,3=Senior,4=Manager): ");
 
         Role role;
         switch (r) {
-            case "1": role = Role.TESTER; break;
-            case "2": role = Role.JUNIOR_DEV; break;
-            case "3": role = Role.SENIOR_DEV; break;
-            case "4": role = Role.MANAGER; break;
+            case "1":
+                role = Role.TESTER;
+                break;
+            case "2":
+                role = Role.JUNIOR_DEV;
+                break;
+            case "3":
+                role = Role.SENIOR_DEV;
+                break;
+            case "4":
+                role = Role.MANAGER;
+                break;
             default:
                 printError("Invalid role selection!");
                 return;
@@ -143,16 +150,24 @@ public class ManagerMenu extends BaseMenu {
 
         String username = InputHelper.readNonEmptyLine(scanner, "Username: ");
         String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
-        String first = InputHelper.readValidName(scanner, "First name: ");   // ✅ sadece harf
-        String last = InputHelper.readValidName(scanner, "Last name: ");    // ✅ sadece harf
+        String first = InputHelper.readValidName(scanner, "First name: "); // ✅ sadece harf
+        String last = InputHelper.readValidName(scanner, "Last name: "); // ✅ sadece harf
         String r = InputHelper.readNonEmptyLine(scanner, "Role (1=Tester,2=Junior,3=Senior,4=Manager): ");
 
         Role role;
         switch (r) {
-            case "1": role = Role.TESTER; break;
-            case "2": role = Role.JUNIOR_DEV; break;
-            case "3": role = Role.SENIOR_DEV; break;
-            case "4": role = Role.MANAGER; break;
+            case "1":
+                role = Role.TESTER;
+                break;
+            case "2":
+                role = Role.JUNIOR_DEV;
+                break;
+            case "3":
+                role = Role.SENIOR_DEV;
+                break;
+            case "4":
+                role = Role.MANAGER;
+                break;
             default:
                 printError("Invalid role selection!");
                 return;
@@ -192,7 +207,7 @@ public class ManagerMenu extends BaseMenu {
         }
     }
 
-    // Renkli mesaj yardımcıları 
+    // Renkli mesaj yardımcıları
     private void printError(String msg) {
         System.out.println("\u001B[31m" + msg + "\u001B[0m");
     }

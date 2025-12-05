@@ -108,26 +108,59 @@ public class InputHelper {
     }
 
     /**
-     * Reads a valid name (only letters and spaces).
-     * Prevents numbers or invalid characters in name fields.
+     * Sadece ad / soyad gibi alanlar için geçerli bir string okur.
+     * - Boş bırakılamaz
+     * - Sadece harf, boşluk, ' ve - karakterlerine izin verir
+     * - Türkçe kurallara göre ilk harf BÜYÜK, kalan harfler küçük yapılır
+     * (I / İ / ı / i dönüşümleri dahil)
+     * Örn: "ahMEt" -> "Ahmet", "ışIK" -> "Işık", "iSMAİL" -> "İsmail"
      */
     public static String readValidName(Scanner scanner, String prompt) {
+        java.util.Locale tr = java.util.Locale.forLanguageTag("tr-TR");
         while (true) {
             System.out.print(prompt);
-            String line = scanner.nextLine();
-            if (line == null) {
-                line = "";
-            }
-            line = line.trim();
+            String input = scanner.nextLine();
 
-            // Regex: sadece harfler (Türkçe dahil) ve boşluk
-            if (line.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
-                return line;
+            if (input == null) {
+                input = "";
+            }
+            input = input.trim();
+
+            if (input.isEmpty()) {
+                System.out.println("⚠ İsim/soyisim boş olamaz. Lütfen tekrar deneyin.");
+                continue;
             }
 
-            System.out.println(util.ConsoleColors.RED 
-                + "Invalid input. Please use only letters and spaces." 
-                + util.ConsoleColors.RESET);
+            // Sadece harf, boşluk, ', - izin veriyoruz (Türkçe harfler dahil)
+            if (!input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
+                System.out.println("⚠ İsim/soyisim yalnızca harf içermelidir. Lütfen tekrar deneyin.");
+                continue;
+            }
+
+            // TÜRKÇE locale ile küçük harfe çevir
+            String lowerAll = input.toLowerCase(tr);
+
+            // Birden fazla kelime (örn: "Ali Can", "Ayşe Nur") için her kelimenin başını
+            // büyüt
+            String[] parts = lowerAll.split("\\s+");
+            StringBuilder sb = new StringBuilder();
+
+            for (String part : parts) {
+                if (part.isEmpty()) {
+                    continue;
+                }
+                String first = part.substring(0, 1).toUpperCase(tr);
+                String rest = "";
+                if (part.length() > 1) {
+                    rest = part.substring(1); // zaten lowerAll olduğu için küçük kalacak
+                }
+                if (sb.length() > 0) {
+                    sb.append(' ');
+                }
+                sb.append(first).append(rest);
+            }
+
+            return sb.toString();
         }
     }
 

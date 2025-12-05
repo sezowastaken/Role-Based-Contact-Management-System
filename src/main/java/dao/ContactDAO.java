@@ -75,9 +75,11 @@ public class ContactDAO {
         try {
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
+            String firstName = normalizeName(contact.getFirstName());
+            String lastName = normalizeName(contact.getLastName());
 
-            ps.setString(1, contact.getFirstName());
-            ps.setString(2, contact.getLastName());
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
             ps.setString(3, contact.getNickname());
             ps.setString(4, contact.getPhoneNumber());
             ps.setString(5, contact.getEmail());
@@ -117,8 +119,11 @@ public class ContactDAO {
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, contact.getFirstName());
-            ps.setString(2, contact.getLastName());
+            String firstName = normalizeName(contact.getFirstName());
+            String lastName = normalizeName(contact.getLastName());
+
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
             ps.setString(3, contact.getNickname());
             ps.setString(4, contact.getPhoneNumber());
             ps.setString(5, contact.getEmail());
@@ -139,6 +144,30 @@ public class ContactDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * İsim/soyisim alanını normalize eder:
+     * İlk harf BÜYÜK, kalan tüm harfler küçük olur.
+     * Örnek: "aHMeT" -> "Ahmet", "YILMAZ" -> "Yilmaz"
+     */
+    private String normalizeName(String name) {
+        if (name == null) {
+            return null;
+        }
+
+        name = name.trim();
+        if (name.isEmpty()) {
+            return name;
+        }
+
+        if (name.length() == 1) {
+            return name.toUpperCase();
+        }
+
+        String firstChar = name.substring(0, 1).toUpperCase();
+        String rest = name.substring(1).toLowerCase();
+        return firstChar + rest;
     }
 
     /**
@@ -280,7 +309,8 @@ public class ContactDAO {
 
     /**
      * It returns all contacts sorted by the selected field.
-     * sortField: "first_name", "last_name", "phone", "birth_date", "created_at", etc.
+     * sortField: "first_name", "last_name", "phone", "birth_date", "created_at",
+     * etc.
      * Only allowed fields are used; otherwise, contact_id is used.
      */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
@@ -454,7 +484,8 @@ public class ContactDAO {
     }
 
     /**
-     * Returns a map of all first names and their counts (how many people have the same first name).
+     * Returns a map of all first names and their counts (how many people have the
+     * same first name).
      * Groups by first_name and counts occurrences.
      * Returns LinkedHashMap ordered by count DESC, then by first_name ASC.
      */
@@ -495,7 +526,8 @@ public class ContactDAO {
     }
 
     /**
-     * Returns a map of birth months and their counts (how many people were born in each month).
+     * Returns a map of birth months and their counts (how many people were born in
+     * each month).
      * Keys are month names (January, February, etc.) and values are counts.
      * Returns LinkedHashMap ordered by count DESC, then by month number ASC.
      */
@@ -504,10 +536,10 @@ public class ContactDAO {
         String sql = "SELECT MONTH(birth_date) AS month_num, COUNT(*) AS cnt " +
                 "FROM contacts WHERE birth_date IS NOT NULL " +
                 "GROUP BY MONTH(birth_date) ORDER BY cnt DESC, month_num ASC";
-        
-        String[] monthNames = {"", "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"};
-        
+
+        String[] monthNames = { "", "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December" };
+
         try {
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -537,20 +569,20 @@ public class ContactDAO {
         ageGroups.put("19-30", 0);
         ageGroups.put("31-50", 0);
         ageGroups.put("50+", 0);
-        
+
         String sql = "SELECT birth_date FROM contacts WHERE birth_date IS NOT NULL";
         try {
             Connection conn = DatabaseConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
+
             LocalDate today = LocalDate.now();
             while (rs.next()) {
                 Date birthDate = rs.getDate("birth_date");
                 if (birthDate != null) {
                     LocalDate birth = birthDate.toLocalDate();
                     int age = Period.between(birth, today).getYears();
-                    
+
                     if (age >= 0 && age <= 18) {
                         ageGroups.put("0-18", ageGroups.get("0-18") + 1);
                     } else if (age >= 19 && age <= 30) {
