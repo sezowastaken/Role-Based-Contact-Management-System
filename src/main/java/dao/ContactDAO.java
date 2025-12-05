@@ -164,17 +164,19 @@ public class ContactDAO {
 
     /**
      * İsme göre arama yapar (first_name LIKE %query%).
+     * Türkçe karakter desteği ile.
      */
     public List<Contact> searchByFirstName(String query) {
-        String sql = "SELECT * FROM contacts WHERE first_name LIKE ?";
+        String sql = "SELECT * FROM contacts WHERE first_name LIKE ? COLLATE utf8mb4_unicode_ci";
         return searchListWithSingleLike(sql, query);
     }
 
     /**
      * Soyisme göre arama yapar (last_name LIKE %query%).
+     * Türkçe karakter desteği ile.
      */
     public List<Contact> searchByLastName(String query) {
-        String sql = "SELECT * FROM contacts WHERE last_name LIKE ?";
+        String sql = "SELECT * FROM contacts WHERE last_name LIKE ? COLLATE utf8mb4_unicode_ci";
         return searchListWithSingleLike(sql, query);
     }
 
@@ -197,7 +199,7 @@ public class ContactDAO {
     public List<Contact> searchByFirstNameAndBirthMonth(String namePart, int month) {
         List<Contact> results = new ArrayList<>();
         String sql = "SELECT * FROM contacts " +
-                "WHERE first_name LIKE ? AND birth_date IS NOT NULL " +
+                "WHERE first_name LIKE ? COLLATE utf8mb4_unicode_ci AND birth_date IS NOT NULL " +
                 "AND MONTH(birth_date) = ?";
 
         try {
@@ -224,7 +226,7 @@ public class ContactDAO {
     public List<Contact> searchByPhoneAndEmailContains(String phonePart, String emailPart) {
         List<Contact> results = new ArrayList<>();
         String sql = "SELECT * FROM contacts " +
-                "WHERE phone_number LIKE ? AND email LIKE ?";
+                "WHERE phone_number LIKE ? AND email LIKE ? COLLATE utf8mb4_unicode_ci";
 
         try {
             Connection conn = DatabaseConnection.getConnection();
@@ -250,7 +252,7 @@ public class ContactDAO {
     public List<Contact> searchByFirstAndLastName(String firstPart, String lastPart) {
         List<Contact> results = new ArrayList<>();
         String sql = "SELECT * FROM contacts " +
-                "WHERE first_name LIKE ? AND last_name LIKE ?";
+                "WHERE first_name LIKE ? COLLATE utf8mb4_unicode_ci AND last_name LIKE ? COLLATE utf8mb4_unicode_ci";
 
         try {
             Connection conn = DatabaseConnection.getConnection();

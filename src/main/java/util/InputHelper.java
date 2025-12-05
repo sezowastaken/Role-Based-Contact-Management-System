@@ -84,6 +84,29 @@ public class InputHelper {
         }
     }
 
+    /**
+     * Reads a yes/no answer from the user.
+     * Keeps asking until the user enters 'y' or 'n'.
+     */
+    public static boolean readYesNo(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt + " (y/n): ");
+            String input = scanner.nextLine();
+            if (input == null) {
+                input = "";
+            }
+            input = input.trim().toLowerCase();
+
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            } else {
+                System.out.println(util.ConsoleColors.RED + "Please enter 'y' or 'n'." + util.ConsoleColors.RESET);
+            }
+        }
+    }
+
     private InputHelper() {
         // static util; instance oluşturulmasın
     }
