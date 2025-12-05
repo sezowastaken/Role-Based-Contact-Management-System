@@ -1,3 +1,27 @@
+-USERS-
+
+TESTER:
+username: bellingham - password: ayhan
+username: tester - password: test
+
+JUNIOR_DEV:
+username: terminatör - password: bilal | calısmıyor
+username: junior - password: junior
+
+SENIOR_DEV:
+username: dede - password: dede
+username: senior - password: senior
+
+TESTER:
+username: sezo - password: sezo
+username: manager - password: manager
+
+-RUN-
+compile:
+javac -cp "libs\mysql-connector-j-9.5.0.jar" -d out src\app\Main.java src\dao\*.java src\model\*.java src\service\*.java src\ui\menu\*.java src\ui\screen\*.java src\undo\*.java src\util\*.java
+
+run:
+java -cp "out;libs\mysql-connector-j-9.5.0.jar" app.Main
 
 ```
 Role-Based-Contact-Management-System
