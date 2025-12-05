@@ -6,6 +6,8 @@ import dao.UserDAO;
 import model.User;
 import service.ContactService;
 import service.UserService;
+import util.ConsoleColors; // Renkler eklendi
+import util.InputHelper; // InputHelper eklendi
 
 public class SeniorDevMenu extends BaseMenu {
 
@@ -39,12 +41,14 @@ public class SeniorDevMenu extends BaseMenu {
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                userService.changeOwnPasswordInteractive(currentUser, scanner);
+                // [DÜZELTME] UserService'ten sildiğimiz metodu burada lokal olarak yapıyoruz
+                handleChangePassword();
                 break;
             case "2":
                 contactService.displayAllContacts();
                 break;
             case "3":
+                // ContactService içindeki metodun artık InputHelper kullandığını varsayıyoruz
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
@@ -60,7 +64,31 @@ public class SeniorDevMenu extends BaseMenu {
                 contactService.deleteContactInteractive(scanner);
                 break;
             default:
-                System.out.println("\nInvalid choice. Please select one of the options above.");
+                System.out.println(ConsoleColors.RED + "\nInvalid choice. Please select one of the options above." + ConsoleColors.RESET);
+        }
+    }
+
+    // ==========================================
+    // ŞİFRE DEĞİŞTİRME (LOCAL IMPLEMENTATION)
+    // ==========================================
+    private void handleChangePassword() {
+        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+        
+        // InputHelper kullanarak güvenli okuma yapıyoruz
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password: ");
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New password: ");
+        
+        // İsteğe bağlı: Yeni şifre tekrarı sorulabilir
+        // String confirm = InputHelper.readNonEmptyLine(scanner, "Confirm new password: ");
+        // if (!newPass.equals(confirm)) { ... return; }
+
+        try {
+            // Saf backend metodunu çağırıyoruz
+            userService.changePassword(currentUser, oldPass, newPass);
+            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
+        } catch (Exception e) {
+            // Service'den gelen hatayı (yanlış eski şifre vb.) basıyoruz
+            System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
         }
     }
 }

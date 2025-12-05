@@ -4,14 +4,12 @@ import dao.ContactDAO;
 import model.Contact;
 import util.InputHelper;
 import util.ConsoleColors;
+import util.DateUtil;
 
-import javax.management.Query;
-
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Scanner;
 
 public class ContactService {
 
@@ -63,11 +61,11 @@ public class ContactService {
             return;
         }
         System.out.println(ConsoleColors.BLUE + "\nCONTACTS LIST" + ConsoleColors.RESET);
-        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-40s %-40s", "ID", "FIRST NAME", "LAST NAME",
+        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-35s %-35s", "ID", "FIRST NAME", "LAST NAME",
                 "PHONE", "EMAIL",
                 "LINKEDIN URL" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.WHITE +
-                "\n---------------------------------------------------------------------------------------------------------------"
+                "\n-------------------------------------------------------------------------------------------------------------------------------"
                 + ConsoleColors.RESET);
 
         for (Contact contact : contacts) {
@@ -78,7 +76,7 @@ public class ContactService {
             String email = contact.getEmail() != null ? contact.getEmail() : "-";
             String url = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "-";
 
-            System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-40s %-40s%n", id, firstName, lastName,
+            System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-35s %-35s%n", id, firstName, lastName,
                     phone, email, url + ConsoleColors.RESET);
 
         }
@@ -117,7 +115,7 @@ public class ContactService {
                 System.out.println(ConsoleColors.RED + "Search cancelled." + ConsoleColors.RESET);
                 return;
             case 1: {
-                String first = InputHelper.readNonEmptyLine(scanner, ConsoleColors.CYAN + "First name contains: ");
+                String first = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "First name contains: ");
                 results = searchByFirstName(first);
                 break;
             }
@@ -144,8 +142,8 @@ public class ContactService {
                 break;
             }
             case 6: {
-                String firstPart = InputHelper.readNonEmptyLine(scanner, "First name contains: ");
-                String lastPart = InputHelper.readNonEmptyLine(scanner, "Last name contains: " + ConsoleColors.RESET);
+                String firstPart = InputHelper.readValidName(scanner, "First name contains: ");
+                String lastPart = InputHelper.readValidName(scanner, "Last name contains: " + ConsoleColors.RESET);
                 results = searchByFirstAndLastName(firstPart, lastPart);
                 break;
             }
@@ -196,7 +194,7 @@ public class ContactService {
         printContactsList(contacts);
     }
 
-    // ===================== UPDATE =====================
+    // ===================== UPDATE (Validasyonlu) =====================
     public void updateContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===");
         int id = InputHelper.readIntInRange(scanner, "Contact ID to update (0 = cancel): " + ConsoleColors.RESET, 0,
@@ -230,73 +228,90 @@ public class ContactService {
                 email, url + ConsoleColors.RESET);
 
         // Confirmation before update
-        String confirm = InputHelper.readLine(scanner,
-                ConsoleColors.BLUE + "\nDo you want to update this contact? " + ConsoleColors.RESET
-                        + ConsoleColors.GREEN + "(y" + ConsoleColors.RESET + "/" + ConsoleColors.RED + "N): "
-                        + ConsoleColors.RESET);
-        if (!confirm.trim().equalsIgnoreCase("y")) {
+        if (!InputHelper.readYesNo(scanner, ConsoleColors.BLUE + "\nDo you want to update this contact?" + ConsoleColors.RESET)) {
             System.out.println(ConsoleColors.RED + "Update cancelled." + ConsoleColors.RESET);
             return;
         }
 
         System.out.println(ConsoleColors.YELLOW
-                + "\nPress Enter to keep current value. Enter 'skip' to skip date field." + ConsoleColors.RESET);
+                + "\nEnter new values (Press Enter to keep current)." + ConsoleColors.RESET);
 
-        String first = InputHelper.readLine(scanner,
-                ConsoleColors.CYAN + "First name [" + (existing.getFirstName() == null ? "" : existing.getFirstName())
-                        + "]: ");
-        if (!first.isEmpty())
-            existing.setFirstName(first);
-
-        // Optional, validated last name
+        // 1. İsim (While Döngüsüyle Zorlama)
         while (true) {
-            String last = InputHelper.readLine(scanner,
-                    "Last name [" + (existing.getLastName() == null ? "" : existing.getLastName()) + "]: ");
-            if (last.isEmpty())
-                break; // keep current
-            if (last.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
-                existing.setLastName(last);
+            System.out.print(ConsoleColors.CYAN + "First name [" + existing.getFirstName() + "]: ");
+            String fInput = scanner.nextLine().trim();
+            if (fInput.isEmpty()) break; // Boşsa eskiyi koru
+            if (fInput.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
+                existing.setFirstName(fInput);
                 break;
             } else {
-                System.out.println(
-                        ConsoleColors.RED + "Invalid input. Please use only letters and spaces." + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.RED + "Error: Name must contain only letters." + ConsoleColors.RESET);
             }
         }
 
+        // 2. Soyisim
+        while (true) {
+            System.out.print("Last name [" + existing.getLastName() + "]: ");
+            String lInput = scanner.nextLine().trim();
+            if (lInput.isEmpty()) break;
+            if (lInput.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
+                existing.setLastName(lInput);
+                break;
+            } else {
+                System.out.println(ConsoleColors.RED + "Error: Name must contain only letters." + ConsoleColors.RESET);
+            }
+        }
+
+        // Nickname (Opsiyonel)
         String nick = InputHelper.readLine(scanner,
                 "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ");
-        if (!nick.isEmpty())
-            existing.setNickname(nick);
+        if (!nick.isEmpty()) existing.setNickname(nick);
 
-        String phoneNew = InputHelper.readLine(scanner,
-                "Phone number [" + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "]: ");
-        if (!phoneNew.isEmpty())
-            existing.setPhoneNumber(phoneNew);
+        // 3. Telefon
+        while (true) {
+            System.out.print("Phone [" + existing.getPhoneNumber() + "]: ");
+            String pInput = scanner.nextLine().trim();
+            if (pInput.isEmpty()) break;
+            
+            String clean = pInput.replaceAll("[^0-9]", "");
+            if (clean.length() == 11 && clean.startsWith("0")) clean = clean.substring(1);
+            if (clean.matches("^5[0-9]{9}$")) {
+                existing.setPhoneNumber(clean);
+                break;
+            }
+            System.out.println(ConsoleColors.RED + "Invalid phone! Must be 5xxxxxxxxx." + ConsoleColors.RESET);
+        }
 
-        String emailNew = InputHelper.readLine(scanner,
-                "Email [" + (existing.getEmail() == null ? "" : existing.getEmail()) + "]: ");
-        if (!emailNew.isEmpty())
-            existing.setEmail(emailNew);
+        // 4. Email
+        while (true) {
+            System.out.print("Email [" + existing.getEmail() + "]: ");
+            String eInput = scanner.nextLine().trim();
+            if (eInput.isEmpty()) break;
+            if (eInput.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                existing.setEmail(eInput);
+                break;
+            }
+            System.out.println(ConsoleColors.RED + "Invalid email format!" + ConsoleColors.RESET);
+        }
 
-        String linkedin = InputHelper.readLine(scanner,
-                "LinkedIn URL [" + (existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl()) + "]: "
-                        + ConsoleColors.RESET);
-        if (!linkedin.isEmpty())
-            existing.setLinkedinUrl(linkedin);
+        // 5. LinkedIn (Update - Akıllı)
+        String currentLi = existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl();
+        String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL [" + currentLi + "] (or 'skip')");
+        if (linkedin != null) existing.setLinkedinUrl(linkedin);
 
+        // 6. Tarih
         String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString();
         while (true) {
             String bd = InputHelper.readLine(scanner,
-                    "Birth date (YYYY-MM-DD) [" + currentBirth + "] (empty to keep, 'skip' to proceed): ");
-            if (bd.isEmpty() || bd.equalsIgnoreCase("skip"))
+                    "Birth date (dd.MM.yyyy) [" + currentBirth + "] (empty to keep, 'skip' to proceed): ");
+            if (bd.isEmpty() || bd.equalsIgnoreCase("skip")) break;
+            
+            String error = DateUtil.checkDateValidity(bd);
+            if (error == null) {
+                existing.setBirthDate(DateUtil.parse(bd));
                 break;
-            try {
-                LocalDate d = LocalDate.parse(bd);
-                existing.setBirthDate(d);
-                break;
-            } catch (DateTimeParseException e) {
-                System.out.println(ConsoleColors.RED + "Invalid date format. Use YYYY-MM-DD or enter 'skip'."
-                        + ConsoleColors.RESET);
+            } else {
+                System.out.println(ConsoleColors.RED + error + ConsoleColors.RESET);
             }
         }
 
@@ -308,7 +323,7 @@ public class ContactService {
         }
     }
 
-    // ===================== ADD =====================
+    // ===================== ADD (Validasyonlu) =====================
     public void addContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.WHITE + "\n=== Add New Contact ===");
 
@@ -317,86 +332,48 @@ public class ContactService {
             String first = InputHelper.readValidName(scanner, "First name: ");
             String last = InputHelper.readValidName(scanner, "Last name: ");
 
-            String nick = "";
-            while (true) {
-                nick = InputHelper.readLine(scanner, "Nickname (optional, or 'skip'): ");
-                if (nick.equalsIgnoreCase("skip")) {
-                    nick = "";
-                    break;
-                }
-                break;
-            }
+            String nick = InputHelper.readLine(scanner, "Nickname (optional, or 'skip'): ");
+            if (nick.equalsIgnoreCase("skip")) nick = null;
 
-            String phone = InputHelper.readNonEmptyLine(scanner, "Phone number: ");
+            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number");
+            String email = InputHelper.readValidEmail(scanner, "Email: ");
 
-            String email = "";
-            while (true) {
-                email = InputHelper.readLine(scanner, "Email (optional, or 'skip'): ");
-                if (email.equalsIgnoreCase("skip")) {
-                    email = "";
-                    break;
-                }
-                break;
-            }
+            // LinkedIn (Akıllı)
+            String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL (optional)");
 
-            String linkedin = "";
-            while (true) {
-                linkedin = InputHelper.readLine(scanner, "LinkedIn URL (optional, or 'skip'): ");
-                if (linkedin.equalsIgnoreCase("skip")) {
-                    linkedin = "";
-                    break;
-                }
-                break;
-            }
-
-            LocalDate birthDate = null;
-            while (true) {
-                String bd = InputHelper.readLine(scanner, "Birth date (YYYY-MM-DD, or 'skip'): " + ConsoleColors.RESET);
-                if (bd.isEmpty() || bd.equalsIgnoreCase("skip"))
-                    break;
-                try {
-                    birthDate = LocalDate.parse(bd);
-                    break;
-                } catch (DateTimeParseException e) {
-                    System.out.println("Invalid date format. Use YYYY-MM-DD or enter 'skip'.");
-                }
-            }
+            LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date");
 
             // Display preview
             System.out.println("\nContact preview:");
             System.out.printf("  First Name: %s%n", first);
             System.out.printf("  Last Name: %s%n", last);
-            System.out.printf("  Nickname: %s%n", nick.isEmpty() ? "-" : nick);
             System.out.printf("  Phone: %s%n", phone);
-            System.out.printf("  Email: %s%n", email.isEmpty() ? "-" : email);
-            System.out.printf("  LinkedIn: %s%n", linkedin.isEmpty() ? "-" : linkedin);
-            System.out.printf("  Birth Date: %s%n", birthDate == null ? "-" : birthDate.toString());
+            System.out.printf("  Email: %s%n", email);
+            System.out.printf("  LinkedIn: %s%n", linkedin == null ? "-" : linkedin);
+            System.out.printf("  Birth Date: %s%n", birthDate);
 
-            String confirm = InputHelper.readLine(scanner, "\nConfirm adding this contact? (y/N): ");
-            if (confirm.trim().equalsIgnoreCase("y")) {
+            if (InputHelper.readYesNo(scanner, "\nConfirm adding this contact?")) {
                 Contact c = new Contact();
                 c.setFirstName(first);
                 c.setLastName(last);
-                c.setNickname(nick.isEmpty() ? null : nick);
+                c.setNickname(nick);
                 c.setPhoneNumber(phone);
-                c.setEmail(email.isEmpty() ? null : email);
-                c.setLinkedinUrl(linkedin.isEmpty() ? null : linkedin);
+                c.setEmail(email);
+                c.setLinkedinUrl(linkedin);
                 c.setBirthDate(birthDate);
 
                 boolean ok = contactDAO.insertContact(c);
                 if (ok) {
-                    System.out.println("\n✓ Contact added successfully.");
+                    System.out.println(ConsoleColors.GREEN + "\n✓ Contact added successfully." + ConsoleColors.RESET);
                     adding = false;
                 } else {
-                    System.out.println("\n✗ Failed to add contact. Try again? (y/N): ");
-                    String retry = InputHelper.readLine(scanner, "");
-                    if (!retry.trim().equalsIgnoreCase("y")) {
+                    System.out.println(ConsoleColors.RED + "\n✗ Failed to add contact." + ConsoleColors.RESET);
+                    if (!InputHelper.readYesNo(scanner, "Try again?")) {
                         adding = false;
                     }
                 }
             } else {
-                String continueAdding = InputHelper.readLine(scanner, "Edit again? (y/N): ");
-                if (!continueAdding.trim().equalsIgnoreCase("y")) {
+                if (!InputHelper.readYesNo(scanner, "Edit again?")) {
                     System.out.println("Add contact cancelled.");
                     adding = false;
                 }
@@ -407,6 +384,9 @@ public class ContactService {
     // ===================== DELETE =====================
     public void deleteContactInteractive(Scanner scanner) {
         System.out.println("\n=== Delete Contact ===");
+        
+        displayAllContacts(); 
+
         int id = InputHelper.readIntInRange(scanner, "Contact ID to delete (0 = cancel): ", 0, Integer.MAX_VALUE);
         if (id == 0) {
             System.out.println("Delete cancelled.");
@@ -433,9 +413,8 @@ public class ContactService {
         System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone,
                 email, url);
 
-        // Double confirmation before delete
-        String confirm1 = InputHelper.readLine(scanner, "\nAre you sure you want to delete this contact? (y/N): ");
-        if (!confirm1.trim().equalsIgnoreCase("y")) {
+        // Double confirmation
+        if (!InputHelper.readYesNo(scanner, ConsoleColors.RED + "\nAre you sure you want to delete this contact?" + ConsoleColors.RESET)) {
             System.out.println("Delete cancelled.");
             return;
         }
@@ -448,9 +427,9 @@ public class ContactService {
 
         boolean ok = contactDAO.deleteContact(id);
         if (ok) {
-            System.out.println("\n✓ Contact deleted successfully.");
+            System.out.println(ConsoleColors.GREEN + "\n✓ Contact deleted successfully." + ConsoleColors.RESET);
         } else {
-            System.out.println("\n✗ Failed to delete contact.");
+            System.out.println(ConsoleColors.RED + "\n✗ Failed to delete contact." + ConsoleColors.RESET);
         }
     }
 
