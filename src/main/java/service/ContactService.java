@@ -3,9 +3,9 @@ package service;
 import dao.ContactDAO;
 import model.Contact;
 import util.InputHelper;
-
 import java.util.List;
 import java.util.Scanner;
+import util.ConsoleColors;
 
 import javax.management.Query;
 
@@ -27,23 +27,28 @@ public class ContactService {
     public List<Contact> searchByFirstName(String query) {
         return contactDAO.searchByFirstName(query);
     }
-    
+
     public List<Contact> searchByLastName(String query) {
         return contactDAO.searchByLastName(query);
     }
+
     public List<Contact> searchByPhoneContains(String digits) {
         return contactDAO.searchByPhoneContains(digits);
     }
 
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
-            System.out.println("No contacts found.");
+            System.out.println(ConsoleColors.RED + "No contacts found." + ConsoleColors.RESET);
             return;
         }
-        System.out.println("\nCONTACTS LIST");
-        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
-        System.out.println("\n---------------------------------------------------------------------------------------------------------------");
-        
+        System.out.println(ConsoleColors.BLUE + "\nCONTACTS LIST" + ConsoleColors.RESET);
+        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-40s %-40s", "ID", "FIRST NAME", "LAST NAME",
+                "PHONE", "EMAIL",
+                "LINKEDIN URL");
+        System.out.println(
+                "\n---------------------------------------------------------------------------------------------------------------"
+                        + ConsoleColors.RESET);
+
         for (Contact contact : contacts) {
             int id = contact.getContactId();
             String firstName = contact.getFirstName() != null ? contact.getFirstName() : "-";
@@ -52,10 +57,12 @@ public class ContactService {
             String email = contact.getEmail() != null ? contact.getEmail() : "-";
             String url = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "-";
 
-            System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", id, firstName, lastName, phone, email, url);
+            System.out.printf(ConsoleColors.WHITE + "%-5d %-15s %-15s %-15s %-40s %-40s%n", id, firstName, lastName,
+                    phone, email, url + ConsoleColors.RESET);
 
         }
-        System.out.println("\n Total " + contacts.size() + " contact(s) found.");
+        System.out.println(
+                ConsoleColors.GREEN + "\n Total " + contacts.size() + " contact(s) found." + ConsoleColors.RESET);
     }
 
     public void displayAllContacts() {
@@ -67,7 +74,8 @@ public class ContactService {
     /**
      * Interactive search flow:
      * lets the user choose which field to search and then delegates to the
-     * existing search methods (searchByFirstName, searchByLastName, searchByPhoneContains).
+     * existing search methods (searchByFirstName, searchByLastName,
+     * searchByPhoneContains).
      */
     public void searchContactsInteractive(Scanner scanner) {
         System.out.println("\n=== Search Contacts ===");
@@ -109,38 +117,43 @@ public class ContactService {
 
     /**
      * Interactive sort flow:
-     * lets the user choose field + order and then calls getAllSorted + printContactsList.
+     * lets the user choose field + order and then calls getAllSorted +
+     * printContactsList.
      */
     public void sortContactsInteractive(Scanner scanner) {
-        System.out.println("\n=== Sort Contacts ===");
+        System.out.println(ConsoleColors.WHITE + "\n=== Sort Contacts ===");
         System.out.println("1 - Sort by first name");
         System.out.println("2 - Sort by last name");
         System.out.println("3 - Sort by phone number");
-        System.out.println("0 - Cancel");
+        System.out.println("0 - Cancel" + ConsoleColors.RESET);
 
         int field = InputHelper.readIntInRange(scanner, "Field: ", 0, 3);
         if (field == 0) {
-            System.out.println("Sort cancelled.");
+            System.out.println(ConsoleColors.RED + "Sort cancelled." + ConsoleColors.RESET);
             return;
         }
 
-        System.out.println("1 - Ascending");
-        System.out.println("2 - Descending");
-        int order = InputHelper.readIntInRange(scanner, "Order: ", 1, 2);
+        System.out.println(ConsoleColors.YELLOW + "1 - Ascending");
+        System.out.println("2 - Descending" + ConsoleColors.RESET);
+        int order = InputHelper.readIntInRange(
+                scanner,
+                ConsoleColors.BLUE + "Order: " + ConsoleColors.RESET,
+                1,
+                2);
 
         String sortField;
         switch (field) {
             case 1:
-                sortField = "first_name";
+                sortField = ConsoleColors.WHITE + "first_name";
                 break;
             case 2:
                 sortField = "last_name";
                 break;
             case 3:
-                sortField = "phone_number";
+                sortField = "phone_number" + ConsoleColors.RESET;
                 break;
             default:
-                System.out.println("Invalid field.");
+                System.out.println(ConsoleColors.RED + "Invalid field." + ConsoleColors.RESET);
                 return;
         }
 
@@ -151,7 +164,7 @@ public class ContactService {
     }
 
     public void updateContactInteractive(Scanner scanner) {
-    System.out.println("[TODO] Update existing contact (Junior/Senior).");
+        System.out.println("[TODO] Update existing contact (Junior/Senior).");
     }
 
     public void addContactInteractive(Scanner scanner) {
