@@ -1,1 +1,24 @@
-.build/
+# Maven build output
+target/
+
+# Eski manuel derleme çıktıları
+out/
+
+
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS çöpü
+.DS_Store
+Thumbs.db
