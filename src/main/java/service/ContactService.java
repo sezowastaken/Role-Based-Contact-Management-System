@@ -6,6 +6,8 @@ import util.InputHelper;
 
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class ContactService {
     private final ContactDAO contactDAO;
@@ -188,15 +190,216 @@ public class ContactService {
     }
 
     public void updateContactInteractive(Scanner scanner) {
-    System.out.println("[TODO] Update existing contact (Junior/Senior).");
+        System.out.println("\n=== Update Contact ===");
+        int id = InputHelper.readIntInRange(scanner, "Contact ID to update (0 = cancel): ", 0, Integer.MAX_VALUE);
+        if (id == 0) {
+            System.out.println("Update cancelled.");
+            return;
+        }
+
+        Contact existing = contactDAO.getContactById(id);
+        if (existing == null) {
+            System.out.println("Contact not found with ID: " + id);
+            return;
+        }
+
+        // Display contact in table format
+        System.out.println("\nContact to update:");
+        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
+        System.out.println("---------------------------------------------------------------------------------------------------------------");
+        String firstName = existing.getFirstName() != null ? existing.getFirstName() : "-";
+        String lastName = existing.getLastName() != null ? existing.getLastName() : "-";
+        String phone = existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-";
+        String email = existing.getEmail() != null ? existing.getEmail() : "-";
+        String url = existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-";
+        System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone, email, url);
+
+        // Confirmation before update
+        String confirm = InputHelper.readLine(scanner, "\nDo you want to update this contact? (y/N): ");
+        if (!confirm.trim().equalsIgnoreCase("y")) {
+            System.out.println("Update cancelled.");
+            return;
+        }
+
+        System.out.println("\nPress Enter to keep current value. Enter 'skip' to skip date field.");
+
+        String first = InputHelper.readLine(scanner, "First name [" + (existing.getFirstName() == null ? "" : existing.getFirstName()) + "]: ");
+        if (!first.isEmpty()) existing.setFirstName(first);
+
+        String last = InputHelper.readLine(scanner, "Last name [" + (existing.getLastName() == null ? "" : existing.getLastName()) + "]: ");
+        if (!last.isEmpty()) existing.setLastName(last);
+
+        String nick = InputHelper.readLine(scanner, "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ");
+        if (!nick.isEmpty()) existing.setNickname(nick);
+
+        String phoneNew = InputHelper.readLine(scanner, "Phone number [" + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "]: ");
+        if (!phoneNew.isEmpty()) existing.setPhoneNumber(phoneNew);
+
+        String emailNew = InputHelper.readLine(scanner, "Email [" + (existing.getEmail() == null ? "" : existing.getEmail()) + "]: ");
+        if (!emailNew.isEmpty()) existing.setEmail(emailNew);
+
+        String linkedin = InputHelper.readLine(scanner, "LinkedIn URL [" + (existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl()) + "]: ");
+        if (!linkedin.isEmpty()) existing.setLinkedinUrl(linkedin);
+
+        String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString();
+        while (true) {
+            String bd = InputHelper.readLine(scanner, "Birth date (YYYY-MM-DD) [" + currentBirth + "] (empty to keep, 'skip' to proceed): ");
+            if (bd.isEmpty() || bd.equalsIgnoreCase("skip")) break;
+            try {
+                LocalDate d = LocalDate.parse(bd);
+                existing.setBirthDate(d);
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Use YYYY-MM-DD or enter 'skip'.");
+            }
+        }
+
+        boolean ok = contactDAO.updateContact(existing);
+        if (ok) {
+            System.out.println("\n✓ Contact updated successfully.");
+        } else {
+            System.out.println("\n✗ Failed to update contact.");
+        }
     }
 
     public void addContactInteractive(Scanner scanner) {
-        System.out.println("[TODO] Add new contact(s) (Senior).");
+        System.out.println("\n=== Add New Contact ===");
+        
+        boolean adding = true;
+        while (adding) {
+            String first = InputHelper.readNonEmptyLine(scanner, "First name: ");
+            String last = InputHelper.readNonEmptyLine(scanner, "Last name: ");
+            
+            String nick = "";
+            while (true) {
+                nick = InputHelper.readLine(scanner, "Nickname (optional, or 'skip'): ");
+                if (nick.equalsIgnoreCase("skip")) {
+                    nick = "";
+                    break;
+                }
+                break;
+            }
+            
+            String phone = InputHelper.readNonEmptyLine(scanner, "Phone number: ");
+            
+            String email = "";
+            while (true) {
+                email = InputHelper.readLine(scanner, "Email (optional, or 'skip'): ");
+                if (email.equalsIgnoreCase("skip")) {
+                    email = "";
+                    break;
+                }
+                break;
+            }
+            
+            String linkedin = "";
+            while (true) {
+                linkedin = InputHelper.readLine(scanner, "LinkedIn URL (optional, or 'skip'): ");
+                if (linkedin.equalsIgnoreCase("skip")) {
+                    linkedin = "";
+                    break;
+                }
+                break;
+            }
+
+            LocalDate birthDate = null;
+            while (true) {
+                String bd = InputHelper.readLine(scanner, "Birth date (YYYY-MM-DD, or 'skip'): ");
+                if (bd.isEmpty() || bd.equalsIgnoreCase("skip")) break;
+                try {
+                    birthDate = LocalDate.parse(bd);
+                    break;
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid date format. Use YYYY-MM-DD or enter 'skip'.");
+                }
+            }
+
+            // Display preview
+            System.out.println("\nContact preview:");
+            System.out.printf("  First Name: %s%n", first);
+            System.out.printf("  Last Name: %s%n", last);
+            System.out.printf("  Nickname: %s%n", nick.isEmpty() ? "-" : nick);
+            System.out.printf("  Phone: %s%n", phone);
+            System.out.printf("  Email: %s%n", email.isEmpty() ? "-" : email);
+            System.out.printf("  LinkedIn: %s%n", linkedin.isEmpty() ? "-" : linkedin);
+            System.out.printf("  Birth Date: %s%n", birthDate == null ? "-" : birthDate.toString());
+
+            String confirm = InputHelper.readLine(scanner, "\nConfirm adding this contact? (y/N): ");
+            if (confirm.trim().equalsIgnoreCase("y")) {
+                Contact c = new Contact();
+                c.setFirstName(first);
+                c.setLastName(last);
+                c.setNickname(nick.isEmpty() ? null : nick);
+                c.setPhoneNumber(phone);
+                c.setEmail(email.isEmpty() ? null : email);
+                c.setLinkedinUrl(linkedin.isEmpty() ? null : linkedin);
+                c.setBirthDate(birthDate);
+
+                boolean ok = contactDAO.insertContact(c);
+                if (ok) {
+                    System.out.println("\n✓ Contact added successfully.");
+                    adding = false;
+                } else {
+                    System.out.println("\n✗ Failed to add contact. Try again? (y/N): ");
+                    String retry = InputHelper.readLine(scanner, "");
+                    if (!retry.trim().equalsIgnoreCase("y")) {
+                        adding = false;
+                    }
+                }
+            } else {
+                String continueAdding = InputHelper.readLine(scanner, "Edit again? (y/N): ");
+                if (!continueAdding.trim().equalsIgnoreCase("y")) {
+                    System.out.println("Add contact cancelled.");
+                    adding = false;
+                }
+            }
+        }
     }
 
     public void deleteContactInteractive(Scanner scanner) {
-        System.out.println("[TODO] Delete existing contact(s) (Senior).");
+        System.out.println("\n=== Delete Contact ===");
+        int id = InputHelper.readIntInRange(scanner, "Contact ID to delete (0 = cancel): ", 0, Integer.MAX_VALUE);
+        if (id == 0) {
+            System.out.println("Delete cancelled.");
+            return;
+        }
+
+        Contact existing = contactDAO.getContactById(id);
+        if (existing == null) {
+            System.out.println("Contact not found with ID: " + id);
+            return;
+        }
+
+        // Display contact in table format
+        System.out.println("\nContact to delete:");
+        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
+        System.out.println("---------------------------------------------------------------------------------------------------------------");
+        String firstName = existing.getFirstName() != null ? existing.getFirstName() : "-";
+        String lastName = existing.getLastName() != null ? existing.getLastName() : "-";
+        String phone = existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-";
+        String email = existing.getEmail() != null ? existing.getEmail() : "-";
+        String url = existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-";
+        System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone, email, url);
+
+        // Double confirmation before delete
+        String confirm1 = InputHelper.readLine(scanner, "\nAre you sure you want to delete this contact? (y/N): ");
+        if (!confirm1.trim().equalsIgnoreCase("y")) {
+            System.out.println("Delete cancelled.");
+            return;
+        }
+
+        String confirm2 = InputHelper.readLine(scanner, "This action cannot be undone. Type 'DELETE' to confirm: ");
+        if (!confirm2.trim().equals("DELETE")) {
+            System.out.println("Delete cancelled.");
+            return;
+        }
+
+        boolean ok = contactDAO.deleteContact(id);
+        if (ok) {
+            System.out.println("\n✓ Contact deleted successfully.");
+        } else {
+            System.out.println("\n✗ Failed to delete contact.");
+        }
     }
 
 }
