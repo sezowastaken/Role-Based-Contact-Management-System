@@ -159,7 +159,7 @@ public class ContactService {
 
     // ===================== SORT =====================
     public void sortContactsInteractive(Scanner scanner) {
-        System.out.println(ConsoleColors.WHITE + "\n=== Sort Contacts ===" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.CYAN + "\n=== Sort Contacts ===");
         System.out.println("1 - Sort by first name");
         System.out.println("2 - Sort by last name");
         System.out.println("3 - Sort by phone number");
@@ -239,22 +239,14 @@ public class ContactService {
             return;
         }
 
-        System.out.println("\nPress Enter to keep current value.");
+        System.out.println(ConsoleColors.YELLOW
+                + "\nPress Enter to keep current value. Enter 'skip' to skip date field." + ConsoleColors.RESET);
 
-        // Optional, validated first name
-        while (true) {
-            String first = InputHelper.readLine(scanner,
-                    "First name [" + (existing.getFirstName() == null ? "" : existing.getFirstName()) + "]: ");
-            if (first.isEmpty())
-                break; // keep current
-            if (first.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
-                existing.setFirstName(first);
-                break;
-            } else {
-                System.out.println(
-                        ConsoleColors.RED + "Invalid input. Please use only letters and spaces." + ConsoleColors.RESET);
-            }
-        }
+        String first = InputHelper.readLine(scanner,
+                ConsoleColors.CYAN + "First name [" + (existing.getFirstName() == null ? "" : existing.getFirstName())
+                        + "]: ");
+        if (!first.isEmpty())
+            existing.setFirstName(first);
 
         // Optional, validated last name
         while (true) {
@@ -287,7 +279,8 @@ public class ContactService {
             existing.setEmail(emailNew);
 
         String linkedin = InputHelper.readLine(scanner,
-                "LinkedIn URL [" + (existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl()) + "]: ");
+                "LinkedIn URL [" + (existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl()) + "]: "
+                        + ConsoleColors.RESET);
         if (!linkedin.isEmpty())
             existing.setLinkedinUrl(linkedin);
 
