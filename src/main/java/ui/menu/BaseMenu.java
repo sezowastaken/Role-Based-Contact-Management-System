@@ -3,6 +3,7 @@ package ui.menu;
 import model.User;
 import util.ConsoleColors;
 import util.InputHelper;
+import undo.UndoManager;
 
 import java.util.Scanner;
 
@@ -24,6 +25,7 @@ public abstract class BaseMenu {
 
     protected final User currentUser;
     protected final Scanner scanner;
+    private boolean undoAvailable;
 
     protected BaseMenu(User currentUser, Scanner scanner) {
         this.currentUser = currentUser;
@@ -106,4 +108,12 @@ public abstract class BaseMenu {
      * Tries to clear the console screen. On unsupported terminals,
      * it will simply behave like several empty lines.
      */
+
+    protected boolean isUndoAvailable() {
+        return undoAvailable;
+    }
+
+    protected void setUndoAvailable(boolean undoAvailable) {
+        this.undoAvailable = undoAvailable;
+    }
 }
