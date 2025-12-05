@@ -33,7 +33,6 @@ public class UserService {
 
     /**
      * Handles password change logic.
-     * Throws exceptions if validation fails.
      */
     public void changePassword(User user, String oldPassword, String newPassword) {
         if (user == null) {
@@ -52,8 +51,8 @@ public class UserService {
         // 2. Yeni şifreyi hashle
         String newHash = HashUtil.hash(newPassword);
         
-        // 3. Veritabanını güncelle
-        boolean ok = userDAO.updatePassword(user.getUserId(), newHash); 
+        // 3. Veritabanını güncelle ([DÜZELTME] getUserId() -> getId())
+        boolean ok = userDAO.updatePassword(user.getId(), newHash); 
         if (!ok) {
             throw new IllegalStateException("Database error: Failed to update password.");
         }
@@ -64,17 +63,15 @@ public class UserService {
 
     /**
      * Creates a new user (Used by Manager).
-     * Includes Strict Validation.
      */
     public void createUser(String username, String rawPassword,
                            String firstName, String lastName,
                            Role role) {
         
-        // --- VALIDATION KATMANI ---
+        // --- VALIDATION ---
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be empty.");
         }
-        // Username Regex: Sadece harf, rakam, alt çizgi ve nokta
         if (!username.matches("^[A-Za-z0-9_.]+$")) {
             throw new IllegalArgumentException("Username contains invalid characters (Only letters, numbers, _, . allowed).");
         }
@@ -85,29 +82,30 @@ public class UserService {
             throw new IllegalArgumentException("Role cannot be null.");
         }
 
-        // --- DATABASE KONTROLÜ ---
+        // --- DATABASE CHECK ---
         if (userDAO.existsByUsername(username, null)) {
             throw new IllegalArgumentException("Username already exists: " + username);
         }
 
-        // --- İSİM KONTROLÜ ---
-        // InputHelper'da yaptığımız kontrolü burada da yapıyoruz (Çift dikiş güvenlik)
-        if (firstName != null && !firstName.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
+        // --- NAME CHECK ---
+        if (firstName != null && !firstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
             throw new IllegalArgumentException("First name must contain only letters.");
         }
-        if (lastName != null && !lastName.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
+        if (lastName != null && !lastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
             throw new IllegalArgumentException("Last name must contain only letters.");
         }
 
-        // --- OLUŞTURMA ---
+        // --- CREATE ---
         String hash = HashUtil.hash(rawPassword);
         
-        User user = new User();
-        user.setUsername(username.trim());
-        user.setPasswordHash(hash);
-        user.setName(firstName != null ? firstName.trim() : "");
-        user.setSurname(lastName != null ? lastName.trim() : "");
-        user.setRole(role);
+        // ID 0 veriyoruz (DB auto-increment)
+        // User constructor'ına createdAt (LocalDateTime) eklendiği için null veya now() göndermeliyiz
+        // Eğer User constructor'ın (int, String, String, String, String, Role, LocalDateTime) ise:
+        User user = new User(0, username.trim(), hash, 
+                             firstName != null ? firstName.trim() : "", 
+                             lastName != null ? lastName.trim() : "", 
+                             role, 
+                             java.time.LocalDateTime.now());
 
         boolean ok = userDAO.insert(user);
         if (!ok) {
@@ -127,12 +125,11 @@ public class UserService {
             throw new IllegalArgumentException("User not found with ID: " + userId);
         }
 
-        // Username Update & Validation
+        // Username Update
         if (newUsername != null && !newUsername.trim().isEmpty()) {
             if (!newUsername.matches("^[A-Za-z0-9_.]+$")) {
                 throw new IllegalArgumentException("Username format is invalid.");
             }
-            // ID gönderiyoruz ki kendi ismini 'duplicate' sanmasın
             if (userDAO.existsByUsername(newUsername, userId)) {
                 throw new IllegalArgumentException("Username already exists: " + newUsername);
             }
@@ -141,14 +138,14 @@ public class UserService {
 
         // Name Validation & Update
         if (newFirstName != null) {
-            if (!newFirstName.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
+            if (!newFirstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 throw new IllegalArgumentException("First name must contain only letters.");
             }
             existing.setName(newFirstName.trim());
         }
 
         if (newLastName != null) {
-            if (!newLastName.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
+            if (!newLastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 throw new IllegalArgumentException("Last name must contain only letters.");
             }
             existing.setSurname(newLastName.trim());
@@ -165,7 +162,6 @@ public class UserService {
     }
 
     public void deleteUser(int userId, int managerUserId) {
-        // Manager kendini silemez kuralı
         if (userId == managerUserId) {
             throw new IllegalArgumentException("You cannot delete your own account.");
         }
