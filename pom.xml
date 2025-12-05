@@ -25,7 +25,6 @@
 
     <build>
         <!-- Java source files are under src instead of src/main/java -->
-        <sourceDirectory>src</sourceDirectory>
 
         <plugins>
             <plugin>

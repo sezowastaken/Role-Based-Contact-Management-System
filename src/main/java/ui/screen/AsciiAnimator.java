@@ -59,9 +59,16 @@ public class AsciiAnimator {
     };
 
     // === Konsolu temizle ===
-    private static void clear() {
-        System.out.print("\u001B[H\u001B[2J");
-        System.out.flush();
+    public static void clearScreen() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (Exception e) {
+            System.out.println("Console is cleared: " + e.getMessage());
+        }
     }
 
     private static void sleep(long ms) {
@@ -85,7 +92,7 @@ public class AsciiAnimator {
 
     // === Girişte CODE WARS çerçevesi ===
     private static void showPrelude() {
-        clear();
+        clearScreen();
         String[] lines = PRELUDE_ART.split("\n");
         for (String line : lines) {
             System.out.println(center(YELLOW + line + RESET, 80));
@@ -101,7 +108,7 @@ public class AsciiAnimator {
         char[] stars = ".+*".toCharArray();
 
         for (int f = 0; f < frames; f++) {
-            clear();
+            clearScreen();
             StringBuilder sb = new StringBuilder();
 
             for (int y = 0; y < height; y++) {
@@ -123,7 +130,7 @@ public class AsciiAnimator {
 
     // === Kadir Has ASCII başlığı ===
     private static void showTitle() {
-        clear();
+        clearScreen();
         String[] lines = TITLE_TEXT.split("\n");
         for (String line : lines) {
             System.out.println(center(BLUE + line + RESET, 90));
@@ -138,7 +145,7 @@ public class AsciiAnimator {
         int total = CRAWL_LINES.length;
 
         for (int frame = 0; frame < screenH + total; frame++) {
-            clear();
+            clearScreen();
 
             for (int i = 0; i < total; i++) {
                 int pos = i + screenH - frame;
@@ -163,7 +170,4 @@ public class AsciiAnimator {
         showCrawl();
     }
 
-    public static void main(String[] args) {
-        runIntro();
-    }
 }
