@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/oop_rbcm_db";
+    private static final String URL = "jdbc:mysql://localhost:3306/oop_rbcm_db?useUnicode=true&characterEncoding=UTF-8&useSSL=false";
     private static final String USER = "myuser";
     private static final String PASSWORD = "1234";
 

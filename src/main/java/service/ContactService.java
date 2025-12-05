@@ -7,8 +7,6 @@ import util.InputHelper;
 import java.util.List;
 import java.util.Scanner;
 
-import javax.management.Query;
-
 public class ContactService {
     private final ContactDAO contactDAO;
 
@@ -35,6 +33,22 @@ public class ContactService {
         return contactDAO.searchByPhoneContains(digits);
     }
 
+    // =====================================================
+    // MULTI-FIELD SEARCH METHODS
+    // =====================================================
+
+    public List<Contact> searchByFirstNameAndBirthMonth(String firstName, int month) {
+        return contactDAO.searchByFirstNameAndBirthMonth(firstName, month);
+    }
+
+    public List<Contact> searchByPhoneAndEmailContains(String phonePart, String emailPart) {
+        return contactDAO.searchByPhoneAndEmailContains(phonePart, emailPart);
+    }
+
+    public List<Contact> searchByFirstAndLastName(String firstPart, String lastPart) {
+        return contactDAO.searchByFirstAndLastName(firstPart, lastPart);
+    }
+
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
             System.out.println("No contacts found.");
@@ -59,24 +73,29 @@ public class ContactService {
     }
 
     public void displayAllContacts() {
-        ContactService contactService = new ContactService();
-        List<Contact> contacts = contactService.getAllContacts();
-        contactService.printContactsList(contacts);
+        List<Contact> contacts = getAllContacts();
+        printContactsList(contacts);
     }
 
     /**
      * Interactive search flow:
-     * lets the user choose which field to search and then delegates to the
-     * existing search methods (searchByFirstName, searchByLastName, searchByPhoneContains).
+     * Shows all search options (single-field and multi-field) in one menu.
      */
     public void searchContactsInteractive(Scanner scanner) {
         System.out.println("\n=== Search Contacts ===");
+        System.out.println("Single-Field Search:");
         System.out.println("1 - Search by first name");
         System.out.println("2 - Search by last name");
         System.out.println("3 - Search by phone number");
+        System.out.println();
+        System.out.println("Multi-Field Search:");
+        System.out.println("4 - First Name + Birth Month");
+        System.out.println("5 - Phone Number + Email");
+        System.out.println("6 - First Name + Last Name");
+        System.out.println();
         System.out.println("0 - Cancel");
 
-        int choice = InputHelper.readIntInRange(scanner, "Choice: ", 0, 3);
+        int choice = InputHelper.readIntInRange(scanner, "Choice: ", 0, 6);
 
         List<Contact> results;
 
@@ -97,6 +116,24 @@ public class ContactService {
             case 3: {
                 String digits = InputHelper.readNonEmptyLine(scanner, "Phone number contains digits: ");
                 results = searchByPhoneContains(digits);
+                break;
+            }
+            case 4: {
+                String firstName = InputHelper.readNonEmptyLine(scanner, "First name contains: ");
+                int month = InputHelper.readIntInRange(scanner, "Birth month (1-12): ", 1, 12);
+                results = searchByFirstNameAndBirthMonth(firstName, month);
+                break;
+            }
+            case 5: {
+                String phonePart = InputHelper.readNonEmptyLine(scanner, "Phone number contains: ");
+                String emailPart = InputHelper.readNonEmptyLine(scanner, "Email contains: ");
+                results = searchByPhoneAndEmailContains(phonePart, emailPart);
+                break;
+            }
+            case 6: {
+                String firstPart = InputHelper.readNonEmptyLine(scanner, "First name contains: ");
+                String lastPart = InputHelper.readNonEmptyLine(scanner, "Last name contains: ");
+                results = searchByFirstAndLastName(firstPart, lastPart);
                 break;
             }
             default:
