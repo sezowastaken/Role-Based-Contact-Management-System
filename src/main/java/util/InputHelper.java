@@ -107,6 +107,30 @@ public class InputHelper {
         }
     }
 
+    /**
+     * Reads a valid name (only letters and spaces).
+     * Prevents numbers or invalid characters in name fields.
+     */
+    public static String readValidName(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String line = scanner.nextLine();
+            if (line == null) {
+                line = "";
+            }
+            line = line.trim();
+
+            // Regex: sadece harfler (Türkçe dahil) ve boşluk
+            if (line.matches("[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+")) {
+                return line;
+            }
+
+            System.out.println(util.ConsoleColors.RED 
+                + "Invalid input. Please use only letters and spaces." 
+                + util.ConsoleColors.RESET);
+        }
+    }
+
     private InputHelper() {
         // static util; instance oluşturulmasın
     }
