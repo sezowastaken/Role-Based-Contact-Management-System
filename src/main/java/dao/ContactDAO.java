@@ -10,7 +10,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ContactDAO {
 
@@ -448,6 +450,29 @@ public class ContactDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    /**
+     * Returns a map of all first names and their counts (how many people have the same first name).
+     * Groups by first_name and counts occurrences.
+     * Returns LinkedHashMap ordered by count DESC, then by first_name ASC.
+     */
+    public Map<String, Integer> getAllFirstNameCounts() {
+        Map<String, Integer> nameCounts = new LinkedHashMap<>();
+        String sql = "SELECT first_name, COUNT(*) AS cnt FROM contacts GROUP BY first_name ORDER BY cnt DESC, first_name ASC";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String firstName = rs.getString("first_name");
+                int count = rs.getInt("cnt");
+                nameCounts.put(firstName, count);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nameCounts;
     }
 
     // =====================================================

@@ -3,16 +3,19 @@ package ui.menu;
 import java.util.Scanner;
 import model.User;
 import service.UserService;
+import service.StatisticsService;
 import model.Role;
 import util.InputHelper;
 
 public class ManagerMenu extends BaseMenu {
 
     private final UserService userService;
+    private final StatisticsService statisticsService;
 
     public ManagerMenu(User currentUser, Scanner scanner, UserService userService) {
         super(currentUser, scanner);
-        this.userService = userService; 
+        this.userService = userService;
+        this.statisticsService = new StatisticsService();
     }
 
     @Override
@@ -75,7 +78,7 @@ public class ManagerMenu extends BaseMenu {
     }
 
     private void handleContactStatistics() {
-        System.out.println("[Manager] Contacts statistical info screen.");
+        statisticsService.displayContactStatistics();
     }
 
     private void handleListUsers() {
