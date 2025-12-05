@@ -13,7 +13,7 @@ import service.UserService;
 public class TesterMenu extends BaseMenu {
 
     private final ContactService contactService;
-    private final UserService userService = new UserService();
+    private final UserService userService = new UserService(new UserDAO());
 
     public TesterMenu(User currentUser, Scanner scanner) {
         super(currentUser, scanner);

@@ -10,8 +10,8 @@ public class UserService {
 
     private final UserDAO userDAO;
 
-    public UserService() {
-        this.userDAO = new UserDAO();
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     public void changePassword(User user, String oldPassword, String newPassword) {
