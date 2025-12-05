@@ -24,6 +24,13 @@ public class UserService {
     }
 
     /**
+     * Finds a user by ID (used in ManagerMenu).
+     */
+    public User findUserById(int id) {
+        return userDAO.getById(id);
+    }
+
+    /**
      * Low-level password change (no Scanner).
      * Verifies old password and updates DB if valid.
      */

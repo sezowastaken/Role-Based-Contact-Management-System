@@ -14,10 +14,9 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        // AsciiAnimator.runIntro();
         AuthService authService = new AuthService();
         LoginScreen loginScreen = new LoginScreen(authService);
         loginScreen.start();
     }
-
+    
 }
