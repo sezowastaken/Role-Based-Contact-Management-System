@@ -4,8 +4,9 @@ target/
 # Eski manuel derleme çıktıları
 out/
 
-
+# Lokal IDE build klasörleri
 build/
+.build/
 
 # IntelliJ IDEA
 .idea/
