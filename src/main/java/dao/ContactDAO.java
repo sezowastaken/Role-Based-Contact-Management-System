@@ -278,9 +278,9 @@ public class ContactDAO {
     // =====================================================
 
     /**
-     * Tüm contact’ları seçilen alana göre sıralı döner.
-     * sortField: "first_name", "last_name", "phone", "birth_date", "created_at" gibi.
-     * Sadece izin verdiğimiz alanlar kullanılır, yoksa contact_id kullanılır.
+     * It returns all contacts sorted by the selected field.
+     * sortField: "first_name", "last_name", "phone", "birth_date", "created_at", etc.
+     * Only allowed fields are used; otherwise, contact_id is used.
      */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
         String column;
@@ -334,8 +334,8 @@ public class ContactDAO {
     // =====================================================
 
     /**
-     * Tüm contact’lar için ortalama yaşı hesaplar.
-     * Doğum tarihi olmayanları hesaba katmaz.
+     * It calculates the average age of all contacts.
+     * It does not consider those without a birth date.
      */
     public double getAverageAge() {
         String sql = "SELECT AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) AS avg_age " +
@@ -355,7 +355,7 @@ public class ContactDAO {
     }
 
     /**
-     * En genç contact kaydını döner (birth_date en büyük olan).
+     * It returns the youngest contact record (the one with the largest birth_date).
      */
     public Contact getYoungestContact() {
         String sql = "SELECT * FROM contacts " +
@@ -375,7 +375,7 @@ public class ContactDAO {
     }
 
     /**
-     * En yaşlı contact kaydını döner (birth_date en küçük olan).
+     * It returns the oldest contact record (the one with the smallest birth_date).
      */
     public Contact getOldestContact() {
         String sql = "SELECT * FROM contacts " +
@@ -395,7 +395,7 @@ public class ContactDAO {
     }
 
     /**
-     * LinkedIn URL’i dolu olan kişi sayısını döner.
+     * It returns the count of contacts with a non-empty LinkedIn URL.
      */
     public int countWithLinkedin() {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts " +
@@ -414,7 +414,7 @@ public class ContactDAO {
     }
 
     /**
-     * LinkedIn URL’i boş olan kişi sayısını döner.
+     * It returns the count of contacts with an empty LinkedIn URL.
      */
     public int countWithoutLinkedin() {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts " +
@@ -433,8 +433,8 @@ public class ContactDAO {
     }
 
     /**
-     * Verilen isimde kaç kişi olduğunu döner.
-     * Tam eşleşme yapar (LIKE değil, =).
+     * It returns the count of contacts with the given first name.
+     * It performs an exact match (not LIKE, but =).
      */
     public int countByFirstName(String firstName) {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts WHERE first_name = ?";
