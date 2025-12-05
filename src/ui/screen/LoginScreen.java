@@ -1,5 +1,6 @@
 package ui.screen;
 
+import java.io.Console;
 import java.util.Scanner;
 
 import model.Role;
@@ -7,6 +8,7 @@ import model.User;
 import service.AuthService;
 import ui.menu.BaseMenu;
 import ui.menu.TesterMenu;
+import util.ConsoleColors;
 import ui.menu.JuniorDevMenu;
 import ui.menu.SeniorDevMenu;
 import ui.menu.ManagerMenu;
@@ -22,19 +24,19 @@ public class LoginScreen {
     }
 
     /**
-     * Uygulamanın login akışını başlatır.
-     * Kullanıcı başarıyla giriş yaptıktan sonra rolüne uygun menüyü açar.
+     * Starts the login flow of the application.
+     * Once the user successfully logs in, opens the menu according to their role.
      */
     public void start() {
         while (true) {
             clearScreen();
-            System.out.println("===========================================");
+            System.out.println(ConsoleColors.MAGENTA + "===========================================");
             System.out.println("  ROLE-BASED CONTACT MANAGEMENT SYSTEM");
-            System.out.println("===========================================\n");
-            System.out.println("Giriş yapmak için kullanıcı adı ve şifrenizi girin.");
-            System.out.println("(Çıkmak için kullanıcı adı kısmına 'q' yazabilirsiniz.)\n");
+            System.out.println("===========================================\n" + ConsoleColors.RESET);
+            System.out.println("Enter your username and password to log in.");
+            System.out.println("(To exit, type 'q' as the username.)\n");
 
-            System.out.print("Kullanıcı adı: ");
+            System.out.print("Username: ");
             String username = scanner.nextLine();
             if (username == null) {
                 username = "";
@@ -42,17 +44,17 @@ public class LoginScreen {
             username = username.trim();
 
             if (username.equalsIgnoreCase("q")) {
-                System.out.println("\nUygulamadan çıkılıyor. Görüşmek üzere!");
+                System.out.println("\nExiting the application. See you next time!");
                 return;
             }
 
             if (username.isEmpty()) {
-                System.out.println("\n⚠ Kullanıcı adı boş olamaz. Lütfen tekrar deneyin.");
+                System.out.println("\n Username cannot be empty. Please try again.");
                 pressEnterToContinue();
                 continue;
             }
 
-            System.out.print("Şifre: ");
+            System.out.print("Password: ");
             String password = scanner.nextLine();
             if (password == null) {
                 password = "";
@@ -60,18 +62,18 @@ public class LoginScreen {
 
             User loggedIn = authService.login(username, password);
             if (loggedIn == null) {
-                System.out.println("\n❌ Giriş başarısız. Kullanıcı adı veya şifre hatalı.");
+                System.out.println("\n Login failed. Incorrect username or password.");
                 pressEnterToContinue();
                 continue;
             }
 
-            System.out.println("\n✅ Giriş başarılı. Hoş geldin, "
+            System.out.println("\n Login successful. Welcome, "
                     + loggedIn.getName() + " " + loggedIn.getSurname() + "!");
             pressEnterToContinue();
 
-            // Rol'e göre menü aç
+            // Open role-specific menu
             openMenuForUser(loggedIn);
-            // Menüden logout ile çıkınca tekrar login ekranına döner
+            // After logout, return to login screen
         }
     }
 
@@ -79,7 +81,7 @@ public class LoginScreen {
         Role role = user.getRole();
 
         if (role == null) {
-            System.out.println("⚠ Kullanıcının rolü tanımsız. Menülere yönlendirilemiyor.");
+            System.out.println(" The user's role is undefined. Cannot navigate to menus.");
             pressEnterToContinue();
             return;
         }
@@ -99,22 +101,22 @@ public class LoginScreen {
                 menu = new ManagerMenu(user, scanner);
                 break;
             default:
-                System.out.println("⚠ Desteklenmeyen rol: " + role);
+                System.out.println(" Unsupported role: " + role);
                 pressEnterToContinue();
                 return;
         }
 
-        // Rol menüsünü başlat
+        // Start role menu
         menu.show();
     }
 
     private void pressEnterToContinue() {
-        System.out.print("\nDevam etmek için Enter'a basın...");
+        System.out.print("\nPress Enter to continue...");
         scanner.nextLine();
     }
 
     private void clearScreen() {
-        // Konsol temizleme – desteklenmeyen ortamlarda sadece boş satır gibi davranır
+        // Console clear – acts like empty lines on unsupported environments
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
