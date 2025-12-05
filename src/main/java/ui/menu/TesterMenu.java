@@ -3,14 +3,18 @@ package ui.menu;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.ContactService;
 import util.ConsoleColors;
+import service.UserService;
 
 public class TesterMenu extends BaseMenu {
 
     private final ContactService contactService;
+    private final UserService userService = new UserService(new UserDAO());
 
     public TesterMenu(User currentUser, Scanner scanner) {
         super(currentUser, scanner);
@@ -53,7 +57,17 @@ public class TesterMenu extends BaseMenu {
     }
 
     private void handleChangePassword() {
-        System.out.println("[Tester] Change password screen (TODO).");
+        System.out.print("Enter old password: ");
+        String oldPassword = scanner.nextLine().trim();
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine().trim();
+
+        try {
+            userService.changePassword(currentUser, oldPassword, newPassword);
+            System.out.println("Password changed successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void handleListAllContacts() {
