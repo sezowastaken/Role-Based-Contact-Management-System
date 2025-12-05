@@ -112,8 +112,8 @@ public class ManagerMenu extends BaseMenu {
         }
 
         String newUsername = InputHelper.readNonEmptyLine(scanner, "New username: ");
-        String newFirstname = InputHelper.readNonEmptyLine(scanner, "New first name: ");
-        String newLastname = InputHelper.readNonEmptyLine(scanner, "New lastname: ");
+        String newFirstname = InputHelper.readValidName(scanner, "New first name: ");   // ✅ sadece harf
+        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");      // ✅ sadece harf
         String r = InputHelper.readNonEmptyLine(scanner, "Role (1=Tester,2=Junior,3=Senior,4=Manager): ");
 
         Role role;
@@ -140,8 +140,8 @@ public class ManagerMenu extends BaseMenu {
 
         String username = InputHelper.readNonEmptyLine(scanner, "Username: ");
         String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
-        String first = InputHelper.readNonEmptyLine(scanner, "First name: ");
-        String last = InputHelper.readNonEmptyLine(scanner, "Last name: ");
+        String first = InputHelper.readValidName(scanner, "First name: ");   // ✅ sadece harf
+        String last = InputHelper.readValidName(scanner, "Last name: ");    // ✅ sadece harf
         String r = InputHelper.readNonEmptyLine(scanner, "Role (1=Tester,2=Junior,3=Senior,4=Manager): ");
 
         Role role;
