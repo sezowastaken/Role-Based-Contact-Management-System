@@ -3,6 +3,7 @@ package ui.menu;
 import model.User;
 import util.ConsoleColors;
 import util.InputHelper;
+import undo.UndoManager;
 
 import java.util.Scanner;
 
@@ -24,11 +25,14 @@ public abstract class BaseMenu {
 
     protected final User currentUser;
     protected final Scanner scanner;
+    protected final UndoManager undoManager;
 
-    protected BaseMenu(User currentUser, Scanner scanner) {
+    public BaseMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         this.currentUser = currentUser;
         this.scanner = scanner;
+        this.undoManager = undoManager;
     }
+
 
     /**
      * Main loop of the menu.
@@ -102,8 +106,12 @@ public abstract class BaseMenu {
         scanner.nextLine();
     }
 
-    /**
-     * Tries to clear the console screen. On unsupported terminals,
-     * it will simply behave like several empty lines.
-     */
+    protected void handleUndo() {
+        if (undoManager == null) {
+            System.out.println("\nUndo is not available in this session.");
+            return;
+        }
+        undoManager.undoLast();
+        pause();
+    }
 }

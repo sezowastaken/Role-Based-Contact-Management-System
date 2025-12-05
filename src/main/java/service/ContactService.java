@@ -5,20 +5,20 @@ import model.Contact;
 import util.InputHelper;
 import util.ConsoleColors;
 
-import javax.management.Query;
-
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import undo.UndoManager;
+import undo.UndoAction;
 
 public class ContactService {
 
-    private final ContactDAO contactDAO;
+    private final ContactDAO contactDAO = new ContactDAO();
+    private final UndoManager undoManager;
 
-    public ContactService() {
-        this.contactDAO = new ContactDAO();
+    public ContactService(UndoManager undoManager) {
+        this.undoManager = undoManager;
     }
 
     public List<Contact> getAllContacts() {
@@ -37,37 +37,37 @@ public class ContactService {
         return contactDAO.searchByLastName(query);
     }
 
-    public List<Contact> searchByPhoneContains(String digits) {
-        return contactDAO.searchByPhoneContains(digits);
+    // use DAO's searchByPhoneContains
+    public List<Contact> searchByPhoneNumber(String query) {
+        return contactDAO.searchByPhoneContains(query);
     }
-
-    // =====================================================
-    // MULTI-FIELD SEARCH METHODS
-    // =====================================================
 
     public List<Contact> searchByFirstNameAndBirthMonth(String firstName, int month) {
         return contactDAO.searchByFirstNameAndBirthMonth(firstName, month);
     }
 
-    public List<Contact> searchByPhoneAndEmailContains(String phonePart, String emailPart) {
-        return contactDAO.searchByPhoneAndEmailContains(phonePart, emailPart);
+    // new DAO helper (added below in ContactDAO)
+    public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
+        return contactDAO.searchByPhonePrefixAndBirthYear(phonePrefix, year);
     }
 
-    public List<Contact> searchByFirstAndLastName(String firstPart, String lastPart) {
-        return contactDAO.searchByFirstAndLastName(firstPart, lastPart);
+    public List<Contact> searchByFirstAndLastName(String firstNamePart, String lastNamePart) {
+        return contactDAO.searchByFirstAndLastName(firstNamePart, lastNamePart);
     }
 
+    // ===================== PRINT HELPER =====================
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
-            System.out.println(ConsoleColors.RED + "No contacts found." + ConsoleColors.RESET);
+            System.out.println(ConsoleColors.YELLOW + "\nNo contacts found." + ConsoleColors.RESET);
             return;
         }
-        System.out.println(ConsoleColors.BLUE + "\nCONTACTS LIST" + ConsoleColors.RESET);
+
+        System.out.println(ConsoleColors.CYAN + "\nContacts:" + ConsoleColors.RESET);
         System.out.printf(
-            ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-40s %-40s" + ConsoleColors.RESET,
-            "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL"
+            ConsoleColors.BLUE + "%-5s %-15s %-15s %-15s %-40s %-40s%n" + ConsoleColors.RESET,
+            "ID", "First Name", "Last Name", "Phone", "Email", "LinkedIn URL"
         );
-        System.out.println("\n---------------------------------------------------------------------------------------------------------------");
+        System.out.println("-------------------------------------------------------------------------------------------");
 
         for (Contact contact : contacts) {
             int id = contact.getContactId();
@@ -97,7 +97,7 @@ public class ContactService {
         System.out.println("2 - Search by last name");
         System.out.println("3 - Search by phone number");
         System.out.println("4 - First Name + Birth Month");
-        System.out.println("5 - Phone Number + Email");
+        System.out.println("5 - Phone Number Prefix + Birth Year");
         System.out.println("6 - First Name + Last Name");
         System.out.println("0 - Cancel");
 
@@ -119,20 +119,20 @@ public class ContactService {
                 break;
             }
             case 3: {
-                String digits = InputHelper.readNonEmptyLine(scanner, "Phone number contains digits: ");
-                results = searchByPhoneContains(digits);
+                String phone = InputHelper.readLine(scanner, "Phone number contains: ");
+                results = searchByPhoneNumber(phone);
                 break;
             }
             case 4: {
-                String firstName = InputHelper.readValidName(scanner, "First name contains: ");
+                String first = InputHelper.readValidName(scanner, "First name: ");
                 int month = InputHelper.readIntInRange(scanner, "Birth month (1-12): ", 1, 12);
-                results = searchByFirstNameAndBirthMonth(firstName, month);
+                results = searchByFirstNameAndBirthMonth(first, month);
                 break;
             }
             case 5: {
-                String phonePart = InputHelper.readNonEmptyLine(scanner, "Phone number contains: ");
-                String emailPart = InputHelper.readNonEmptyLine(scanner, "Email contains: ");
-                results = searchByPhoneAndEmailContains(phonePart, emailPart);
+                String prefix = InputHelper.readLine(scanner, "Phone number prefix: ");
+                int year = InputHelper.readIntInRange(scanner, "Birth year (e.g., 1990): ", 1900, 2100);
+                results = searchByPhonePrefixAndBirthYear(prefix, year);
                 break;
             }
             case 6: {
@@ -151,32 +151,47 @@ public class ContactService {
 
     // ===================== SORT =====================
     public void sortContactsInteractive(Scanner scanner) {
-        System.out.println(ConsoleColors.WHITE + "\n=== Sort Contacts ===" + ConsoleColors.RESET);
+        System.out.println("\n=== Sort Contacts ===");
         System.out.println("1 - Sort by first name");
         System.out.println("2 - Sort by last name");
         System.out.println("3 - Sort by phone number");
+        System.out.println("4 - Sort by email");
+        System.out.println("5 - Sort by birth date");
         System.out.println("0 - Cancel");
 
-        int field = InputHelper.readIntInRange(scanner, "Field: ", 0, 3);
-        if (field == 0) {
-            System.out.println(ConsoleColors.RED + "Sort cancelled." + ConsoleColors.RESET);
+        int choice = InputHelper.readIntInRange(scanner, "Choice: ", 0, 5);
+        if (choice == 0) {
+            System.out.println("Sorting cancelled.");
             return;
         }
 
-        System.out.println("1 - Ascending");
-        System.out.println("2 - Descending");
-        int order = InputHelper.readIntInRange(scanner, "Order: ", 1, 2);
-
         String sortField;
-        switch (field) {
-            case 1: sortField = "first_name"; break;
-            case 2: sortField = "last_name"; break;
-            case 3: sortField = "phone_number"; break;
+        switch (choice) {
+            case 1:
+                sortField = "first_name";
+                break;
+            case 2:
+                sortField = "last_name";
+                break;
+            case 3:
+                sortField = "phone_number";
+                break;
+            case 4:
+                sortField = "email";
+                break;
+            case 5:
+                sortField = "birth_date";
+                break;
             default:
-                System.out.println(ConsoleColors.RED + "Invalid field." + ConsoleColors.RESET);
+                System.out.println("Invalid choice.");
                 return;
         }
 
+        System.out.println("\nOrder:");
+        System.out.println("1 - Ascending");
+        System.out.println("2 - Descending");
+
+        int order = InputHelper.readIntInRange(scanner, "Choice: ", 1, 2);
         boolean ascending = (order == 1);
         List<Contact> contacts = getAllSorted(sortField, ascending);
         printContactsList(contacts);
@@ -198,23 +213,19 @@ public class ContactService {
             return;
         }
 
+        // Take a snapshot BEFORE modification for undo
+        Contact previousState = UndoAction.cloneContact(existing);
+
         System.out.println("\nContact to update:");
-        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
-        System.out.println("---------------------------------------------------------------------------------------------------------------");
-        String firstName = existing.getFirstName() != null ? existing.getFirstName() : "-";
-        String lastName = existing.getLastName() != null ? existing.getLastName() : "-";
-        String phone = existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-";
-        String email = existing.getEmail() != null ? existing.getEmail() : "-";
-        String url = existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-";
-        System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone, email, url);
+        System.out.printf("ID: %d | Name: %s %s | Phone: %s | Email: %s | LinkedIn: %s%n",
+                existing.getContactId(),
+                existing.getFirstName(),
+                existing.getLastName(),
+                existing.getPhoneNumber(),
+                existing.getEmail(),
+                existing.getLinkedinUrl());
 
-        String confirm = InputHelper.readLine(scanner, "\nDo you want to update this contact? (y/N): ");
-        if (!confirm.trim().equalsIgnoreCase("y")) {
-            System.out.println("Update cancelled.");
-            return;
-        }
-
-        System.out.println("\nPress Enter to keep current value.");
+        System.out.println("\nLeave input empty to keep the current value.");
 
         // Optional, validated first name
         while (true) {
@@ -275,6 +286,9 @@ public class ContactService {
         boolean ok = contactDAO.updateContact(existing);
         if (ok) {
             System.out.println("\n✓ Contact updated successfully.");
+            if (undoManager != null) {
+                undoManager.push(UndoAction.forContactUpdate(contactDAO, previousState));
+            }
         } else {
             System.out.println("\n✗ Failed to update contact.");
         }
@@ -287,19 +301,20 @@ public class ContactService {
         boolean adding = true;
         while (adding) {
             String first = InputHelper.readValidName(scanner, "First name: ");
+
             String last = InputHelper.readValidName(scanner, "Last name: ");
 
-            String nick = "";
+            String nick = InputHelper.readLine(scanner, "Nickname (optional): ");
+
+            String phone;
             while (true) {
-                nick = InputHelper.readLine(scanner, "Nickname (optional, or 'skip'): ");
-                if (nick.equalsIgnoreCase("skip")) {
-                    nick = "";
-                    break;
+                phone = InputHelper.readLine(scanner, "Phone number (required): ");
+                if (phone.isEmpty()) {
+                    System.out.println("Phone number is required.");
+                    continue;
                 }
                 break;
             }
-
-            String phone = InputHelper.readNonEmptyLine(scanner, "Phone number: ");
 
             String email = "";
             while (true) {
@@ -308,7 +323,11 @@ public class ContactService {
                     email = "";
                     break;
                 }
-                break;
+                if (!email.isEmpty() && !email.contains("@")) {
+                    System.out.println("Invalid email format. Please include '@' or enter 'skip'.");
+                } else {
+                    break;
+                }
             }
 
             String linkedin = "";
@@ -357,6 +376,10 @@ public class ContactService {
                 boolean ok = contactDAO.insertContact(c);
                 if (ok) {
                     System.out.println("\n✓ Contact added successfully.");
+                    // Register undo: delete the newly inserted contact
+                    if (undoManager != null && c.getContactId() != 0) {
+                        undoManager.push(UndoAction.forContactInsert(contactDAO, c.getContactId()));
+                    }
                     adding = false;
                 } else {
                     System.out.println("\n✗ Failed to add contact. Try again? (y/N): ");
@@ -390,16 +413,18 @@ public class ContactService {
             return;
         }
 
+        // Snapshot BEFORE delete for undo
+        Contact contactSnapshot = UndoAction.cloneContact(existing);
+
         // Display contact in table format
         System.out.println("\nContact to delete:");
-        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL", "LINKEDIN URL");
-        System.out.println("---------------------------------------------------------------------------------------------------------------");
-        String firstName = existing.getFirstName() != null ? existing.getFirstName() : "-";
-        String lastName = existing.getLastName() != null ? existing.getLastName() : "-";
-        String phone = existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-";
-        String email = existing.getEmail() != null ? existing.getEmail() : "-";
-        String url = existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-";
-        System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone, email, url);
+        System.out.printf("ID: %d | Name: %s %s | Phone: %s | Email: %s | LinkedIn: %s%n",
+                existing.getContactId(),
+                existing.getFirstName(),
+                existing.getLastName(),
+                existing.getPhoneNumber(),
+                existing.getEmail(),
+                existing.getLinkedinUrl());
 
         // Double confirmation before delete
         String confirm1 = InputHelper.readLine(scanner, "\nAre you sure you want to delete this contact? (y/N): ");
@@ -417,6 +442,9 @@ public class ContactService {
         boolean ok = contactDAO.deleteContact(id);
         if (ok) {
             System.out.println("\n✓ Contact deleted successfully.");
+            if (undoManager != null && contactSnapshot != null) {
+                undoManager.push(UndoAction.forContactDelete(contactDAO, contactSnapshot));
+            }
         } else {
             System.out.println("\n✗ Failed to delete contact.");
         }

@@ -6,16 +6,18 @@ import dao.UserDAO;
 import model.User;
 import service.ContactService;
 import service.UserService;
+import undo.UndoManager;
 
 public class SeniorDevMenu extends BaseMenu {
 
     private final ContactService contactService;
     private final UserService userService;
 
-    public SeniorDevMenu(User currentUser, Scanner scanner) {
-        super(currentUser, scanner);
-        this.contactService = new ContactService();
-        this.userService = new UserService(new UserDAO());
+    public SeniorDevMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
+        super(currentUser, scanner, undoManager);
+        // Undo destekli service örnekleri
+        this.contactService = new ContactService(undoManager);
+        this.userService = new UserService(new UserDAO(), undoManager);
     }
 
     @Override
@@ -32,6 +34,12 @@ public class SeniorDevMenu extends BaseMenu {
         System.out.println("5 - Update existing contact");
         System.out.println("6 - Add new contact(s)");
         System.out.println("7 - Delete existing contact(s)");
+
+        // Stack'te en az bir undoable action varsa, UNDO seçeneğini göster
+        if (undoManager != null && undoManager.canUndo()) {
+            System.out.println("8 - Undo last operation");
+        }
+
         System.out.println("0 - Logout");
     }
 
@@ -58,6 +66,14 @@ public class SeniorDevMenu extends BaseMenu {
                 break;
             case "7":
                 contactService.deleteContactInteractive(scanner);
+                break;
+            case "8":
+                // Menüde gösterilmese bile kullanıcı 8 yazarsa kontrol et
+                if (undoManager != null && undoManager.canUndo()) {
+                    handleUndo(); // BaseMenu'deki ortak UNDO davranışı
+                } else {
+                    System.out.println("\nThere is nothing to undo.");
+                }
                 break;
             default:
                 System.out.println("\nInvalid choice. Please select one of the options above.");

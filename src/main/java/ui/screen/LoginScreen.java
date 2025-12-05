@@ -6,6 +6,7 @@ import model.Role;
 import model.User;
 import service.AuthService;
 import service.UserService;
+import undo.UndoManager;
 import ui.menu.BaseMenu;
 import ui.menu.TesterMenu;
 import ui.menu.JuniorDevMenu;
@@ -18,12 +19,9 @@ public class LoginScreen {
 
     private final AuthService authService;
     private final Scanner scanner;
-    private final UserService userService; 
-
     public LoginScreen(AuthService authService) {
         this.authService = authService;
         this.scanner = new Scanner(System.in);
-        this.userService = new UserService(); 
     }
 
     public void start() {
@@ -81,19 +79,21 @@ public class LoginScreen {
             return;
         }
 
+        // create a per-session UndoManager and pass it to menus
+        UndoManager undoManager = new UndoManager();
         BaseMenu menu;
         switch (role) {
             case TESTER:
-                menu = new TesterMenu(user, scanner);
+                menu = new TesterMenu(user, scanner, undoManager);
                 break;
             case JUNIOR_DEV:
-                menu = new JuniorDevMenu(user, scanner);
+                menu = new JuniorDevMenu(user, scanner, undoManager);
                 break;
             case SENIOR_DEV:
-                menu = new SeniorDevMenu(user, scanner);
+                menu = new SeniorDevMenu(user, scanner, undoManager);
                 break;
             case MANAGER:
-                menu = new ManagerMenu(user, scanner, userService); // ✅ artık hata vermez
+                menu = new ManagerMenu(user, scanner, undoManager);
                 break;
             default:
                 System.out.println(ConsoleColors.RED + "Unsupported role: " + ConsoleColors.RESET + role);
