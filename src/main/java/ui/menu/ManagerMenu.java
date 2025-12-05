@@ -72,12 +72,10 @@ public class ManagerMenu extends BaseMenu {
         } catch (Exception e) {
             printError(e.getMessage());
         }
-        pressEnter();
     }
 
     private void handleContactStatistics() {
         System.out.println("[Manager] Contacts statistical info screen.");
-        pressEnter();
     }
 
     private void handleListUsers() {
@@ -93,7 +91,6 @@ public class ManagerMenu extends BaseMenu {
             );
         }
         printSuccess("Total users: " + users.size());
-        pressEnter();
     }
 
     private void handleUpdateUser() {
@@ -121,18 +118,10 @@ public class ManagerMenu extends BaseMenu {
 
         Role role;
         switch (r) {
-            case "1":
-                role = Role.TESTER;
-                break;
-            case "2":
-                role = Role.JUNIOR_DEV;
-                break;
-            case "3":
-                role = Role.SENIOR_DEV;
-                break;
-            case "4":
-                role = Role.MANAGER;
-                break;
+            case "1": role = Role.TESTER; break;
+            case "2": role = Role.JUNIOR_DEV; break;
+            case "3": role = Role.SENIOR_DEV; break;
+            case "4": role = Role.MANAGER; break;
             default:
                 printError("Invalid role selection!");
                 return;
@@ -144,7 +133,6 @@ public class ManagerMenu extends BaseMenu {
         } catch (Exception e) {
             printError(e.getMessage());
         }
-        pressEnter();
     }
 
     private void handleAddUser() {
@@ -158,18 +146,10 @@ public class ManagerMenu extends BaseMenu {
 
         Role role;
         switch (r) {
-            case "1":
-                role = Role.TESTER;
-                break;
-            case "2":
-                role = Role.JUNIOR_DEV;
-                break;
-            case "3":
-                role = Role.SENIOR_DEV;
-                break;
-            case "4":
-                role = Role.MANAGER;
-                break;
+            case "1": role = Role.TESTER; break;
+            case "2": role = Role.JUNIOR_DEV; break;
+            case "3": role = Role.SENIOR_DEV; break;
+            case "4": role = Role.MANAGER; break;
             default:
                 printError("Invalid role selection!");
                 return;
@@ -181,7 +161,6 @@ public class ManagerMenu extends BaseMenu {
         } catch (Exception e) {
             printError(e.getMessage());
         }
-        pressEnter();
     }
 
     private void handleDeleteUser() {
@@ -208,7 +187,6 @@ public class ManagerMenu extends BaseMenu {
         } catch (Exception e) {
             printError(e.getMessage());
         }
-        pressEnter();
     }
 
     // Renkli mesaj yardımcıları 
@@ -218,10 +196,5 @@ public class ManagerMenu extends BaseMenu {
 
     private void printSuccess(String msg) {
         System.out.println("\u001B[32m" + msg + "\u001B[0m");
-    }
-
-    private void pressEnter(){
-        System.out.print("\nPress enter to continue..");
-        scanner.nextLine();
     }
 }
