@@ -24,17 +24,19 @@
     </dependencies>
 
     <build>
+        <!-- Java source files are under src instead of src/main/java -->
+        <sourceDirectory>src</sourceDirectory>
+
         <plugins>
-            <!-- CMD'den kolayca çalıştırmak için -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <!-- Main.java'nın başındaki package'a göre -->
                     <mainClass>app.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>
