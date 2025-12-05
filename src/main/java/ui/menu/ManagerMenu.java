@@ -52,7 +52,6 @@ public class ManagerMenu extends BaseMenu {
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
 
-        // [DEĞİŞİKLİK] InputHelper kullanımı devam ediyor
         String oldPassword = InputHelper.readNonEmptyLine(scanner, "Enter old password: ");
         String newPassword = InputHelper.readNonEmptyLine(scanner, "Enter new password: ");
 
@@ -65,10 +64,7 @@ public class ManagerMenu extends BaseMenu {
     }
 
     private void handleContactStatistics() {
-        // İstatistik servisini çağır
         statisticsService.displayContactStatistics();
-        // Okumak için bekleme ekleyelim
-        // pause(); // BaseMenu'de pause varsa otomatik yapar, yoksa kalsın.
     }
 
     private void handleListUsers() {
@@ -76,16 +72,15 @@ public class ManagerMenu extends BaseMenu {
 
         var users = userService.findAllUsers();
         
-        // [DEĞİŞİKLİK] Tablo formatında yazdırma (Daha okunaklı)
         System.out.printf(ConsoleColors.YELLOW + "%-5s %-15s %-25s %-15s%n" + ConsoleColors.RESET, "ID", "USERNAME", "FULL NAME", "ROLE");
         System.out.println("----------------------------------------------------------------");
 
         for (User u : users) {
-            // [NOT] User modelinde getUserId() veya getId() hangisiyse onu kullan. Burada getUserId() varsaydım.
+            // [DÜZELTME] getUserId() yerine getId() kullanıldı
             System.out.printf("%-5d %-15s %-25s %-15s%n", 
-                u.getUserId(), 
+                u.getId(), 
                 u.getUsername(), 
-                u.getName() + " " + u.getSurname(), // Full Name birleşimi
+                u.getName() + " " + u.getSurname(),
                 u.getRole());
         }
         System.out.println("----------------------------------------------------------------");
@@ -95,7 +90,6 @@ public class ManagerMenu extends BaseMenu {
     private void handleUpdateUser() {
         System.out.println(ConsoleColors.CYAN + "\n--- Update Existing User ---" + ConsoleColors.RESET);
 
-        // Listeyi gösterelim ki ID seçebilsin
         handleListUsers();
 
         int userId = InputHelper.readIntInRange(scanner, "User ID to update: ", 1, Integer.MAX_VALUE);
@@ -115,12 +109,11 @@ public class ManagerMenu extends BaseMenu {
         }
 
         String newUsername = InputHelper.readNonEmptyLine(scanner, "New username: ");
-        String newFirstname = InputHelper.readValidName(scanner, "New first name: "); // Sadece harf
-        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");   // Sadece harf
+        String newFirstname = InputHelper.readValidName(scanner, "New first name: ");
+        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");
         
-        // Rol seçimi metodunu aşağıda ayırdım (Temiz kod için)
         Role role = selectRole(); 
-        if (role == null) return; // İptal durumu
+        if (role == null) return;
 
         try {
             userService.updateUser(userId, newUsername, newFirstname, newLastname, role);
@@ -157,8 +150,8 @@ public class ManagerMenu extends BaseMenu {
 
         int id = InputHelper.readIntInRange(scanner, "User ID to delete: ", 1, Integer.MAX_VALUE);
         
-        // Kendini silme kontrolü (Service de yapar ama UI'da da olsun)
-        if (id == currentUser.getUserId()) {
+        // [DÜZELTME] getUserId() yerine getId() kullanıldı
+        if (id == currentUser.getId()) {
             printError("You cannot delete your own account!");
             return;
         }
@@ -178,7 +171,8 @@ public class ManagerMenu extends BaseMenu {
         }
 
         try {
-            userService.deleteUser(id, currentUser.getUserId());
+            // [DÜZELTME] getUserId() yerine getId() kullanıldı
+            userService.deleteUser(id, currentUser.getId());
             printSuccess("User deleted.");
         } catch (Exception e) {
             printError(e.getMessage());
@@ -205,7 +199,6 @@ public class ManagerMenu extends BaseMenu {
         }
     }
 
-    
     private void printError(String msg) {
         System.out.println(ConsoleColors.RED + "ERROR: " + msg + ConsoleColors.RESET);
     }

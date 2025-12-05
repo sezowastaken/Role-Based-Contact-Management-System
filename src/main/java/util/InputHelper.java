@@ -45,7 +45,7 @@ public class InputHelper {
     public static int readIntInRange(Scanner scanner, String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
-            String line = scanner.nextLine();
+            String line = scanner.nextLine().trim();
             if (line == null) line = "";
             line = line.trim();
 
@@ -147,18 +147,24 @@ public class InputHelper {
     // ==========================================
     public static String readValidPhoneTR(Scanner scanner, String prompt) {
         while (true) {
-            System.out.print(prompt + " (+90) ");
+            // İPUCU: print kullandık, println değil. İmleç yanında beklesin diye.
+            System.out.print(prompt + " (+90) "); 
             String input = scanner.nextLine().trim();
 
+            // Sadece rakamları ayıkla
             String clean = input.replaceAll("[^0-9]", "");
+
+            // Kullanıcı "0532..." girdiyse başındaki 0'ı atıyoruz.
             if (clean.length() == 11 && clean.startsWith("0")) {
                 clean = clean.substring(1);
             }
 
+            // Regex: Mutlaka 5 ile başlamalı ve toplam 10 hane olmalı (5xxxxxxxxx)
             if (clean.matches("^5[0-9]{9}$")) {
                 return clean; 
             }
-            System.out.println(ERR_PREFIX + "Invalid phone number! Enter 10 digits starting with 5.");
+            
+            System.out.println(ERR_PREFIX + "Invalid phone number! Must be 10 digits starting with 5 (e.g. 532xxxxxxx).");
         }
     }
 
