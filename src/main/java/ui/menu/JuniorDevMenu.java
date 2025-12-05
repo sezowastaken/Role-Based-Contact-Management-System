@@ -43,12 +43,17 @@ public class JuniorDevMenu extends BaseMenu {
                         + "                          │");
         System.out.println("│" + ConsoleColors.WHITE + " 4 - Sort results by selected field (ascending / descending)  "
                 + ConsoleColors.BLUE + "        │");
-        System.out.println("│ 5 - Update existing contact                                          │");
+        System.out.println("│ " + ConsoleColors.WHITE + "5 - Update existing contact    " + ConsoleColors.BLUE
+                + "                                      │");
         if (isUndoAvailable()) {
-            System.out.println("│ U - Undo last operation                                              │");
+            System.out.println("│ " + ConsoleColors.WHITE + "U - Undo last operation     " + ConsoleColors.BLUE
+                    + "                                         │");
         }
-        System.out.println("│ 0 - Logout                                                           │");
-        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "0 - Logout    " + ConsoleColors.BLUE
+                        + "                                                       │");
+        System.out.println(
+                "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
     @Override
