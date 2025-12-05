@@ -6,7 +6,7 @@ import service.UserService;
 import service.StatisticsService;
 import model.Role;
 import util.InputHelper;
-import util.ConsoleColors; 
+import util.ConsoleColors;
 
 public class ManagerMenu extends BaseMenu {
 
@@ -26,26 +26,47 @@ public class ManagerMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - View contacts statistical info");
-        System.out.println("3 - List all users");
-        System.out.println("4 - Update existing user");
-        System.out.println("5 - Hire new user (Add)");
-        System.out.println("6 - Fire existing user (Delete)");
-        System.out.println("0 - Logout");
+        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│                             MANAGER MENU                             │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ 1 - Change password                                                  │");
+        System.out.println("│ 2 - View contacts statistical info                                   │");
+        System.out.println("│ 3 - List all users                                                   │");
+        System.out.println("│ 4 - Update existing user                                             │");
+        System.out.println("│ 5 - Add/employ new user                                              │");
+        System.out.println("│ 6 - Delete/fire existing user                                        │");
+        if (isUndoAvailable()) {
+            System.out.println("│ U - Undo last operation                                              │");
+        }
+        System.out.println("│ 0 - Logout                                                           │");
+        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
     }
 
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
-            case "1": handleChangePassword(); break;
-            case "2": handleContactStatistics(); break;
-            case "3": handleListUsers(); break;
-            case "4": handleUpdateUser(); break;
-            case "5": handleAddUser(); break;
-            case "6": handleDeleteUser(); break;
-            case "0": return;
-            default: printError("Invalid choice. Please select one of the options above.");
+            case "1":
+                handleChangePassword();
+                break;
+            case "2":
+                handleContactStatistics();
+                break;
+            case "3":
+                handleListUsers();
+                break;
+            case "4":
+                handleUpdateUser();
+                break;
+            case "5":
+                handleAddUser();
+                break;
+            case "6":
+                handleDeleteUser();
+                break;
+            case "0":
+                return;
+            default:
+                printError("Invalid choice. Please select one of the options above.");
         }
     }
 
@@ -75,18 +96,20 @@ public class ManagerMenu extends BaseMenu {
         System.out.println(ConsoleColors.CYAN + "\n--- System Users List ---" + ConsoleColors.RESET);
 
         var users = userService.findAllUsers();
-        
+
         // [DEĞİŞİKLİK] Tablo formatında yazdırma (Daha okunaklı)
-        System.out.printf(ConsoleColors.YELLOW + "%-5s %-15s %-25s %-15s%n" + ConsoleColors.RESET, "ID", "USERNAME", "FULL NAME", "ROLE");
+        System.out.printf(ConsoleColors.YELLOW + "%-5s %-15s %-25s %-15s%n" + ConsoleColors.RESET, "ID", "USERNAME",
+                "FULL NAME", "ROLE");
         System.out.println("----------------------------------------------------------------");
 
         for (User u : users) {
-            // [NOT] User modelinde getUserId() veya getId() hangisiyse onu kullan. Burada getUserId() varsaydım.
-            System.out.printf("%-5d %-15s %-25s %-15s%n", 
-                u.getUserId(), 
-                u.getUsername(), 
-                u.getName() + " " + u.getSurname(), // Full Name birleşimi
-                u.getRole());
+            // [NOT] User modelinde getUserId() veya getId() hangisiyse onu kullan. Burada
+            // getUserId() varsaydım.
+            System.out.printf("%-5d %-15s %-25s %-15s%n",
+                    u.getUserId(),
+                    u.getUsername(),
+                    u.getName() + " " + u.getSurname(), // Full Name birleşimi
+                    u.getRole());
         }
         System.out.println("----------------------------------------------------------------");
         printSuccess("Total users: " + users.size());
@@ -107,7 +130,7 @@ public class ManagerMenu extends BaseMenu {
         }
 
         System.out.println("Selected: " + target.getName() + " (" + target.getUsername() + ")");
-        
+
         boolean confirm = InputHelper.readYesNo(scanner, "Do you want to update this user?");
         if (!confirm) {
             printError("Update cancelled.");
@@ -116,11 +139,12 @@ public class ManagerMenu extends BaseMenu {
 
         String newUsername = InputHelper.readNonEmptyLine(scanner, "New username: ");
         String newFirstname = InputHelper.readValidName(scanner, "New first name: "); // Sadece harf
-        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");   // Sadece harf
-        
+        String newLastname = InputHelper.readValidName(scanner, "New lastname: "); // Sadece harf
+
         // Rol seçimi metodunu aşağıda ayırdım (Temiz kod için)
-        Role role = selectRole(); 
-        if (role == null) return; // İptal durumu
+        Role role = selectRole();
+        if (role == null)
+            return; // İptal durumu
 
         try {
             userService.updateUser(userId, newUsername, newFirstname, newLastname, role);
@@ -135,12 +159,13 @@ public class ManagerMenu extends BaseMenu {
 
         String username = InputHelper.readNonEmptyLine(scanner, "Username: ");
         String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
-        
-        String first = InputHelper.readValidName(scanner, "First name: "); 
-        String last = InputHelper.readValidName(scanner, "Last name: "); 
-        
+
+        String first = InputHelper.readValidName(scanner, "First name: ");
+        String last = InputHelper.readValidName(scanner, "Last name: ");
+
         Role role = selectRole();
-        if (role == null) return;
+        if (role == null)
+            return;
 
         try {
             userService.createUser(username, password, first, last, role);
@@ -156,7 +181,7 @@ public class ManagerMenu extends BaseMenu {
         handleListUsers();
 
         int id = InputHelper.readIntInRange(scanner, "User ID to delete: ", 1, Integer.MAX_VALUE);
-        
+
         // Kendini silme kontrolü (Service de yapar ama UI'da da olsun)
         if (id == currentUser.getUserId()) {
             printError("You cannot delete your own account!");
@@ -170,8 +195,9 @@ public class ManagerMenu extends BaseMenu {
         }
 
         System.out.println("Selected user: " + target.getName() + " (" + target.getUsername() + ")");
-        boolean confirm = InputHelper.readYesNo(scanner, ConsoleColors.RED + "Are you SURE you want to delete this user?" + ConsoleColors.RESET);
-        
+        boolean confirm = InputHelper.readYesNo(scanner,
+                ConsoleColors.RED + "Are you SURE you want to delete this user?" + ConsoleColors.RESET);
+
         if (!confirm) {
             printError("Delete cancelled.");
             return;
@@ -191,21 +217,24 @@ public class ManagerMenu extends BaseMenu {
         System.out.println("2 - Junior Developer");
         System.out.println("3 - Senior Developer");
         System.out.println("4 - Manager");
-        
+
         int choice = InputHelper.readIntInRange(scanner, "Role Choice (1-4): ", 1, 4);
-        
+
         switch (choice) {
-            case 1: return Role.TESTER;
-            case 2: return Role.JUNIOR_DEV;
-            case 3: return Role.SENIOR_DEV;
-            case 4: return Role.MANAGER;
-            default: 
+            case 1:
+                return Role.TESTER;
+            case 2:
+                return Role.JUNIOR_DEV;
+            case 3:
+                return Role.SENIOR_DEV;
+            case 4:
+                return Role.MANAGER;
+            default:
                 printError("Invalid role.");
                 return null;
         }
     }
 
-    
     private void printError(String msg) {
         System.out.println(ConsoleColors.RED + "ERROR: " + msg + ConsoleColors.RESET);
     }
