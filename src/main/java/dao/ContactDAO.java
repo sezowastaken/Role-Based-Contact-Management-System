@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -473,6 +474,98 @@ public class ContactDAO {
             e.printStackTrace();
         }
         return nameCounts;
+    }
+
+    /**
+     * Returns the total count of all contacts in the database.
+     */
+    public int getTotalContactCount() {
+        String sql = "SELECT COUNT(*) AS cnt FROM contacts";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Returns a map of birth months and their counts (how many people were born in each month).
+     * Keys are month names (January, February, etc.) and values are counts.
+     * Returns LinkedHashMap ordered by count DESC, then by month number ASC.
+     */
+    public Map<String, Integer> getBirthMonthDistribution() {
+        Map<String, Integer> monthCounts = new LinkedHashMap<>();
+        String sql = "SELECT MONTH(birth_date) AS month_num, COUNT(*) AS cnt " +
+                "FROM contacts WHERE birth_date IS NOT NULL " +
+                "GROUP BY MONTH(birth_date) ORDER BY cnt DESC, month_num ASC";
+        
+        String[] monthNames = {"", "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int monthNum = rs.getInt("month_num");
+                int count = rs.getInt("cnt");
+                if (monthNum >= 1 && monthNum <= 12) {
+                    monthCounts.put(monthNames[monthNum], count);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return monthCounts;
+    }
+
+    /**
+     * Returns a map of age groups and their counts.
+     * Age groups: "0-18", "19-30", "31-50", "50+"
+     * Only considers contacts with birth date information.
+     * Returns LinkedHashMap ordered by age group.
+     */
+    public Map<String, Integer> getAgeGroupDistribution() {
+        Map<String, Integer> ageGroups = new LinkedHashMap<>();
+        ageGroups.put("0-18", 0);
+        ageGroups.put("19-30", 0);
+        ageGroups.put("31-50", 0);
+        ageGroups.put("50+", 0);
+        
+        String sql = "SELECT birth_date FROM contacts WHERE birth_date IS NOT NULL";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            
+            LocalDate today = LocalDate.now();
+            while (rs.next()) {
+                Date birthDate = rs.getDate("birth_date");
+                if (birthDate != null) {
+                    LocalDate birth = birthDate.toLocalDate();
+                    int age = Period.between(birth, today).getYears();
+                    
+                    if (age >= 0 && age <= 18) {
+                        ageGroups.put("0-18", ageGroups.get("0-18") + 1);
+                    } else if (age >= 19 && age <= 30) {
+                        ageGroups.put("19-30", ageGroups.get("19-30") + 1);
+                    } else if (age >= 31 && age <= 50) {
+                        ageGroups.put("31-50", ageGroups.get("31-50") + 1);
+                    } else if (age > 50) {
+                        ageGroups.put("50+", ageGroups.get("50+") + 1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ageGroups;
     }
 
     // =====================================================

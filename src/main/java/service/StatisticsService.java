@@ -27,6 +27,11 @@ public class StatisticsService {
     public void displayContactStatistics() {
         System.out.println(ConsoleColors.CYAN + "\n=== CONTACTS STATISTICAL INFORMATION ===\n" + ConsoleColors.RESET);
 
+        // Total Contact Count
+        int totalCount = contactDAO.getTotalContactCount();
+        System.out.println(ConsoleColors.YELLOW + "Total Contact Count:" + ConsoleColors.RESET);
+        System.out.printf("  %d contact(s)%n%n", totalCount);
+
         // Average Age
         double avgAge = contactDAO.getAverageAge();
         System.out.println(ConsoleColors.YELLOW + "Average Age:" + ConsoleColors.RESET);
@@ -70,6 +75,37 @@ public class StatisticsService {
         System.out.println(ConsoleColors.YELLOW + "LinkedIn Profile Statistics:" + ConsoleColors.RESET);
         System.out.printf("  Contacts with LinkedIn: %d%n", withLinkedin);
         System.out.printf("  Contacts without LinkedIn: %d%n%n", withoutLinkedin);
+
+        // Birth Month Distribution
+        Map<String, Integer> birthMonthDist = contactDAO.getBirthMonthDistribution();
+        System.out.println(ConsoleColors.YELLOW + "Birth Month Distribution:" + ConsoleColors.RESET);
+        if (birthMonthDist.isEmpty()) {
+            System.out.println("  No contacts with birth date information.\n");
+        } else {
+            for (Map.Entry<String, Integer> entry : birthMonthDist.entrySet()) {
+                System.out.printf("  %s: %d person(s)%n", entry.getKey(), entry.getValue());
+            }
+            System.out.println();
+        }
+
+        // Age Group Distribution
+        Map<String, Integer> ageGroups = contactDAO.getAgeGroupDistribution();
+        System.out.println(ConsoleColors.YELLOW + "Age Group Distribution:" + ConsoleColors.RESET);
+        int totalWithBirthDate = 0;
+        for (int count : ageGroups.values()) {
+            totalWithBirthDate += count;
+        }
+        if (totalWithBirthDate == 0) {
+            System.out.println("  No contacts with birth date information.\n");
+        } else {
+            for (Map.Entry<String, Integer> entry : ageGroups.entrySet()) {
+                int count = entry.getValue();
+                if (count > 0) {
+                    System.out.printf("  %s: %d person(s)%n", entry.getKey(), count);
+                }
+            }
+            System.out.println();
+        }
 
         // Same First Name Statistics
         Map<String, Integer> nameCounts = contactDAO.getAllFirstNameCounts();
