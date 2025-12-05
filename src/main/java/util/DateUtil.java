@@ -11,28 +11,28 @@ import java.time.format.ResolverStyle;
  */
 public class DateUtil {
 
-    // Format: Gün.Ay.Yıl (Örn: 25.11.2025)
+    // Format: Yıl-Ay-Gün (Örn: 2000-11-25)
     // CRITICAL: ResolverStyle.STRICT modu, Java'nın otomatik yuvarlama yapmasını engeller.
-    // "30 Şubat" girilirse 2 Mart'a yuvarlamaz, direkt HATA verir.
-    // Artık Yıl (Leap Year) hesabını otomatik yapar (2023'te 29 Şubat'ı reddeder, 2024'te kabul eder).
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    // "2023-02-30" girilirse hata verir.
+    // Artık Yıl (Leap Year) hesabını otomatik yapar (2023-02-29'u reddeder, 2024-02-29'u kabul eder).
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             .withResolverStyle(ResolverStyle.STRICT);
 
     /**
      * Returns the standard date format string used in the application.
      */
     public static String getDateFormat() {
-        return "dd.MM.yyyy";
+        return "yyyy-MM-dd";
     }
 
     /**
      * Checks if the date string is valid based on logical rules.
      * Rules:
-     * 1. Must match dd.MM.yyyy format.
+     * 1. Must match yyyy-MM-dd format.
      * 2. Must be a real calendar date (No Feb 30, No Feb 29 on non-leap years).
      * 3. Cannot be in the future.
      * 4. Cannot be before 1900.
-     * * @param dateStr The input string (e.g., "25.11.2000")
+     * * @param dateStr The input string (e.g., "2000-11-25")
      * @return Error message (String) if invalid, NULL if valid.
      */
     public static String checkDateValidity(String dateStr) {
@@ -55,9 +55,9 @@ public class DateUtil {
             return null; // Valid (Hata yok)
 
         } catch (DateTimeParseException e) {
-            // Format hatası veya takvimde olmayan gün (örn: 30.02.2023)
+            // Format hatası veya takvimde olmayan gün (örn: 2023-02-30)
             return "Invalid date! Please ensure:\n" +
-                   "- Format is dd.MM.yyyy\n" +
+                   "- Format is yyyy-MM-dd (e.g. 1990-12-31)\n" +
                    "- Day exists in the calendar (e.g., No Feb 30)\n" +
                    "- Leap years are respected (Feb 29 only in 2024, 2028...)";
         }

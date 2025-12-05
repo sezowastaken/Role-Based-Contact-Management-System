@@ -189,6 +189,7 @@ public class InputHelper {
     // ==========================================
     public static LocalDate readValidPastDate(Scanner scanner, String prompt) {
         while (true) {
+            // Kullanıcıya DateUtil içindeki güncel formatı (yyyy-MM-dd) gösteriyoruz
             System.out.print(prompt + " (" + DateUtil.getDateFormat() + "): ");
             String input = scanner.nextLine().trim();
             

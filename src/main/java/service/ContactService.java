@@ -7,8 +7,8 @@ import util.ConsoleColors;
 import util.DateUtil;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.DateTimeFormatter; // Eklendi
 import java.util.List;
 import java.util.Scanner;
 
@@ -198,6 +198,9 @@ public class ContactService {
     // ===================== UPDATE (DÜZELTİLMİŞ) =====================
     public void updateContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===");
+        
+        displayAllContacts(); // Listeyi göster ki ID seçebilsin
+
         int id = InputHelper.readIntInRange(scanner, "Contact ID to update (0 = cancel): " + ConsoleColors.RESET, 0,
                 Integer.MAX_VALUE);
         if (id == 0) {
@@ -233,21 +236,21 @@ public class ContactService {
         System.out.println(ConsoleColors.YELLOW
                 + "\nEnter new values (Press Enter to keep current)." + ConsoleColors.RESET);
 
-        // --- 1. İSİM ---
+        // --- 1. İSİM (Zorunlu Döngü) ---
         while (true) {
             System.out.print(ConsoleColors.CYAN + "First name [" + existing.getFirstName() + "]: ");
             String input = scanner.nextLine().trim();
-            if (input.isEmpty()) break;
+            
+            if (input.isEmpty()) break; // Boşsa eskiyi koru, döngüden çık
             
             if (input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 existing.setFirstName(input);
-                break;
-            } else {
-                System.out.println(ConsoleColors.RED + "Error: Name must contain only letters." + ConsoleColors.RESET);
+                break; // Validasyon geçti, döngüden çık
             }
+            System.out.println(ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // --- 2. SOYİSİM ---
+        // --- 2. SOYİSİM (Zorunlu Döngü) ---
         while (true) {
             System.out.print("Last name [" + existing.getLastName() + "]: ");
             String input = scanner.nextLine().trim();
@@ -256,18 +259,17 @@ public class ContactService {
             if (input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 existing.setLastName(input);
                 break;
-            } else {
-                System.out.println(ConsoleColors.RED + "Error: Name must contain only letters." + ConsoleColors.RESET);
             }
+            System.out.println(ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // Nickname
+        // Nickname (Opsiyonel)
         String nick = InputHelper.readLine(scanner,
                 "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ");
         if (!nick.isEmpty())
             existing.setNickname(nick);
 
-        // --- 3. TELEFON (+90) ---
+        // --- 3. TELEFON (+90 ve Döngü) ---
         while (true) {
             System.out.print("Phone [" + existing.getPhoneNumber() + "] (+90) ");
             String input = scanner.nextLine().trim();
@@ -279,12 +281,11 @@ public class ContactService {
             if (clean.matches("^5[0-9]{9}$")) {
                 existing.setPhoneNumber(clean);
                 break;
-            } else {
-                System.out.println(ConsoleColors.RED + "Error: Invalid phone! Must be 5xxxxxxxxx." + ConsoleColors.RESET);
             }
+            System.out.println(ConsoleColors.RED + "Error: Invalid phone! Must be 10 digits starting with 5. Try again." + ConsoleColors.RESET);
         }
 
-        // --- 4. EMAIL ---
+        // --- 4. EMAIL (Zorunlu Döngü) ---
         while (true) {
             System.out.print("Email [" + existing.getEmail() + "]: ");
             String input = scanner.nextLine().trim();
@@ -293,30 +294,36 @@ public class ContactService {
             if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                 existing.setEmail(input);
                 break;
-            } else {
-                System.out.println(ConsoleColors.RED + "Error: Invalid email format!" + ConsoleColors.RESET);
             }
+            System.out.println(ConsoleColors.RED + "Error: Invalid email format! Try again." + ConsoleColors.RESET);
         }
 
-        // --- 5. LINKEDIN ---
+        // --- 5. LINKEDIN (Akıllı Tamamlama) ---
         String currentLi = existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl();
         String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn [" + currentLi + "] (or 'skip')");
-        if (linkedin != null) existing.setLinkedinUrl(linkedin);
+        if (linkedin != null) {
+            existing.setLinkedinUrl(linkedin);
+        }
 
-        // --- 6. TARIH ---
-        String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        // --- 6. TARIH (KRİTİK DÜZELTME: yyyy-MM-dd) ---
+        // Veritabanındaki LocalDate.toString() zaten yyyy-MM-dd verir
+        String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString(); 
+        
         while (true) {
-            System.out.print("Birth Date [" + currentBirth + "] (dd.MM.yyyy or 'skip'): ");
+            // Kullanıcıya DOĞRU FORMATI (yyyy-MM-dd) gösteriyoruz
+            System.out.print("Birth Date [" + currentBirth + "] (" + DateUtil.getDateFormat() + " or 'skip'): ");
             String input = scanner.nextLine().trim();
             
-            if (input.isEmpty() || input.equalsIgnoreCase("skip")) break;
-            
-            String error = DateUtil.checkDateValidity(input);
-            if (error == null) {
+            if (input.isEmpty() || input.equalsIgnoreCase("skip")) break; // Boşsa geç
+
+            // DateUtil artık yyyy-MM-dd bekliyor
+            String err = DateUtil.checkDateValidity(input);
+            if (err == null) {
                 existing.setBirthDate(DateUtil.parse(input));
                 break;
             } else {
-                System.out.println(ConsoleColors.RED + error + ConsoleColors.RESET);
+                // Hata varsa yazdırıp döngü başa döner
+                System.out.println(ConsoleColors.RED + err + ConsoleColors.RESET);
             }
         }
 
@@ -328,12 +335,13 @@ public class ContactService {
         }
     }
 
-    // ===================== ADD =====================
+    // ===================== ADD (Validasyonlu) =====================
     public void addContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.WHITE + "\n=== Add New Contact ===");
 
         boolean adding = true;
         while (adding) {
+            // [GÜNCELLEME] InputHelper Kullanımı
             String first = InputHelper.readValidName(scanner, "First name: ");
             String last = InputHelper.readValidName(scanner, "Last name: ");
 
@@ -342,12 +350,15 @@ public class ContactService {
                 nick = null;
             }
 
+            // Telefon +90 ve 10 hane
             String phone = InputHelper.readValidPhoneTR(scanner, "Phone number");
+            // Email @ kontrolü
             String email = InputHelper.readValidEmail(scanner, "Email: ");
 
-            // Akıllı LinkedIn
+            // LinkedIn Akıllı
             String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL (optional)");
 
+            // Tarih yyyy-MM-dd
             LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date");
 
             // Display preview
