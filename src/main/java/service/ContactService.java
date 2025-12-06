@@ -5,19 +5,24 @@ import model.Contact;
 import util.InputHelper;
 import util.ConsoleColors;
 import util.DateUtil;
+import undo.UndoManager;
+import undo.UndoAction;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
 public class ContactService {
 
-    private final ContactDAO contactDAO;
+    private final ContactDAO contactDAO = new ContactDAO();
+    private final UndoManager undoManager;
 
     public ContactService() {
-        this.contactDAO = new ContactDAO();
+        this(null);
+    }
+
+    public ContactService(UndoManager undoManager) {
+        this.undoManager = undoManager;
     }
 
     public List<Contact> getAllContacts() {
@@ -31,44 +36,43 @@ public class ContactService {
     public List<Contact> searchByFirstName(String query) {
         return contactDAO.searchByFirstName(query);
     }
-
+    
     public List<Contact> searchByLastName(String query) {
         return contactDAO.searchByLastName(query);
     }
 
-    public List<Contact> searchByPhoneContains(String digits) {
-        return contactDAO.searchByPhoneContains(digits);
+    public List<Contact> searchByPhoneNumber(String query) {
+        return contactDAO.searchByPhoneContains(query);
     }
-
-    // =====================================================
-    // MULTI-FIELD SEARCH METHODS
-    // =====================================================
 
     public List<Contact> searchByFirstNameAndBirthMonth(String firstName, int month) {
         return contactDAO.searchByFirstNameAndBirthMonth(firstName, month);
     }
 
-    public List<Contact> searchByPhoneAndEmailContains(String phonePart, String emailPart) {
-        return contactDAO.searchByPhoneAndEmailContains(phonePart, emailPart);
+    public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
+        return contactDAO.searchByPhonePrefixAndBirthYear(phonePrefix, year);
     }
 
-    public List<Contact> searchByFirstAndLastName(String firstPart, String lastPart) {
-        return contactDAO.searchByFirstAndLastName(firstPart, lastPart);
+    public List<Contact> searchByFirstAndLastName(String firstNamePart, String lastNamePart) {
+        return contactDAO.searchByFirstAndLastName(firstNamePart, lastNamePart);
     }
 
+    // ----------------- Printing -----------------
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
-            System.out.println(ConsoleColors.RED + "No contacts found." + ConsoleColors.RESET);
+            System.out.println(ConsoleColors.YELLOW + "\nNo contacts found." + ConsoleColors.RESET);
             return;
         }
-        System.out.println(ConsoleColors.BLUE + "\nCONTACTS LIST" + ConsoleColors.RESET);
-        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-40s %-40s", "ID", "FIRST NAME", "LAST NAME",
-                "PHONE", "EMAIL",
-                "LINKEDIN URL" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.WHITE +
-                "\n-------------------------------------------------------------------------------------------------------------------------------"
-                + ConsoleColors.RESET);
 
+        System.out.println(ConsoleColors.BLUE + "\nCONTACTS LIST" + ConsoleColors.RESET);
+        System.out.printf(
+                ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-12s %-40s %-40s%n" + ConsoleColors.RESET,
+                "ID", "FIRST NAME", "LAST NAME", "PHONE", "BIRTH DATE", "EMAIL", "LINKEDIN URL"
+        );
+        System.out.println(ConsoleColors.WHITE +
+                "----------------------------------------------------------------------------------------------------------------------------------------------------------------"
+                + ConsoleColors.RESET);
+        
         for (Contact contact : contacts) {
             int id = contact.getContactId();
             String firstName = contact.getFirstName() != null ? contact.getFirstName() : "-";
@@ -76,13 +80,14 @@ public class ContactService {
             String phone = contact.getPhoneNumber() != null ? contact.getPhoneNumber() : "-";
             String email = contact.getEmail() != null ? contact.getEmail() : "-";
             String url = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "-";
+            String birthDate = contact.getBirthDate() != null ? contact.getBirthDate().toString() : "-";
 
-            System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-40s %-40s%n", id, firstName, lastName,
-                    phone, email, url + ConsoleColors.RESET);
+            System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-12s %-40s %-40s%n" + ConsoleColors.RESET, id, firstName, lastName,
+                    phone, birthDate, email, url);
 
         }
-        System.out.println(
-                ConsoleColors.GREEN + "\n Total " + contacts.size() + " contact(s) found." + ConsoleColors.RESET);
+
+        System.out.println(ConsoleColors.GREEN + "\nTotal " + contacts.size() + " contact(s) found." + ConsoleColors.RESET);
     }
 
     public void displayAllContacts() {
@@ -90,24 +95,18 @@ public class ContactService {
         printContactsList(contacts);
     }
 
-    // ===================== SEARCH =====================
+    // ----------------- Search (interactive) -----------------
     public void searchContactsInteractive(Scanner scanner) {
-        System.out.println(ConsoleColors.CYAN + "\n=== Search Contacts ===");
-        System.out.println("Single-Field Search:");
+        System.out.println(ConsoleColors.CYAN + "\n=== Search Contacts ===" + ConsoleColors.RESET);
         System.out.println("1 - Search by first name");
         System.out.println("2 - Search by last name");
         System.out.println("3 - Search by phone number");
-        System.out.println("4 - First Name + Birth Month");
-        System.out.println("5 - Phone Number + Email");
-        System.out.println("6 - First Name + Last Name");
-        System.out.println();
-        System.out.println("0 - Cancel" + ConsoleColors.RESET);
+        System.out.println("4 - First name + birth month");
+        System.out.println("5 - Phone prefix + birth year");
+        System.out.println("6 - First name + last name");
+        System.out.println("0 - Cancel");
 
-        int choice = InputHelper.readIntInRange(
-                scanner,
-                ConsoleColors.YELLOW + "Choice: " + ConsoleColors.RESET,
-                0,
-                6);
+        int choice = InputHelper.readIntInRange(scanner, ConsoleColors.YELLOW + "Choice: " + ConsoleColors.RESET, 0, 6);
 
         List<Contact> results;
 
@@ -116,35 +115,35 @@ public class ContactService {
                 System.out.println(ConsoleColors.RED + "Search cancelled." + ConsoleColors.RESET);
                 return;
             case 1: {
-                String first = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "First name contains: ");
+                String first = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "First name contains: " + ConsoleColors.RESET);
                 results = searchByFirstName(first);
                 break;
             }
             case 2: {
-                String last = InputHelper.readValidName(scanner, "Last name contains: ");
+                String last = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "Last name contains: " + ConsoleColors.RESET);
                 results = searchByLastName(last);
                 break;
             }
             case 3: {
-                String digits = InputHelper.readNonEmptyLine(scanner, "Phone number contains digits: ");
-                results = searchByPhoneContains(digits);
+                String phone = InputHelper.readLine(scanner, ConsoleColors.CYAN + "Phone number contains: " + ConsoleColors.RESET);
+                results = searchByPhoneNumber(phone);
                 break;
             }
             case 4: {
-                String firstName = InputHelper.readValidName(scanner, "First name contains: ");
+                String first = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "First name: " + ConsoleColors.RESET);
                 int month = InputHelper.readIntInRange(scanner, "Birth month (1-12): ", 1, 12);
-                results = searchByFirstNameAndBirthMonth(firstName, month);
+                results = searchByFirstNameAndBirthMonth(first, month);
                 break;
             }
             case 5: {
-                String phonePart = InputHelper.readNonEmptyLine(scanner, "Phone number contains: ");
-                String emailPart = InputHelper.readNonEmptyLine(scanner, "Email contains: ");
-                results = searchByPhoneAndEmailContains(phonePart, emailPart);
+                String prefix = InputHelper.readLine(scanner, ConsoleColors.CYAN + "Phone number prefix: " + ConsoleColors.RESET);
+                int year = InputHelper.readIntInRange(scanner, ConsoleColors.CYAN + "Birth year (e.g., 1990): " + ConsoleColors.RESET, 1900, 2100);
+                results = searchByPhonePrefixAndBirthYear(prefix, year);
                 break;
             }
             case 6: {
-                String firstPart = InputHelper.readValidName(scanner, "First name contains: ");
-                String lastPart = InputHelper.readValidName(scanner, "Last name contains: " + ConsoleColors.RESET);
+                String firstPart = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "First name contains: " + ConsoleColors.RESET);
+                String lastPart = InputHelper.readValidName(scanner, ConsoleColors.CYAN + "Last name contains: " + ConsoleColors.RESET);
                 results = searchByFirstAndLastName(firstPart, lastPart);
                 break;
             }
@@ -156,23 +155,20 @@ public class ContactService {
         printContactsList(results);
     }
 
-    // ===================== SORT =====================
+    // ----------------- Sort (interactive) -----------------
     public void sortContactsInteractive(Scanner scanner) {
-        System.out.println(ConsoleColors.CYAN + "\n=== Sort Contacts ===");
+        System.out.println(ConsoleColors.CYAN + "\n=== Sort Contacts ===" + ConsoleColors.RESET);
         System.out.println("1 - Sort by first name");
         System.out.println("2 - Sort by last name");
         System.out.println("3 - Sort by phone number");
+        System.out.println("4 - Sort by birth date");
         System.out.println("0 - Cancel");
 
-        int field = InputHelper.readIntInRange(scanner, "Field: ", 0, 3);
+        int field = InputHelper.readIntInRange(scanner, "Field: ", 0, 4);
         if (field == 0) {
             System.out.println(ConsoleColors.RED + "Sort cancelled." + ConsoleColors.RESET);
             return;
         }
-
-        System.out.println("1 - Ascending");
-        System.out.println("2 - Descending");
-        int order = InputHelper.readIntInRange(scanner, "Order: ", 1, 2);
 
         String sortField;
         switch (field) {
@@ -185,24 +181,31 @@ public class ContactService {
             case 3:
                 sortField = "phone_number";
                 break;
+            case 4:
+                sortField = "birth_date";
+                break;
             default:
-                System.out.println(ConsoleColors.RED + "Invalid field." + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.RED + "Invalid choice." + ConsoleColors.RESET);
                 return;
         }
 
+        System.out.println("\nOrder:");
+        System.out.println("1 - Ascending");
+        System.out.println("2 - Descending");
+
+        int order = InputHelper.readIntInRange(scanner, "Choice: ", 1, 2);
         boolean ascending = (order == 1);
         List<Contact> contacts = getAllSorted(sortField, ascending);
         printContactsList(contacts);
     }
 
-    // ===================== UPDATE (DÜZELTİLMİŞ) =====================
+    // ----------------- Update (interactive) -----------------
     public void updateContactInteractive(Scanner scanner) {
-        System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===");
-        
-        displayAllContacts(); // Listeyi göster ki ID seçebilsin
+        System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===" + ConsoleColors.RESET);
 
-        int id = InputHelper.readIntInRange(scanner, "Contact ID to update (0 = cancel): " + ConsoleColors.RESET, 0,
-                Integer.MAX_VALUE);
+        displayAllContacts();
+
+        int id = InputHelper.readIntInRange(scanner, ConsoleColors.YELLOW + "Contact ID to update (0 = cancel): " + ConsoleColors.RESET, 0, Integer.MAX_VALUE);
         if (id == 0) {
             System.out.println(ConsoleColors.RED + "Update cancelled." + ConsoleColors.RESET);
             return;
@@ -210,52 +213,56 @@ public class ContactService {
 
         Contact existing = contactDAO.getContactById(id);
         if (existing == null) {
-            System.out.println(ConsoleColors.YELLOW + "Contact not found with ID: " + ConsoleColors.RESET + id);
+            System.out.println(ConsoleColors.YELLOW + "Contact not found with ID: " + id + ConsoleColors.RESET);
             return;
         }
 
-        // Display contact in table format
+        // Snapshot BEFORE modification for undo
+        Contact previousState = UndoAction.cloneContact(existing);
+
+        // Display current contact
         System.out.println(ConsoleColors.BLUE + "\nContact to update:" + ConsoleColors.RESET);
-        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME",
-                "PHONE", "EMAIL",
-                "LINKEDIN URL" + ConsoleColors.RESET);
+        System.out.printf(ConsoleColors.CYAN + "%-5s %-15s %-15s %-15s %-12s %-40s %-40s%n" + ConsoleColors.RESET,
+                "ID", "FIRST NAME", "LAST NAME", "PHONE", "BIRTH DATE", "EMAIL", "LINKEDIN URL");
         System.out.println(ConsoleColors.WHITE +
-                "-------------------------------------------------------------------------------------------------------------------------------"
+                "----------------------------------------------------------------------------------------------------------------------------------------------------------------"
                 + ConsoleColors.RESET);
         
-        System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(),
-                existing.getFirstName(), existing.getLastName(), existing.getPhoneNumber(),
-                existing.getEmail(), existing.getLinkedinUrl() + ConsoleColors.RESET);
+        String birthDateStr = existing.getBirthDate() != null ? existing.getBirthDate().toString() : "-";
+        System.out.printf(ConsoleColors.CYAN + "%-5d %-15s %-15s %-15s %-12s %-40s %-40s%n" + ConsoleColors.RESET,
+                existing.getContactId(),
+                existing.getFirstName() != null ? existing.getFirstName() : "-",
+                existing.getLastName() != null ? existing.getLastName() : "-",
+                existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-",
+                birthDateStr,
+                existing.getEmail() != null ? existing.getEmail() : "-",
+                existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-"
+        );
 
-        // Confirmation before update
         if (!InputHelper.readYesNo(scanner, ConsoleColors.BLUE + "\nDo you want to update this contact?" + ConsoleColors.RESET)) {
             System.out.println(ConsoleColors.RED + "Update cancelled." + ConsoleColors.RESET);
             return;
         }
 
-        System.out.println(ConsoleColors.YELLOW
-                + "\nEnter new values (Press Enter to keep current)." + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "\nEnter new values (Press Enter to keep current)." + ConsoleColors.RESET);
 
-        // --- 1. İSİM (Zorunlu Döngü) ---
+        // First name
         while (true) {
-            System.out.print(ConsoleColors.CYAN + "First name [" + existing.getFirstName() + "]: ");
+            System.out.print(ConsoleColors.CYAN + "First name [" + (existing.getFirstName() == null ? "" : existing.getFirstName()) + "]: " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
-            
-            if (input.isEmpty()) break; // Boşsa eskiyi koru, döngüden çık
-            
+            if (input.isEmpty()) break;
             if (input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 existing.setFirstName(input);
-                break; // Validasyon geçti, döngüden çık
+                break;
             }
             System.out.println(ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // --- 2. SOYİSİM (Zorunlu Döngü) ---
+        // Last name
         while (true) {
-            System.out.print("Last name [" + existing.getLastName() + "]: ");
+            System.out.print(ConsoleColors.CYAN + "Last name [" + (existing.getLastName() == null ? "" : existing.getLastName()) + "]: " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) break;
-            
             if (input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 existing.setLastName(input);
                 break;
@@ -263,21 +270,18 @@ public class ContactService {
             System.out.println(ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // Nickname (Opsiyonel)
-        String nick = InputHelper.readLine(scanner,
-                "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ");
-        if (!nick.isEmpty())
-            existing.setNickname(nick);
+        // Nickname
+        String nickPrompt = "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ";
+        String nick = InputHelper.readLine(scanner, ConsoleColors.CYAN + nickPrompt + ConsoleColors.RESET);
+        if (!nick.isEmpty()) existing.setNickname(nick);
 
-        // --- 3. TELEFON (+90 ve Döngü) ---
+        // Phone
         while (true) {
-            System.out.print("Phone [" + existing.getPhoneNumber() + "] (+90) ");
+            System.out.print(ConsoleColors.CYAN + "Phone [" + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "] (+90): " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) break;
-            
             String clean = input.replaceAll("[^0-9]", "");
             if (clean.length() == 11 && clean.startsWith("0")) clean = clean.substring(1);
-            
             if (clean.matches("^5[0-9]{9}$")) {
                 existing.setPhoneNumber(clean);
                 break;
@@ -285,12 +289,11 @@ public class ContactService {
             System.out.println(ConsoleColors.RED + "Error: Invalid phone! Must be 10 digits starting with 5. Try again." + ConsoleColors.RESET);
         }
 
-        // --- 4. EMAIL (Zorunlu Döngü) ---
+        // Email
         while (true) {
-            System.out.print("Email [" + existing.getEmail() + "]: ");
+            System.out.print(ConsoleColors.CYAN + "Email [" + (existing.getEmail() == null ? "" : existing.getEmail()) + "]: " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) break;
-            
             if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                 existing.setEmail(input);
                 break;
@@ -298,31 +301,22 @@ public class ContactService {
             System.out.println(ConsoleColors.RED + "Error: Invalid email format! Try again." + ConsoleColors.RESET);
         }
 
-        // --- 5. LINKEDIN (Akıllı Tamamlama) ---
+        // LinkedIn
         String currentLi = existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl();
-        String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn [" + currentLi + "] (or 'skip')");
-        if (linkedin != null) {
-            existing.setLinkedinUrl(linkedin);
-        }
+        String linkedin = InputHelper.readValidLinkedin(scanner, ConsoleColors.CYAN + "LinkedIn [" + currentLi + "] (or 'skip'): " + ConsoleColors.RESET);
+        if (linkedin != null) existing.setLinkedinUrl(linkedin);
 
-        // --- 6. TARIH (KRİTİK DÜZELTME: yyyy-MM-dd) ---
-        // Veritabanındaki LocalDate.toString() zaten yyyy-MM-dd verir
-        String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString(); 
-        
+        // Birth date
+        String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString();
         while (true) {
-            // Kullanıcıya DOĞRU FORMATI (yyyy-MM-dd) gösteriyoruz
-            System.out.print("Birth Date [" + currentBirth + "] (" + DateUtil.getDateFormat() + " or 'skip'): ");
+            System.out.print(ConsoleColors.CYAN + "Birth Date [" + currentBirth + "] (" + DateUtil.getDateFormat() + " or 'skip'): " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
-            
-            if (input.isEmpty() || input.equalsIgnoreCase("skip")) break; // Boşsa geç
-
-            // DateUtil artık yyyy-MM-dd bekliyor
+            if (input.isEmpty() || input.equalsIgnoreCase("skip")) break;
             String err = DateUtil.checkDateValidity(input);
             if (err == null) {
                 existing.setBirthDate(DateUtil.parse(input));
                 break;
             } else {
-                // Hata varsa yazdırıp döngü başa döner
                 System.out.println(ConsoleColors.RED + err + ConsoleColors.RESET);
             }
         }
@@ -330,39 +324,86 @@ public class ContactService {
         boolean ok = contactDAO.updateContact(existing);
         if (ok) {
             System.out.println(ConsoleColors.GREEN + "\nContact updated successfully." + ConsoleColors.RESET);
+            if (undoManager != null) {
+                undoManager.push(UndoAction.forContactUpdate(contactDAO, previousState));
+            }
         } else {
             System.out.println(ConsoleColors.RED + "\nFailed to update contact." + ConsoleColors.RESET);
         }
     }
 
-    // ===================== ADD (Validasyonlu) =====================
+    // ----------------- Add (interactive) -----------------
     public void addContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.WHITE + "\n=== Add New Contact ===");
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
         boolean adding = true;
         while (adding) {
-            // [GÜNCELLEME] InputHelper Kullanımı
+            // First name with cancel check
+            System.out.print("First name (0 to cancel): ");
+            String firstInput = scanner.nextLine().trim();
+            if (firstInput.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
+            // Use InputHelper to validate and read (it will prompt)
             String first = InputHelper.readValidName(scanner, "First name: ");
+
+            // Last name with cancel check  
+            System.out.print("Last name (0 to cancel): ");
+            String lastInput = scanner.nextLine().trim();
+            if (lastInput.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
             String last = InputHelper.readValidName(scanner, "Last name: ");
 
-            String nick = InputHelper.readLine(scanner, "Nickname (optional, or 'skip'): ");
+            // Nickname
+            String nick = InputHelper.readLine(scanner, "Nickname (optional, 'skip', or 0 to cancel): ");
+            if (nick.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
             if (nick.equalsIgnoreCase("skip")) {
                 nick = null;
             }
 
-            // Telefon +90 ve 10 hane
-            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number");
-            // Email @ kontrolü
+            // Phone
+            System.out.print("Phone number (0 to cancel) (+90) ");
+            String phoneInput = scanner.nextLine().trim();
+            if (phoneInput.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
+            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number: ");
+
+            // Email
+            System.out.print("Email (0 to cancel): ");
+            String emailInput = scanner.nextLine().trim();
+            if (emailInput.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
             String email = InputHelper.readValidEmail(scanner, "Email: ");
 
-            // LinkedIn Akıllı
-            String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL (optional)");
+            // LinkedIn
+            String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL (optional, 0 to cancel): ");
+            if (linkedin != null && linkedin.equals("CANCEL")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
 
-            // Tarih yyyy-MM-dd
-            LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date");
+            // Birth date
+            System.out.print("Birth date (0 to cancel) (" + DateUtil.getDateFormat() + "): ");
+            String dateInput = scanner.nextLine().trim();
+            if (dateInput.equals("0")) {
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
+                return;
+            }
+            LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date (" + DateUtil.getDateFormat() + "): ");
 
-            // Display preview
-            System.out.println("\nContact preview:");
+            // Preview
+            System.out.println(ConsoleColors.WHITE + "\nContact preview:" + ConsoleColors.RESET);
             System.out.printf("  First Name: %s%n", first);
             System.out.printf("  Last Name: %s%n", last);
             System.out.printf("  Nickname: %s%n", nick == null ? "-" : nick);
@@ -371,7 +412,7 @@ public class ContactService {
             System.out.printf("  LinkedIn: %s%n", linkedin == null ? "-" : linkedin);
             System.out.printf("  Birth Date: %s%n", birthDate);
 
-            if (InputHelper.readYesNo(scanner, "\nConfirm adding this contact?")) {
+            if (InputHelper.readYesNo(scanner, ConsoleColors.YELLOW + "\nConfirm adding this contact?" + ConsoleColors.RESET)) {
                 Contact c = new Contact();
                 c.setFirstName(first);
                 c.setLastName(last);
@@ -384,6 +425,9 @@ public class ContactService {
                 boolean ok = contactDAO.insertContact(c);
                 if (ok) {
                     System.out.println(ConsoleColors.GREEN + "\n✓ Contact added successfully." + ConsoleColors.RESET);
+                    if (undoManager != null && c.getContactId() != 0) {
+                        undoManager.push(UndoAction.forContactInsert(contactDAO, c.getContactId()));
+                    }
                     adding = false;
                 } else {
                     System.out.println(ConsoleColors.RED + "\n✗ Failed to add contact." + ConsoleColors.RESET);
@@ -393,61 +437,67 @@ public class ContactService {
                 }
             } else {
                 if (!InputHelper.readYesNo(scanner, "Edit again?")) {
-                    System.out.println("Add contact cancelled.");
+                    System.out.println(ConsoleColors.RED + "Add contact cancelled." + ConsoleColors.RESET);
                     adding = false;
                 }
             }
         }
     }
 
-    // ===================== DELETE =====================
+    // ----------------- Delete (interactive) -----------------
     public void deleteContactInteractive(Scanner scanner) {
-        System.out.println("\n=== Delete Contact ===");
-        
-        displayAllContacts(); 
+        System.out.println(ConsoleColors.CYAN + "\n=== Delete Contact ===" + ConsoleColors.RESET);
 
-        int id = InputHelper.readIntInRange(scanner, "Contact ID to delete (0 = cancel): ", 0, Integer.MAX_VALUE);
+        displayAllContacts();
+
+        int id = InputHelper.readIntInRange(scanner, ConsoleColors.YELLOW + "Contact ID to delete (0 = cancel): " + ConsoleColors.RESET, 0, Integer.MAX_VALUE);
         if (id == 0) {
-            System.out.println("Delete cancelled.");
+            System.out.println(ConsoleColors.RED + "Delete cancelled." + ConsoleColors.RESET);
             return;
         }
 
         Contact existing = contactDAO.getContactById(id);
         if (existing == null) {
-            System.out.println("Contact not found with ID: " + id);
+            System.out.println(ConsoleColors.YELLOW + "Contact not found with ID: " + id + ConsoleColors.RESET);
             return;
         }
 
+        // Snapshot BEFORE delete for undo
+        Contact contactSnapshot = UndoAction.cloneContact(existing);
+
         System.out.println("\nContact to delete:");
-        System.out.printf("%-5s %-15s %-15s %-15s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "EMAIL",
+        System.out.printf("%-5s %-15s %-15s %-15s %-12s %-40s %-40s%n", "ID", "FIRST NAME", "LAST NAME", "PHONE", "BIRTH DATE", "EMAIL",
                 "LINKEDIN URL");
         System.out.println(
-                "---------------------------------------------------------------------------------------------------------------");
+                "----------------------------------------------------------------------------------------------------------------------------------------------------------------");
         String firstName = existing.getFirstName() != null ? existing.getFirstName() : "-";
         String lastName = existing.getLastName() != null ? existing.getLastName() : "-";
         String phone = existing.getPhoneNumber() != null ? existing.getPhoneNumber() : "-";
         String email = existing.getEmail() != null ? existing.getEmail() : "-";
         String url = existing.getLinkedinUrl() != null ? existing.getLinkedinUrl() : "-";
-        System.out.printf("%-5d %-15s %-15s %-15s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone,
-                email, url);
+        String birthDate = existing.getBirthDate() != null ? existing.getBirthDate().toString() : "-";
+        System.out.printf("%-5d %-15s %-15s %-15s %-12s %-40s %-40s%n", existing.getContactId(), firstName, lastName, phone,
+                birthDate, email, url);
 
         if (!InputHelper.readYesNo(scanner, ConsoleColors.RED + "\nAre you sure you want to delete this contact?" + ConsoleColors.RESET)) {
-            System.out.println("Delete cancelled.");
+            System.out.println(ConsoleColors.RED + "Delete cancelled." + ConsoleColors.RESET);
             return;
         }
 
-        String confirm2 = InputHelper.readLine(scanner, "This action cannot be undone. Type 'DELETE' to confirm: ");
+        String confirm2 = InputHelper.readLine(scanner, ConsoleColors.YELLOW + "This action cannot be undone. Type 'DELETE' to confirm: " + ConsoleColors.RESET);
         if (!confirm2.trim().equals("DELETE")) {
-            System.out.println("Delete cancelled.");
+            System.out.println(ConsoleColors.RED + "Delete cancelled." + ConsoleColors.RESET);
             return;
         }
 
         boolean ok = contactDAO.deleteContact(id);
         if (ok) {
             System.out.println(ConsoleColors.GREEN + "\n✓ Contact deleted successfully." + ConsoleColors.RESET);
+            if (undoManager != null && contactSnapshot != null) {
+                undoManager.push(UndoAction.forContactDelete(contactDAO, contactSnapshot));
+            }
         } else {
             System.out.println(ConsoleColors.RED + "\n✗ Failed to delete contact." + ConsoleColors.RESET);
         }
     }
-
 }

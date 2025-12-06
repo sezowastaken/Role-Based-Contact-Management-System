@@ -15,11 +15,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Data Access Object (DAO) class for Contact entities.
+ * Provides methods to perform CRUD operations, search, sort, and statistical queries
+ * on the contacts table in the database.
+ */
 public class ContactDAO {
 
     /**
-     * Tüm contact kayıtlarını listeler.
-     * Hiç kayıt yoksa boş liste döner.
+     * Retrieves all contacts from the database.
+     * @return List of all contacts.
      */
     public List<Contact> getAllContacts() {
         List<Contact> contacts = new ArrayList<>();
@@ -43,8 +48,9 @@ public class ContactDAO {
     }
 
     /**
-     * Verilen ID’ye sahip contact’ı döner.
-     * Bulamazsa null döner.
+     * Retrieves a contact by its ID.
+     * @param id the contact ID to search for
+     * @return Contact object.
      */
     public Contact getContactById(int id) {
         String sql = "SELECT * FROM contacts WHERE contact_id = ?";
@@ -64,8 +70,9 @@ public class ContactDAO {
     }
 
     /**
-     * Yeni bir contact kaydı ekler.
-     * Başarılıysa true, hata varsa false döner.
+     * Inserts a new contact record into the database.
+     * @param contact the Contact object to insert
+     * @return true if successful, false otherwise.
      */
     public boolean insertContact(Contact contact) {
         String sql = "INSERT INTO contacts " +
@@ -74,7 +81,7 @@ public class ContactDAO {
 
         try {
             Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
             String firstName = normalizeName(contact.getFirstName());
             String lastName = normalizeName(contact.getLastName());
 
@@ -92,7 +99,17 @@ public class ContactDAO {
             }
 
             int affected = ps.executeUpdate();
-            return affected > 0;
+            if (affected == 0) {
+                return false;
+            }
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    contact.setContactId(keys.getInt(1));
+                }
+            }
+
+            return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,8 +118,10 @@ public class ContactDAO {
     }
 
     /**
-     * Var olan bir contact kaydını günceller.
-     * contactId alanı dolu olmalı.
+     * Updates an existing contact record in the database.
+     * The contact must have a valid contactId.
+     * @param contact the Contact object with updated information
+     * @return true if successful, false otherwise
      */
     public boolean updateContact(Contact contact) {
         String sql = "UPDATE contacts SET " +
@@ -147,9 +166,10 @@ public class ContactDAO {
     }
 
     /**
-     * İsim/soyisim alanını normalize eder:
-     * İlk harf BÜYÜK, kalan tüm harfler küçük olur.
-     * Örnek: "aHMeT" -> "Ahmet", "YILMAZ" -> "Yilmaz"
+     * Normalizes a name field: first letter uppercase, rest lowercase.
+     * Examples: "aHMeT" -> "Ahmet", "YILMAZ" -> "Yilmaz"
+     * @param name the name string to normalize
+     * @return normalized name string, or null if input is null
      */
     private String normalizeName(String name) {
         if (name == null) {
@@ -171,8 +191,9 @@ public class ContactDAO {
     }
 
     /**
-     * Verilen ID’ye göre contact siler.
-     * En az bir satır silinirse true döner.
+     * Deletes a contact from the database by its ID.
+     * @param id the contact ID to delete
+     * @return true if at least one row was deleted, false otherwise
      */
     public boolean deleteContact(int id) {
         String sql = "DELETE FROM contacts WHERE contact_id = ?";
@@ -195,25 +216,25 @@ public class ContactDAO {
     // =====================================================
 
     /**
-     * İsme göre arama yapar (first_name LIKE %query%).
-     * Türkçe karakter desteği ile.
+     * Searches contacts by first name and last name using LIKE pattern matching.
+     * Supports Turkish character case-insensitive search.
+     * @param query the search string (partial match supported)
+     * @return List of matching contacts
      */
     public List<Contact> searchByFirstName(String query) {
         String sql = "SELECT * FROM contacts WHERE first_name LIKE ? COLLATE utf8mb4_unicode_ci";
         return searchListWithSingleLike(sql, query);
     }
 
-    /**
-     * Soyisme göre arama yapar (last_name LIKE %query%).
-     * Türkçe karakter desteği ile.
-     */
     public List<Contact> searchByLastName(String query) {
         String sql = "SELECT * FROM contacts WHERE last_name LIKE ? COLLATE utf8mb4_unicode_ci";
         return searchListWithSingleLike(sql, query);
     }
 
     /**
-     * Telefon numarasına göre arama yapar (phone_number LIKE %digits%).
+     * Searches contacts by phone number using LIKE pattern matching.
+     * @param digits the phone number substring to search for
+     * @return List of matching contacts
      */
     public List<Contact> searchByPhoneContains(String digits) {
         String sql = "SELECT * FROM contacts WHERE phone_number LIKE ?";
@@ -225,8 +246,11 @@ public class ContactDAO {
     // =====================================================
 
     /**
-     * İsim + doğum ayına göre arama yapar.
-     * first_name LIKE %name% AND MONTH(birth_date) = month.
+     * Searches contacts by first name and birth month.
+     * Matches first_name LIKE pattern AND birth month equals specified month.
+     * @param namePart the first name substring to search for
+     * @param month the birth month (1-12)
+     * @return List of matching contacts
      */
     public List<Contact> searchByFirstNameAndBirthMonth(String namePart, int month) {
         List<Contact> results = new ArrayList<>();
@@ -248,6 +272,35 @@ public class ContactDAO {
             e.printStackTrace();
         }
 
+        return results;
+    }
+
+    /**
+     * Searches contacts by phone number and email using LIKE pattern matching.
+     * Both conditions must match.
+     * @param phonePart the phone number substring to search for
+     * @param emailPart the email substring to search for
+     * @return List of matching contacts
+     * Search by phone prefix and birth year.
+     * Matches phone numbers that start with the given prefix and birth year equals the given year.
+     */
+    public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
+        List<Contact> results = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE phone_number LIKE ? AND YEAR(birth_date) = ?";
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, phonePrefix + "%");
+            ps.setInt(2, year);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return results;
     }
 
@@ -278,8 +331,11 @@ public class ContactDAO {
     }
 
     /**
-     * İsim + soyisme birlikte bakarak arama yapar.
-     * first_name LIKE %first% AND last_name LIKE %last%.
+     * Searches contacts by both first name and last name using LIKE pattern matching.
+     * Both conditions must match.
+     * @param firstPart the first name substring to search for
+     * @param lastPart the last name substring to search for
+     * @return List of matching contacts
      */
     public List<Contact> searchByFirstAndLastName(String firstPart, String lastPart) {
         List<Contact> results = new ArrayList<>();
@@ -308,12 +364,19 @@ public class ContactDAO {
     // =====================================================
 
     /**
-     * It returns all contacts sorted by the selected field.
-     * sortField: "first_name", "last_name", "phone", "birth_date", "created_at",
-     * etc.
-     * Only allowed fields are used; otherwise, contact_id is used.
+     * Returns all contacts sorted by the specified field.
+     * Supported fields: "first_name", "last_name", "phone", "birth_date", "created_at", "age".
+     * If field is not recognized, defaults to sorting by contact_id.
+     * @param sortField the field name to sort by
+     * @param ascending true for ascending order, false for descending
+     * @return List of contacts sorted by the specified field
      */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
+        
+        if (sortField.equals("age") || sortField.equals("Age")) {
+            return getAllSortedByAge(ascending);
+        }
+
         String column;
 
         switch (sortField) {
@@ -360,13 +423,46 @@ public class ContactDAO {
         return contacts;
     }
 
+    /**
+     * Returns all contacts sorted by age (calculated from birth_date).
+     * Contacts without birth_date are placed at the end of the list.
+     * @param ascending true for youngest first (ascending by age), false for oldest first (descending by age)
+     * @return List of contacts sorted by age
+     */
+    private List<Contact> getAllSortedByAge(boolean ascending) {
+        List<Contact> contacts = new ArrayList<>();
+        // Sort by age: NULL birth_date contacts go to the end
+        // For ascending (youngest first): smallest age first, so DESC by birth_date
+        // For descending (oldest first): largest age first, so ASC by birth_date
+        String direction = ascending ? "DESC" : "ASC"; // DESC = youngest first (largest birth_date = youngest)
+        String sql = "SELECT * FROM contacts " +
+                "ORDER BY " +
+                "CASE WHEN birth_date IS NULL THEN 1 ELSE 0 END, " + // NULLs go to end
+                "birth_date " + direction;
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                contacts.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return contacts;
+    }
+
     // =====================================================
     // STATISTICS
     // =====================================================
 
     /**
-     * It calculates the average age of all contacts.
-     * It does not consider those without a birth date.
+     * Calculates the average age of all contacts.
+     * Only considers contacts with a valid birth date.
+     * @return average age as a double, 0.0 if no contacts with birth date found
      */
     public double getAverageAge() {
         String sql = "SELECT AVG(TIMESTAMPDIFF(YEAR, birth_date, CURDATE())) AS avg_age " +
@@ -386,7 +482,8 @@ public class ContactDAO {
     }
 
     /**
-     * It returns the youngest contact record (the one with the largest birth_date).
+     * Returns the youngest and oldest contact.
+     * @return youngest Contact object, null if no contacts with birth date found
      */
     public Contact getYoungestContact() {
         String sql = "SELECT * FROM contacts " +
@@ -405,9 +502,6 @@ public class ContactDAO {
         return null;
     }
 
-    /**
-     * It returns the oldest contact record (the one with the smallest birth_date).
-     */
     public Contact getOldestContact() {
         String sql = "SELECT * FROM contacts " +
                 "WHERE birth_date IS NOT NULL " +
@@ -426,7 +520,8 @@ public class ContactDAO {
     }
 
     /**
-     * It returns the count of contacts with a non-empty LinkedIn URL.
+     * Returns the count of contacts that have and not have a non-empty Linkedin URL.
+     * @return number of contacts with Linkedin URL
      */
     public int countWithLinkedin() {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts " +
@@ -444,9 +539,6 @@ public class ContactDAO {
         return 0;
     }
 
-    /**
-     * It returns the count of contacts with an empty LinkedIn URL.
-     */
     public int countWithoutLinkedin() {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts " +
                 "WHERE linkedin_url IS NULL OR linkedin_url = ''";
@@ -464,8 +556,10 @@ public class ContactDAO {
     }
 
     /**
-     * It returns the count of contacts with the given first name.
-     * It performs an exact match (not LIKE, but =).
+     * Returns the count of contacts with the specified first name.
+     * Performs an exact match (case-sensitive). 
+     * @param firstName the first name to count
+     * @return number of contacts with the given first name
      */
     public int countByFirstName(String firstName) {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts WHERE first_name = ?";
@@ -484,10 +578,10 @@ public class ContactDAO {
     }
 
     /**
-     * Returns a map of all first names and their counts (how many people have the
-     * same first name).
-     * Groups by first_name and counts occurrences.
-     * Returns LinkedHashMap ordered by count DESC, then by first_name ASC.
+     * Returns a map of all first names and their occurrence counts.
+     * Shows how many contacts share each first name.
+     * @return LinkedHashMap with first names as keys and counts as values,
+     *         ordered by count descending, then by first name ascending
      */
     public Map<String, Integer> getAllFirstNameCounts() {
         Map<String, Integer> nameCounts = new LinkedHashMap<>();
@@ -508,7 +602,8 @@ public class ContactDAO {
     }
 
     /**
-     * Returns the total count of all contacts in the database.
+     * Returns the total number of contacts in the database.
+     * @return total contact count
      */
     public int getTotalContactCount() {
         String sql = "SELECT COUNT(*) AS cnt FROM contacts";
@@ -526,10 +621,10 @@ public class ContactDAO {
     }
 
     /**
-     * Returns a map of birth months and their counts (how many people were born in
-     * each month).
-     * Keys are month names (January, February, etc.) and values are counts.
-     * Returns LinkedHashMap ordered by count DESC, then by month number ASC.
+     * Returns a map showing the distribution of birth months.
+     * Keys are month names (January, February, etc.), values are counts.
+     * @return LinkedHashMap with month names as keys and counts as values,
+     *         ordered by count descending, then by month number ascending
      */
     public Map<String, Integer> getBirthMonthDistribution() {
         Map<String, Integer> monthCounts = new LinkedHashMap<>();
@@ -558,10 +653,11 @@ public class ContactDAO {
     }
 
     /**
-     * Returns a map of age groups and their counts.
+     * Returns a map showing the distribution of contacts by age groups.
      * Age groups: "0-18", "19-30", "31-50", "50+"
-     * Only considers contacts with birth date information.
-     * Returns LinkedHashMap ordered by age group.
+     * Only considers contacts with valid birth date information.
+     * @return LinkedHashMap with age group names as keys and counts as values,
+     *         ordered by age group
      */
     public Map<String, Integer> getAgeGroupDistribution() {
         Map<String, Integer> ageGroups = new LinkedHashMap<>();
@@ -601,9 +697,15 @@ public class ContactDAO {
     }
 
     // =====================================================
-    // PRIVATE HELPER METOTLAR
+    // PRIVATE HELPER METHODS
     // =====================================================
 
+    /**
+     * Helper method to execute a single LIKE search query.
+     * @param sql the SQL query with one LIKE parameter
+     * @param value the search value to match
+     * @return List of matching contacts
+     */
     private List<Contact> searchListWithSingleLike(String sql, String value) {
         List<Contact> results = new ArrayList<>();
         try {
@@ -621,6 +723,12 @@ public class ContactDAO {
         return results;
     }
 
+    /**
+     * Maps a ResultSet row to a Contact object.
+     * @param rs the ResultSet containing contact data
+     * @return Contact object created from the ResultSet
+     * @throws SQLException if database access error occurs
+     */
     private Contact mapResultSetToContact(ResultSet rs) throws SQLException {
         Contact c = new Contact();
         c.setContactId(rs.getInt("contact_id"));
