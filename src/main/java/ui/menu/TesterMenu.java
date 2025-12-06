@@ -36,7 +36,7 @@ public class TesterMenu extends BaseMenu {
                 + ConsoleColors.YELLOW + "        │");
         System.out.println("├──────────────────────────────────────────────────────────────────────┤");
         System.out.println(
-                "│ " + ConsoleColors.YELLOW + "1 - Change password                                "
+                "│ " + ConsoleColors.WHITE + "1 - Change password                                "
                         + ConsoleColors.YELLOW + "                  │");
         System.out.println(
                 "│ " + ConsoleColors.WHITE + "2 - List all contacts            " + ConsoleColors.YELLOW
@@ -50,7 +50,7 @@ public class TesterMenu extends BaseMenu {
         if (undoManager != null && undoManager.canUndo()) {
             System.out.println("| " + ConsoleColors.WHITE
                     + "5 - Undo last operation |                       " + ConsoleColors.YELLOW
-                    + "                   │");
+                    + "                     │");
         }
         System.out.println(
                 "│ " + ConsoleColors.RED + "0 - Logout              " + ConsoleColors.YELLOW
