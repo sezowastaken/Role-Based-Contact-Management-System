@@ -50,9 +50,6 @@ public class InputHelper {
     // 2) Read Line (Can be empty)
     // ==========================================
     public static String readLine(Scanner scanner, String prompt) {
-        if (!scanner.hasNextLine()) {
-            return null;
-        }
         System.out.print(prompt);
         String line = scanner.nextLine();
         return (line == null) ? "" : line.trim();

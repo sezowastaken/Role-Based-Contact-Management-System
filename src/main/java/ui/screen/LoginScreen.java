@@ -46,18 +46,19 @@ public class LoginScreen {
             System.out.println(ConsoleColors.CYAN + "Enter your username and password to log in." + ConsoleColors.RESET);
             System.out.println(ConsoleColors.YELLOW + "(To exit, type 'q' as the username.)\n" + ConsoleColors.RESET);
     
-            // ✅ Username girişini InputHelper ile al
             String username = InputHelper.readValidUsername(scanner, ConsoleColors.WHITE + "Username: " + ConsoleColors.RESET);
             if (username.equalsIgnoreCase("q")) {
                 InputHelper.clearScreen();
+                ui.screen.AsciiAnimator.runOutro();
+                InputHelper.clearScreen();
                 System.out.println(ConsoleColors.GREEN + "\nExiting the application. See you next time!" + ConsoleColors.RESET);
+                System.exit(0);
                 return;
             }
-    
-            // ✅ Password girişini InputHelper ile al
+
             String password = InputHelper.readNonEmptyLine(scanner, ConsoleColors.WHITE + "Password: " + ConsoleColors.RESET);
     
-            // Giriş kontrolü
+
             User loggedIn = authService.login(username, password);
             if (loggedIn == null) {
                 System.out.println(ConsoleColors.RED + "\nLogin failed. Incorrect username or password." + ConsoleColors.RESET);

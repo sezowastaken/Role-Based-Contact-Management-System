@@ -16,6 +16,7 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final UndoManager undoManager;
+    String usernamePattern = "^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$";
 
     public UserService() {
         this(new UserDAO(), null);
@@ -116,11 +117,11 @@ public class UserService {
             if (newUsername.equals("0"))
                 return;
 
-            String newFirst = InputHelper.readLine(scanner, "New first name (current: " + existing.getName() + "): ");
+            String newFirst = InputHelper.readValidName(scanner, "New first name (current: " + existing.getName() + "): ");
             if (newFirst.equals("0"))
                 return;
 
-            String newLast = InputHelper.readLine(scanner, "New last name (current: " + existing.getSurname() + "): ");
+            String newLast = InputHelper.readValidName(scanner, "New last name (current: " + existing.getSurname() + "): ");
             if (newLast.equals("0"))
                 return;
 
@@ -288,7 +289,7 @@ public class UserService {
             Role role) {
         if (username == null || username.trim().isEmpty())
             throw new IllegalArgumentException(ConsoleColors.RED + "Username cannot be empty." + ConsoleColors.RESET);
-        if (!username.matches("^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$"))
+        if (!username.matches(usernamePattern))
             throw new IllegalArgumentException(ConsoleColors.RED +
                     "Username contains invalid characters (Only letters, numbers, _, . allowed)."
                     + ConsoleColors.RESET);
@@ -340,7 +341,7 @@ public class UserService {
                 existing.getName(), existing.getSurname(), existing.getRole(), existing.getCreatedAt());
 
         if (newUsername != null && !newUsername.trim().isEmpty()) {
-            if (!newUsername.matches("^[A-Za-z0-9_.]+$"))
+            if (!newUsername.matches(usernamePattern))
                 throw new IllegalArgumentException(
                         ConsoleColors.RED + "Username format is invalid." + ConsoleColors.RESET);
             if (userDAO.existsByUsername(newUsername, userId))

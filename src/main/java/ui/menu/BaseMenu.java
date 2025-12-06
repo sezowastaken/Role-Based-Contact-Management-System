@@ -45,7 +45,7 @@ public abstract class BaseMenu {
             printUserInfo();
             printOptions();
 
-            System.out.println(); // spacing
+            System.out.println();
             String choice = InputHelper.readLine(scanner,
                     ConsoleColors.CYAN + "Select an option: " + ConsoleColors.RESET);
             InputHelper.clearScreen();
@@ -53,12 +53,9 @@ public abstract class BaseMenu {
                 System.out.println(ConsoleColors.GREEN + "\nLogging out... See you soon, "
                         + currentUser.getName() + "!" + ConsoleColors.RESET);
             
-                pause();  // kullanıcı logout mesajını görsün
+                pause(); 
             
-                // ⭐ LOGOUT OUTRO ANİMASYONUN TAM DOĞRU YERİ ⭐
-                ui.screen.AsciiAnimator.runOutro();
-            
-                return;  // menüden çık, üst katman uygulamayı kapatsın
+                return;
             }
             
 
