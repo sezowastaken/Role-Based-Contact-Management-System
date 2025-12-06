@@ -1,5 +1,9 @@
 package ui.screen;
 
+/**
+ * Handles ASCII art animations displayed at application startup.
+ * Shows intro animations with Star Wars-style effects.
+ */
 public class AsciiAnimator {
     private static final String RESET = "\u001B[0m";
     private static final String BLUE = "\u001B[34m";
@@ -58,7 +62,9 @@ public class AsciiAnimator {
             ""
     };
 
-    // === Konsolu temizle ===
+    /**
+     * Clears the console screen (works on Windows and Unix systems).
+     */
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
@@ -71,6 +77,10 @@ public class AsciiAnimator {
         }
     }
 
+    /**
+     * Helper method to pause execution for a specified number of milliseconds.
+     * @param ms milliseconds to sleep
+     */
     private static void sleep(long ms) {
         try {
             Thread.sleep(ms);
@@ -79,7 +89,12 @@ public class AsciiAnimator {
         }
     }
 
-    // === Ortaya hizalama ===
+    /**
+     * Centers a text string within a specified width.
+     * @param text the text to center
+     * @param width the total width
+     * @return centered text string
+     */
     private static String center(String text, int width) {
         if (text == null)
             return "";
@@ -90,7 +105,9 @@ public class AsciiAnimator {
         return " ".repeat(Math.max(left, 0)) + text;
     }
 
-    // === Girişte CODE WARS çerçevesi ===
+    /**
+     * Displays the CODE WARS prelude art with animation.
+     */
     private static void showPrelude() {
         clearScreen();
         String[] lines = PRELUDE_ART.split("\n");
@@ -101,7 +118,10 @@ public class AsciiAnimator {
         sleep(1500);
     }
 
-    // === Yıldızlı arka plan ===
+    /**
+     * Displays an animated starfield background.
+     * @param frames number of animation frames to show
+     */
     private static void showStarfield(int frames) {
         int width = 90;
         int height = 25;
@@ -128,7 +148,9 @@ public class AsciiAnimator {
         }
     }
 
-    // === Kadir Has ASCII başlığı ===
+    /**
+     * Displays the Kadir Has University title with ASCII art.
+     */
     private static void showTitle() {
         clearScreen();
         String[] lines = TITLE_TEXT.split("\n");
@@ -139,7 +161,9 @@ public class AsciiAnimator {
         sleep(2500);
     }
 
-    // === Star Wars crawl efekt ===
+    /**
+     * Displays a Star Wars-style scrolling text effect (crawl).
+     */
     private static void showCrawl() {
         int screenH = 30;
         int total = CRAWL_LINES.length;
@@ -161,7 +185,10 @@ public class AsciiAnimator {
         }
     }
 
-    // === Tüm intro akışı ===
+    /**
+     * Runs the complete intro animation sequence.
+     * Shows prelude, starfield, title, and crawl effects in order.
+     */
     public static void runIntro() {
 
         showPrelude();
