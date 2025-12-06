@@ -51,7 +51,7 @@ public class UserService {
         System.out.println(ConsoleColors.YELLOW + "(Enter '0' at any step to cancel)" + ConsoleColors.RESET);
 
         try {
-            String username = InputHelper.readNonEmptyLine(scanner, ConsoleColors.WHITE + "Username: ");
+            String username = InputHelper.readValidNickname(scanner, ConsoleColors.WHITE + "Username: ");
             if (username.equals("0"))
                 return;
 
@@ -288,7 +288,7 @@ public class UserService {
             Role role) {
         if (username == null || username.trim().isEmpty())
             throw new IllegalArgumentException(ConsoleColors.RED + "Username cannot be empty." + ConsoleColors.RESET);
-        if (!username.matches("^[A-Za-z0-9_.]+$"))
+        if (!username.matches("^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$"))
             throw new IllegalArgumentException(ConsoleColors.RED +
                     "Username contains invalid characters (Only letters, numbers, _, . allowed)."
                     + ConsoleColors.RESET);

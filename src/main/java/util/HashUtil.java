@@ -2,6 +2,9 @@ package util;
 
 import java.security.MessageDigest;
 
+/**
+ * Utility class for hashing and verifying passwords using SHA-256.
+ */
 public class HashUtil {
 
     public static String hash(String password){
@@ -23,11 +26,16 @@ public class HashUtil {
         catch (Exception e){
             throw new RuntimeException("An error occurred while hashing the password!",e);
         }
-        /* girilen plain text şifre hashlernir ve storedHash ile karşılaştırır,
-        eğer eşlenirse true döner */
+        /* Hashes the given plain text password and compares it with the stored hash,
+        returns true if they match */
     }
 
-    
+    /**
+     * Verifies if the plain password matches the stored hash.
+     * @param plainPassword The plain text password to verify.
+     * @param storedHashString The stored hashed password.
+     * @return true if the passwords match, false otherwise.
+     */
     public static boolean verify(String plainPassword, String storedHashString){
         
         return hash(plainPassword).equalsIgnoreCase(storedHashString);

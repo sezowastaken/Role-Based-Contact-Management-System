@@ -10,23 +10,24 @@ import java.util.regex.Pattern;
  */
 public class InputHelper {
 
-    // Hata mesajları için standart ön ek (Renkli)
+    // Standard prefix for error messages (Colored)
     private static final String ERR_PREFIX = ConsoleColors.RED + " ERROR: " + ConsoleColors.RESET;
 
     // ==========================================
-    // VERİTABANI UZUNLUK SINIRLARI (DB ŞEMASINA GÖRE)
+    // DATABASE LIMITS (BASED ON DB SCHEMA)
     // ==========================================
     private static final int MAX_NAME_LENGTH = 50; // name, surname, first_name, last_name, nickname
     private static final int MAX_USERNAME_LENGTH = 50; // username
-    private static final int MAX_RAW_PASSWORD_LENGTH = 100; // Ham şifre girişi limiti (Hash 255)
+    private static final int MAX_RAW_PASSWORD_LENGTH = 100; // Raw password input limit (Hash 255)
     private static final int MAX_EMAIL_LENGTH = 100; // email
     private static final int MAX_LINKEDIN_LENGTH = 255; // linkedin_url
     private static final String NICKNAME_REGEX = "^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$"; // Nickname regex'i
 
     // ==========================================
-    // 1) Boş Olmayan Satır Oku (PASSWORD/GENEL)
+    // 1) Read Non-Empty Line (PASSWORD/GENERAL)
     // ==========================================
     public static String readNonEmptyLine(Scanner scanner, String prompt) {
+        
         while (true) {
             System.out.print(prompt);
             String line = scanner.nextLine();
@@ -34,7 +35,7 @@ public class InputHelper {
             line = line.trim();
 
             if (!line.isEmpty()) {
-                // Ham şifre için uzunluk kontrolü
+                // Length check for raw password
                 if (line.length() > MAX_RAW_PASSWORD_LENGTH) {
                     System.out.printf(ERR_PREFIX + "Input exceeds maximum length of %d characters.\n", MAX_RAW_PASSWORD_LENGTH);
                     continue;
@@ -46,16 +47,19 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 2) Satır Oku (Boş olabilir)
+    // 2) Read Line (Can be empty)
     // ==========================================
     public static String readLine(Scanner scanner, String prompt) {
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
         System.out.print(prompt);
         String line = scanner.nextLine();
         return (line == null) ? "" : line.trim();
     }
 
     // ==========================================
-    // 3) Integer Oku (Aralık Kontrollü)
+    // 3) Read Integer (With Range)
     // ==========================================
     public static int readIntInRange(Scanner scanner, String prompt, int min, int max) {
         while (true) {
@@ -83,7 +87,7 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 4) Genel Integer Oku
+    // 4) Read Integer (General)
     // ==========================================
     public static int readInt(Scanner scanner, String prompt) {
         while (true) {
@@ -98,7 +102,7 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 5) Evet/Hayır Sorusu (y/n)
+    // 5) Yes/No Question (y/n)
     // ==========================================
     public static boolean readYesNo(Scanner scanner, String prompt) {
         while (true) {
@@ -118,7 +122,7 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 6) İsim/Soyisim Doğrulama (UZUNLUK KONTROLLÜ)
+    // 6) Name/Surname Validation (LENGTH CHECK)
     // ==========================================
     public static String readValidName(Scanner scanner, String prompt) {
         java.util.Locale tr = java.util.Locale.forLanguageTag("tr-TR");
@@ -136,19 +140,19 @@ public class InputHelper {
                 continue;
             }
             
-            // UZUNLUK KONTROLÜ (MAX 50)
+            // LENGTH CHECK (MAX 50)
             if (input.length() > MAX_NAME_LENGTH) {
                  System.out.printf(ERR_PREFIX + "Name exceeds maximum length of %d characters.\n", MAX_NAME_LENGTH);
                  continue;
             }
 
-            // KARAKTER KONTROLÜ
+            // CHARACTER CHECK
             if (!input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 System.out.println(ERR_PREFIX + "Name must contain only letters (no numbers).");
                 continue;
             }
 
-            // Baş Harf Büyütme İşlemi
+            // Capitalize First Letter
             String lowerAll = input.toLowerCase(tr);
             String[] parts = lowerAll.split("\\s+");
             StringBuilder sb = new StringBuilder();
@@ -167,7 +171,7 @@ public class InputHelper {
     }
     
     // ==========================================
-    // 6.5) Nickname Doğrulama (UZUNLUK KONTROLLÜ)
+    // 6.5) Nickname Validation (LENGTH CHECK)
     // ==========================================
     public static String readValidNickname(Scanner scanner, String prompt) {
         while (true) {
@@ -186,7 +190,7 @@ public class InputHelper {
                  continue;
             }
             
-            // Regex: Harf, Rakam, Boşluk, Tire
+            // Regex: Letter, Number, Space, Hyphen
             if (!input.matches(NICKNAME_REGEX)) {
                 System.out.println(ERR_PREFIX + "Nickname can only contain letters, numbers, dot, space, and hyphens.");
                 continue;
@@ -196,7 +200,7 @@ public class InputHelper {
     }
     
     // ==========================================
-    // 6.7) Username Doğrulama (UZUNLUK KONTROLLÜ)
+    // 6.7) Username Validation (LENGTH CHECK)
     // ==========================================
     public static String readValidUsername(Scanner scanner, String prompt) {
         while (true) {
@@ -215,7 +219,7 @@ public class InputHelper {
                  continue;
             }
             
-            // Username Regex: Sadece harf, rakam, alt çizgi ve nokta
+            // Username Regex: Only letters, numbers, underscore, and dot
             if (!input.matches("^[A-Za-z0-9_.]+$")) {
                 System.out.println(ERR_PREFIX + "Username can only contain letters, numbers, dot, and underscore.");
                 continue;
@@ -226,7 +230,7 @@ public class InputHelper {
 
 
     // ==========================================
-    // 7) Telefon Doğrulama (+90 Türkiye Formatı)
+    // 7) Phone Validation (+90 Turkey Format)
     // ==========================================
     public static String readValidPhoneTR(Scanner scanner, String prompt) {
         while (true) {
@@ -249,10 +253,12 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 8) Email Doğrulama (UZUNLUK KONTROLLÜ)
+    // 8) Email Validation (LENGTH CHECK)
     // ==========================================
     public static String readValidEmail(Scanner scanner, String prompt) {
-        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        String regex = "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
+                        "[A-Za-z0-9.-]+\\." +
+                        "[A-Za-z]{2,}$";
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
@@ -272,7 +278,7 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 9) Tarih Doğrulama (DateUtil Entegrasyonu)
+    // 9) Date Validation (DateUtil Integration)
     // ==========================================
     public static LocalDate readValidPastDate(Scanner scanner, String prompt) {
         while (true) {
@@ -290,7 +296,7 @@ public class InputHelper {
     }
 
     // =========================================================================
-    // 10) LinkedIn Doğrulama (UZUNLUK KONTROLLÜ)
+    // 10) LinkedIn Validation (LENGTH CHECK)
     // =========================================================================
     public static String readValidLinkedin(Scanner scanner, String prompt) {
         String linkedinRegex = "^https:\\/\\/([a-z]{2,3}\\.)?linkedin\\.com\\/.*$";
@@ -328,7 +334,7 @@ public class InputHelper {
     }
 
     // ==========================================
-    // 11) Konsol Temizleme
+    // 11) Clear Console
     // ==========================================
     public static void clearScreen() {
         try {

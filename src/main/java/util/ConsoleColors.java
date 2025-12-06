@@ -1,5 +1,9 @@
 package util;
 
+/**
+ * Utility class for console text colors using ANSI escape codes.
+ * Provides constants for various text colors and a reset code.
+ */
 public class ConsoleColors {
 
     public static final String RESET = "\u001B[0m";
@@ -14,6 +18,6 @@ public class ConsoleColors {
     public static final String WHITE = "\u001B[97m";
 
     private ConsoleColors() {
-        // utility class, instance oluşturulmasın
+        // utility class, instance not allowed
     }
 }

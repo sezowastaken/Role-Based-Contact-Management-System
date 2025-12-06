@@ -12,52 +12,112 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Service class for managing contact operations.
+ * Provides methods for searching, sorting, updating, adding, and deleting contacts.
+ * Supports undo functionality.
+ */
 public class ContactService {
 
     private final ContactDAO contactDAO = new ContactDAO();
     private final UndoManager undoManager;
 
+    /**
+     * Constructor for ContactService.
+     * @param undoManager the undo manager to use
+     */
     public ContactService() {
         this(null);
     }
 
+    /**
+     * Constructor for ContactService.
+     * @param undoManager the undo manager to use
+     */
     public ContactService(UndoManager undoManager) {
         this.undoManager = undoManager;
     }
 
+    /**
+     * Retrieves all contacts from the database.
+     * @return List of all contacts.
+     */
     public List<Contact> getAllContacts() {
         return contactDAO.getAllContacts();
     }
 
+    /**
+     * Retrieves all contacts from the database sorted by the given field.
+     * @param sortField the field to sort by
+     * @param ascending true if the sort should be ascending, false otherwise
+     * @return List of all contacts sorted by the given field.
+     */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
         return contactDAO.getAllSorted(sortField, ascending);
     }
 
+    /**
+     * Searches for contacts by first name.
+     * @param query the query to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByFirstName(String query) {
         return contactDAO.searchByFirstName(query);
     }
 
+    /**
+     * Searches for contacts by last name.
+     * @param query the query to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByLastName(String query) {
         return contactDAO.searchByLastName(query);
     }
 
+    /**
+     * Searches for contacts by phone number.
+     * @param query the query to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByPhoneNumber(String query) {
         return contactDAO.searchByPhoneContains(query);
     }
 
+    /**
+     * Searches for contacts by first name and birth month.
+     * @param firstName the first name to search for
+     * @param month the birth month to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByFirstNameAndBirthMonth(String firstName, int month) {
         return contactDAO.searchByFirstNameAndBirthMonth(firstName, month);
     }
 
+    /**
+     * Searches for contacts by phone prefix and birth year.
+     * @param phonePrefix the phone prefix to search for
+     * @param year the birth year to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
         return contactDAO.searchByPhonePrefixAndBirthYear(phonePrefix, year);
     }
 
+    /**
+     * Searches for contacts by first name and last name.
+     * @param firstNamePart the first name to search for
+     * @param lastNamePart the last name to search for
+     * @return List of contacts matching the query.
+     */
     public List<Contact> searchByFirstAndLastName(String firstNamePart, String lastNamePart) {
         return contactDAO.searchByFirstAndLastName(firstNamePart, lastNamePart);
     }
 
     // ----------------- Printing -----------------
+    /**
+     * Prints a list of contacts to the console.
+     * @param contacts the list of contacts to print
+     */
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
             System.out.println(ConsoleColors.YELLOW + "\nNo contacts found." + ConsoleColors.RESET);
@@ -91,12 +151,19 @@ public class ContactService {
                 ConsoleColors.GREEN + "\nTotal " + contacts.size() + " contact(s) found." + ConsoleColors.RESET);
     }
 
+    /**
+     * Displays all contacts.
+     */
     public void displayAllContacts() {
         List<Contact> contacts = getAllContacts();
         printContactsList(contacts);
     }
 
     // ----------------- Search (interactive) -----------------
+    /**
+     * Searches for contacts interactively.
+     * @param scanner the scanner to use
+     */
     public void searchContactsInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Search Contacts ===" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.WHITE + "1 - Search by first name");
@@ -165,6 +232,10 @@ public class ContactService {
     }
 
     // ----------------- Sort (interactive) -----------------
+    /**
+     * Sorts contacts interactively.
+     * @param scanner the scanner to use
+     */
     public void sortContactsInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Sort Contacts ===" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.WHITE + "1 - Sort by first name");
@@ -209,6 +280,10 @@ public class ContactService {
     }
 
     // ----------------- Update (interactive) -----------------
+    /**
+     * Updates a contact interactively.
+     * @param scanner the scanner to use
+     */
     public void updateContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===" + ConsoleColors.RESET);
 
@@ -321,10 +396,10 @@ public class ContactService {
             if (input.isEmpty()) break;
 
             // Türkçe karakterleri de destekleyen basit ama sağlam regex
-            String emailRegex =
-                    "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
-                    "[A-Za-z0-9çÇğĞıİöÖşŞüÜ.-]+\\." +
-                    "[A-Za-zçÇğĞıİöÖşŞüÜ]{2,}$";
+            String emailRegex = "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
+                                "[A-Za-z0-9.-]+\\." +
+                                "[A-Za-z]{2,}$";
+
 
             if (input.matches(emailRegex)) {
                 existing.setEmail(input);
@@ -371,6 +446,10 @@ public class ContactService {
     }
 
     // ----------------- Add (interactive) -----------------
+    /**
+     * Adds a contact interactively.
+     * @param scanner the scanner to use
+     */
     public void addContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.WHITE + "\n=== Add New Contact ===");
         System.out.println(ConsoleColors.RED + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
@@ -473,6 +552,10 @@ public class ContactService {
     }
 
     // ----------------- Delete (interactive) -----------------
+    /**
+     * Deletes a contact interactively.
+     * @param scanner the scanner to use
+     */
     public void deleteContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.BLUE + "\n=== Delete Contact ===" + ConsoleColors.RESET);
 
