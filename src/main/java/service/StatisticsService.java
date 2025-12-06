@@ -21,14 +21,11 @@ public class StatisticsService {
     }
 
     /**
-     * Displays comprehensive contact statistics for Manager role.
-     * Includes: average age, youngest/oldest contacts, LinkedIn counts, and name
-     * frequency.
+     * Displays contact statistics for Manager role.
      */
     public void displayContactStatistics() {
         System.out.println(ConsoleColors.BLUE + "\n=== CONTACTS STATISTICAL INFORMATION ===\n" + ConsoleColors.RESET);
 
-        // Total Contact Count
         int totalCount = contactDAO.getTotalContactCount();
         System.out.println(ConsoleColors.YELLOW + "Total Contact Count:" + ConsoleColors.RESET);
         System.out.printf("%s%d contact(s)%s%n%n",
@@ -37,7 +34,6 @@ public class StatisticsService {
                 ConsoleColors.RESET
         );
 
-        // Average Age
         double avgAge = contactDAO.getAverageAge();
         System.out.println(ConsoleColors.YELLOW + "Average Age:" + ConsoleColors.RESET);
         if (avgAge > 0) {
@@ -50,7 +46,6 @@ public class StatisticsService {
             System.out.println(ConsoleColors.RED + "No contacts with birth date information.\n" + ConsoleColors.RESET);
         }
 
-        // Youngest Contact
         Contact youngest = contactDAO.getYoungestContact();
         System.out.println(ConsoleColors.YELLOW + "Youngest Contact:" + ConsoleColors.RESET);
         if (youngest != null && youngest.getBirthDate() != null) {
@@ -65,7 +60,6 @@ public class StatisticsService {
             System.out.println(ConsoleColors.RED + "No contact with birth date information.\n" + ConsoleColors.RESET);
         }
 
-        // Oldest Contact
         Contact oldest = contactDAO.getOldestContact();
         System.out.println(ConsoleColors.YELLOW + "Oldest Contact:" + ConsoleColors.RESET);
         if (oldest != null && oldest.getBirthDate() != null) {
@@ -80,7 +74,6 @@ public class StatisticsService {
             System.out.println(ConsoleColors.RED + "No contact with birth date information.\n" + ConsoleColors.RESET);
         }
 
-        // LinkedIn Statistics
         int withLinkedin = contactDAO.countWithLinkedin();
         int withoutLinkedin = contactDAO.countWithoutLinkedin();
         System.out.println(ConsoleColors.YELLOW + "LinkedIn Profile Statistics:" + ConsoleColors.RESET);
@@ -95,7 +88,6 @@ public class StatisticsService {
                 ConsoleColors.RESET
         );
 
-        // Birth Month Distribution
         Map<String, Integer> birthMonthDist = contactDAO.getBirthMonthDistribution();
         System.out.println(ConsoleColors.YELLOW + "Birth Month Distribution:" + ConsoleColors.RESET);
         if (birthMonthDist.isEmpty()) {
@@ -112,7 +104,6 @@ public class StatisticsService {
             System.out.println();
         }
 
-        // Age Group Distribution
         Map<String, Integer> ageGroups = contactDAO.getAgeGroupDistribution();
         System.out.println(ConsoleColors.YELLOW + "Age Group Distribution:" + ConsoleColors.RESET);
         int totalWithBirthDate = 0;
@@ -136,7 +127,6 @@ public class StatisticsService {
             System.out.println();
         }
 
-        // Same First Name Statistics
         Map<String, Integer> nameCounts = contactDAO.getAllFirstNameCounts();
         System.out.println(ConsoleColors.YELLOW + "First Name Frequency (same name count):" + ConsoleColors.RESET);
         if (nameCounts.isEmpty()) {

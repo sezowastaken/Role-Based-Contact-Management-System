@@ -6,8 +6,8 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
-import util.ConsoleColors; // Colors
-import util.InputHelper; // Safe Input
+import util.ConsoleColors;
+import util.InputHelper;
 
 /**
  * Menu for Tester role.
@@ -26,11 +26,8 @@ public class TesterMenu extends BaseMenu {
      */
     public TesterMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
-        // UndoManager constructor
         this.contactService = new ContactService(undoManager);
         this.userService = new UserService(undoManager);
-        // If UserService has another constructor for UserDAO:
-        // this.userService = new UserService(new UserDAO(), undoManager);
     }
 
     /**
@@ -84,21 +81,18 @@ public class TesterMenu extends BaseMenu {
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                // Tester kendi şifresini değiştirebiliyor
                 userService.changeOwnPasswordInteractive(currentUser, scanner);
                 break;
             case "2":
                 contactService.displayAllContacts();
                 break;
             case "3":
-                // ContactService içindeki Regex/InputHelper korumalı metodu çağırır
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
                 contactService.sortContactsInteractive(scanner);
                 break;
             case "5":
-                // Menüde 5 yazmıyorsa da kullanıcı elle girerse:
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo();
                 } else {

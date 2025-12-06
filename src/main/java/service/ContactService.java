@@ -22,83 +22,38 @@ public class ContactService {
     private final ContactDAO contactDAO = new ContactDAO();
     private final UndoManager undoManager;
 
-    /**
-     * Constructor for ContactService.
-     * @param undoManager the undo manager to use
-     */
     public ContactService() {
         this(null);
     }
 
-    /**
-     * Constructor for ContactService.
-     * @param undoManager the undo manager to use
-     */
     public ContactService(UndoManager undoManager) {
         this.undoManager = undoManager;
     }
 
-    /**
-     * Retrieves all contacts from the database.
-     * @return List of all contacts.
-     */
     public List<Contact> getAllContacts() {
         return contactDAO.getAllContacts();
     }
 
-    /**
-     * Retrieves all contacts from the database sorted by the given field.
-     * @param sortField the field to sort by
-     * @param ascending true if the sort should be ascending, false otherwise
-     * @return List of all contacts sorted by the given field.
-     */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
         return contactDAO.getAllSorted(sortField, ascending);
     }
 
-    /**
-     * Searches for contacts by first name.
-     * @param query the query to search for
-     * @return List of contacts matching the query.
-     */
     public List<Contact> searchByFirstName(String query) {
         return contactDAO.searchByFirstName(query);
     }
 
-    /**
-     * Searches for contacts by last name.
-     * @param query the query to search for
-     * @return List of contacts matching the query.
-     */
     public List<Contact> searchByLastName(String query) {
         return contactDAO.searchByLastName(query);
     }
 
-    /**
-     * Searches for contacts by phone number.
-     * @param query the query to search for
-     * @return List of contacts matching the query.
-     */
     public List<Contact> searchByPhoneNumber(String query) {
         return contactDAO.searchByPhoneContains(query);
     }
 
-    /**
-     * Searches for contacts by first name and birth month.
-     * @param firstName the first name to search for
-     * @param month the birth month to search for
-     * @return List of contacts matching the query.
-     */
     public List<Contact> searchByFirstNameAndBirthMonth(String firstName, int month) {
         return contactDAO.searchByFirstNameAndBirthMonth(firstName, month);
     }
 
-    /**
-     * Searches for contacts by phone prefix and birth year.
-     * @param phonePrefix the phone prefix to search for
-     * @param year the birth year to search for
-     * @return List of contacts matching the query.
-     */
     public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
         return contactDAO.searchByPhonePrefixAndBirthYear(phonePrefix, year);
     }
@@ -113,10 +68,8 @@ public class ContactService {
         return contactDAO.searchByFirstAndLastName(firstNamePart, lastNamePart);
     }
 
-    // ----------------- Printing -----------------
     /**
      * Prints a list of contacts to the console.
-     * @param contacts the list of contacts to print
      */
     public void printContactsList(List<Contact> contacts) {
         if (contacts == null || contacts.isEmpty()) {
@@ -151,18 +104,13 @@ public class ContactService {
                 ConsoleColors.GREEN + "\nTotal " + contacts.size() + " contact(s) found." + ConsoleColors.RESET);
     }
 
-    /**
-     * Displays all contacts.
-     */
     public void displayAllContacts() {
         List<Contact> contacts = getAllContacts();
         printContactsList(contacts);
     }
 
-    // ----------------- Search (interactive) -----------------
     /**
      * Searches for contacts interactively.
-     * @param scanner the scanner to use
      */
     public void searchContactsInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Search Contacts ===" + ConsoleColors.RESET);
@@ -231,10 +179,8 @@ public class ContactService {
         printContactsList(results);
     }
 
-    // ----------------- Sort (interactive) -----------------
     /**
      * Sorts contacts interactively.
-     * @param scanner the scanner to use
      */
     public void sortContactsInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Sort Contacts ===" + ConsoleColors.RESET);
@@ -279,10 +225,8 @@ public class ContactService {
         printContactsList(contacts);
     }
 
-    // ----------------- Update (interactive) -----------------
     /**
      * Updates a contact interactively.
-     * @param scanner the scanner to use
      */
     public void updateContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.CYAN + "\n=== Update Contact ===" + ConsoleColors.RESET);
@@ -303,10 +247,7 @@ public class ContactService {
             return;
         }
 
-        // Snapshot BEFORE modification for undo
         Contact previousState = UndoAction.cloneContact(existing);
-
-        // Display current contact
         System.out.println(ConsoleColors.BLUE + "\nContact to update:" + ConsoleColors.RESET);
         System.out.printf(ConsoleColors.YELLOW + "%-5s %-15s %-15s %-15s %-12s %-40s %-40s%n" + ConsoleColors.RESET,
                 "ID", "FIRST NAME", "LAST NAME", "PHONE", "BIRTH DATE", "EMAIL", "LINKEDIN URL");
@@ -333,7 +274,6 @@ public class ContactService {
         System.out.println(
                 ConsoleColors.YELLOW + "\nEnter new values (Press Enter to keep current)." + ConsoleColors.RESET);
 
-        // First name
         while (true) {
             System.out.print(ConsoleColors.WHITE + "First name ["
                     + (existing.getFirstName() == null ? "" : existing.getFirstName()) + "]: " + ConsoleColors.RESET);
@@ -348,7 +288,6 @@ public class ContactService {
                     ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // Last name
         while (true) {
             System.out.print(ConsoleColors.WHITE + "Last name ["
                     + (existing.getLastName() == null ? "" : existing.getLastName()) + "]: " + ConsoleColors.RESET);
@@ -363,13 +302,10 @@ public class ContactService {
                     ConsoleColors.RED + "Error: Name must contain only letters! Try again." + ConsoleColors.RESET);
         }
 
-        // Nickname
         String nickPrompt = "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ";
         String nick = InputHelper.readValidNickname(scanner, ConsoleColors.CYAN + nickPrompt + ConsoleColors.RESET);
         existing.setNickname(nick);
-        
 
-        // Phone
         while (true) {
             System.out.print(ConsoleColors.WHITE + "Phone ["
                     + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "] (+90): "
@@ -388,14 +324,12 @@ public class ContactService {
                     + ConsoleColors.RESET);
         }
 
-        // Email
         while (true) {
             System.out.print(ConsoleColors.CYAN + "Email [" + (existing.getEmail() == null ? "" : existing.getEmail())
                     + "]: " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) break;
 
-            // Türkçe karakterleri de destekleyen basit ama sağlam regex
             String emailRegex =
                     "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
                     "[A-Za-z0-9çÇğĞıİöÖşŞüÜ.-]+\\." +
@@ -409,15 +343,12 @@ public class ContactService {
             System.out.println(ConsoleColors.RED + "Error: Invalid email format! Try again." + ConsoleColors.RESET);
         }
 
-
-        // LinkedIn
         String currentLi = existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl();
         String linkedin = InputHelper.readValidLinkedin(scanner,
                 ConsoleColors.WHITE + "LinkedIn [" + currentLi + "] (or 'skip'): " + ConsoleColors.RESET);
         if (linkedin != null)
             existing.setLinkedinUrl(linkedin);
 
-        // Birth date
         String currentBirth = existing.getBirthDate() == null ? "" : existing.getBirthDate().toString();
         while (true) {
             System.out.print(ConsoleColors.WHITE + "Birth Date [" + currentBirth + "] (" + DateUtil.getDateFormat()
@@ -445,10 +376,8 @@ public class ContactService {
         }
     }
 
-    // ----------------- Add (interactive) -----------------
     /**
      * Adds a contact interactively.
-     * @param scanner the scanner to use
      */
     public void addContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.WHITE + "\n=== Add New Contact ===");
@@ -491,7 +420,6 @@ public class ContactService {
                 return;
             }
 
-            // LinkedIn
             String linkedin = InputHelper.readValidLinkedin(scanner,
                     ConsoleColors.WHITE + "LinkedIn URL (optional, 0 to cancel): " + ConsoleColors.RESET);
             if (linkedin != null && linkedin.equals("CANCEL")) {
@@ -499,14 +427,12 @@ public class ContactService {
                 return;
             }
 
-            // Birth date
             LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date (0 to cancel) ");
             if (birthDate.equals(LocalDate.now())) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
 
-            // Preview
             System.out.println(ConsoleColors.BLUE + "\nContact preview:" + ConsoleColors.RESET);
             System.out.printf(ConsoleColors.WHITE + "  First Name: %s%n", first);
             System.out.printf("  Last Name: %s%n", last);
@@ -551,10 +477,8 @@ public class ContactService {
         }
     }
 
-    // ----------------- Delete (interactive) -----------------
     /**
      * Deletes a contact interactively.
-     * @param scanner the scanner to use
      */
     public void deleteContactInteractive(Scanner scanner) {
         System.out.println(ConsoleColors.BLUE + "\n=== Delete Contact ===" + ConsoleColors.RESET);
@@ -575,7 +499,6 @@ public class ContactService {
             return;
         }
 
-        // Snapshot BEFORE delete for undo
         Contact contactSnapshot = UndoAction.cloneContact(existing);
 
         System.out.println(ConsoleColors.BLUE + "\nContact to delete:" + ConsoleColors.RESET);

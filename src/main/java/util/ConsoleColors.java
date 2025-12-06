@@ -18,6 +18,5 @@ public class ConsoleColors {
     public static final String WHITE = "\u001B[97m";
 
     private ConsoleColors() {
-        // utility class, instance not allowed
     }
 }

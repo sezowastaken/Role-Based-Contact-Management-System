@@ -67,8 +67,6 @@ public class UndoAction {
         this.newPasswordHash = newPasswordHash;
     }
 
-    // ---------- FACTORY METHODS ----------
-
     /**
      * Creates an undo action for contact insertion.
      * @param contactDAO the ContactDAO instance
@@ -216,8 +214,6 @@ public class UndoAction {
         );
     }
 
-    // ---------- PUBLIC API ----------
-
     /**
      * Performs the actual undo operation.
      * If DAO methods return false, prints a simple console message.
@@ -272,8 +268,6 @@ public class UndoAction {
     public Type getType() {
         return type;
     }
-
-    // ---------- PRIVATE UNDO HELPER METHODS ----------
 
     /**
      * Undoes a contact insert operation by deleting the contact.
@@ -382,8 +376,6 @@ public class UndoAction {
             System.out.println("Undo failed: password could not be restored (user ID=" + userId + ").");
         }
     }
-
-    // ---------- CLONE HELPERS (DEEP COPY) ----------
 
     /**
      * Creates a deep copy of a Contact object.

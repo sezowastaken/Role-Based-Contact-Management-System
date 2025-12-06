@@ -29,7 +29,6 @@ public class AsciiAnimator {
 
             """ + RESET;
 
-    // === KADIR HAS ÜNİVERSİTESİ BÜYÜK ASCII BAŞLIK ===
     private static final String TITLE_TEXT = BLUE + """
               _  __         _ _        _    _             _   _                         _ _            _
              | |/ /        | (_)      | |  | |           (_) (_)                       (_) |          (_)
@@ -45,7 +44,6 @@ public class AsciiAnimator {
                         - NOT THIS TIME -
                     """, 80) + RESET;
 
-    // === Opening Crawl Lines (yavaş yavaş yukarı kayan metin) ===
     private static final String[] CRAWL_LINES = {
             "",
             YELLOW + "A long time ago, in a distant lab of Kadir Has University..." + RESET,

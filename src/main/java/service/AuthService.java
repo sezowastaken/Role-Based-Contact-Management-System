@@ -30,13 +30,11 @@ public class AuthService {
             return null;
         }
 
-        // 1) Fetch user from database
         User user = userDAO.findByUsername(username);
         if (user == null) {
             return null;
         }
 
-        // 2) Password hash check
         String storedHash = user.getPasswordHash();
         if (storedHash == null || storedHash.isEmpty()) {
             return null;

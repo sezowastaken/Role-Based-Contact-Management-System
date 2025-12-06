@@ -10,22 +10,15 @@ import java.util.regex.Pattern;
  */
 public class InputHelper {
 
-    // Standard prefix for error messages (Colored)
     private static final String ERR_PREFIX = ConsoleColors.RED + " ERROR: " + ConsoleColors.RESET;
 
-    // ==========================================
-    // DATABASE LIMITS (BASED ON DB SCHEMA)
-    // ==========================================
-    private static final int MAX_NAME_LENGTH = 50; // name, surname, first_name, last_name, nickname
-    private static final int MAX_USERNAME_LENGTH = 50; // username
-    private static final int MAX_RAW_PASSWORD_LENGTH = 100; // Raw password input limit (Hash 255)
-    private static final int MAX_EMAIL_LENGTH = 100; // email
-    private static final int MAX_LINKEDIN_LENGTH = 255; // linkedin_url
-    private static final String NICKNAME_REGEX = "^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$"; // Nickname regex'i
+    private static final int MAX_NAME_LENGTH = 50;
+    private static final int MAX_USERNAME_LENGTH = 50;
+    private static final int MAX_RAW_PASSWORD_LENGTH = 100;
+    private static final int MAX_EMAIL_LENGTH = 100;
+    private static final int MAX_LINKEDIN_LENGTH = 255;
+    private static final String NICKNAME_REGEX = "^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$";
 
-    // ==========================================
-    // 1) Read Non-Empty Line (PASSWORD/GENERAL)
-    // ==========================================
     public static String readNonEmptyLine(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -34,7 +27,6 @@ public class InputHelper {
             line = line.trim();
 
             if (!line.isEmpty()) {
-                // Length check for raw password
                 if (line.length() > MAX_RAW_PASSWORD_LENGTH) {
                     System.out.printf(ERR_PREFIX + "Input exceeds maximum length of %d characters.\n", MAX_RAW_PASSWORD_LENGTH);
                     continue;
@@ -45,18 +37,12 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 2) Read Line (Can be empty)
-    // ==========================================
     public static String readLine(Scanner scanner, String prompt) {
         System.out.print(prompt);
         String line = scanner.nextLine();
         return (line == null) ? "" : line.trim();
     }
 
-    // ==========================================
-    // 3) Read Integer (With Range)
-    // ==========================================
     public static int readIntInRange(Scanner scanner, String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
@@ -82,9 +68,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 4) Read Integer (General)
-    // ==========================================
     public static int readInt(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -97,9 +80,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 5) Yes/No Question (y/n)
-    // ==========================================
     public static boolean readYesNo(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt + " (y/n): ");
@@ -117,9 +97,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 6) Name/Surname Validation (LENGTH CHECK)
-    // ==========================================
     public static String readValidName(Scanner scanner, String prompt) {
         java.util.Locale tr = java.util.Locale.forLanguageTag("tr-TR");
         
@@ -136,19 +113,16 @@ public class InputHelper {
                 continue;
             }
             
-            // LENGTH CHECK (MAX 50)
             if (input.length() > MAX_NAME_LENGTH) {
                  System.out.printf(ERR_PREFIX + "Name exceeds maximum length of %d characters.\n", MAX_NAME_LENGTH);
                  continue;
             }
 
-            // CHARACTER CHECK
             if (!input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 System.out.println(ERR_PREFIX + "Name must contain only letters (no numbers).");
                 continue;
             }
 
-            // Capitalize First Letter
             String lowerAll = input.toLowerCase(tr);
             String[] parts = lowerAll.split("\\s+");
             StringBuilder sb = new StringBuilder();
@@ -166,9 +140,6 @@ public class InputHelper {
         }
     }
     
-    // ==========================================
-    // 6.5) Nickname Validation (LENGTH CHECK)
-    // ==========================================
     public static String readValidNickname(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -181,12 +152,11 @@ public class InputHelper {
                 continue;
             }
 
-            if (input.length() > MAX_NAME_LENGTH) { // Nickname de 50 char
+            if (input.length() > MAX_NAME_LENGTH) {
                  System.out.printf(ERR_PREFIX + "Nickname exceeds maximum length of %d characters.\n", MAX_NAME_LENGTH);
                  continue;
             }
             
-            // Regex: Letter, Number, Space, Hyphen
             if (!input.matches(NICKNAME_REGEX)) {
                 System.out.println(ERR_PREFIX + "Nickname can only contain letters, numbers, dot, space, and hyphens.");
                 continue;
@@ -195,9 +165,6 @@ public class InputHelper {
         }
     }
     
-    // ==========================================
-    // 6.7) Username Validation (LENGTH CHECK)
-    // ==========================================
     public static String readValidUsername(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -215,7 +182,6 @@ public class InputHelper {
                  continue;
             }
             
-            // Username Regex: Only letters, numbers, underscore, and dot
             if (!input.matches("^[A-Za-z0-9_.]+$")) {
                 System.out.println(ERR_PREFIX + "Username can only contain letters, numbers, dot, and underscore.");
                 continue;
@@ -225,9 +191,6 @@ public class InputHelper {
     }
 
 
-    // ==========================================
-    // 7) Phone Validation (+90 Turkey Format)
-    // ==========================================
     public static String readValidPhoneTR(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt + " (+90) "); 
@@ -248,9 +211,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 8) Email Validation (LENGTH CHECK)
-    // ==========================================
     public static String readValidEmail(Scanner scanner, String prompt) {
         String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         while (true) {
@@ -271,9 +231,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 9) Date Validation (DateUtil Integration)
-    // ==========================================
     public static LocalDate readValidPastDate(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt + " (" + util.DateUtil.getDateFormat() + "): ");
@@ -289,9 +246,6 @@ public class InputHelper {
         }
     }
 
-    // =========================================================================
-    // 10) LinkedIn Validation (LENGTH CHECK)
-    // =========================================================================
     public static String readValidLinkedin(Scanner scanner, String prompt) {
         String linkedinRegex = "^https:\\/\\/([a-z]{2,3}\\.)?linkedin\\.com\\/.*$";
 
@@ -327,9 +281,6 @@ public class InputHelper {
         }
     }
 
-    // ==========================================
-    // 11) Clear Console
-    // ==========================================
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
