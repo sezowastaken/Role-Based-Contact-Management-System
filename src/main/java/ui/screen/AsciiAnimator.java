@@ -2,7 +2,7 @@ package ui.screen;
 
 /**
  * Handles ASCII art animations displayed at application startup and logout.
- * Shows intro & outro animations with Star Wars-style effects.
+ * Shows intro and outro animations with Star Wars-style effects.
  * Uses ANSI escape codes for color and formatting.
  */
 public class AsciiAnimator {

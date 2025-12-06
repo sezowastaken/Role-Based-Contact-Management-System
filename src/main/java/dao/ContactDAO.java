@@ -361,10 +361,10 @@ public class ContactDAO {
     }
 
     /**
-     * Searches contacts by phone number and email using LIKE pattern matching.
-     * Both conditions must match.
-     * @param phonePart the phone number substring to search for
-     * @param emailPart the email substring to search for
+     * Searches contacts by phone prefix and birth year.
+     * Matches phone_number starting with given prefix and birth year equals specified year.
+     * @param phonePrefix the phone number prefix to search for
+     * @param year the birth year to match
      * @return List of matching contacts
      */
     public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {

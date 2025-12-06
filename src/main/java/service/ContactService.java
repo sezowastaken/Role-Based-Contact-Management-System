@@ -323,7 +323,7 @@ public class ContactService {
 
         while (true) {
             System.out.print(ConsoleColors.WHITE + "Phone ["
-                    + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "] (+90): "
+                    + (existing.getPhoneNumber() == null ? "" : existing.getPhoneNumber()) + "] "
                     + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty())
@@ -424,7 +424,7 @@ public class ContactService {
             }
             
 
-            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number (0 to cancel) (+90) ");
+            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number (0 to cancel) ");
             if (phone.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
@@ -537,13 +537,6 @@ public class ContactService {
 
         if (!InputHelper.readYesNo(scanner,
                 ConsoleColors.YELLOW + "\nAre you sure you want to delete this contact?" + ConsoleColors.RESET)) {
-            System.out.println(ConsoleColors.RED + "Delete cancelled." + ConsoleColors.RESET);
-            return;
-        }
-
-        String confirm2 = InputHelper.readLine(scanner, ConsoleColors.YELLOW
-                + "This action cannot be undone. Type 'DELETE' to confirm: " + ConsoleColors.RESET);
-        if (!confirm2.trim().equals("DELETE")) {
             System.out.println(ConsoleColors.RED + "Delete cancelled." + ConsoleColors.RESET);
             return;
         }

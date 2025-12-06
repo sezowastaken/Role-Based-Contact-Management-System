@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1
--- Üretim Zamanı: 04 Ara 2025, 18:24:46
+-- Üretim Zamanı: 06 Ara 2025, 08:00:26
 -- Sunucu sürümü: 10.4.32-MariaDB
 -- PHP Sürümü: 8.2.12
 
@@ -98,7 +98,8 @@ INSERT INTO `contacts` (`contact_id`, `first_name`, `last_name`, `nickname`, `ph
 (51, 'Zubkov', 'Zubkov', 'Zubkov', '05530000051', 'zubkov@example.com', 'https://www.linkedin.com/in/zubkov', '1996-08-03', '2025-12-04 16:52:59', '2025-12-04 16:52:59'),
 (52, 'Felipe', 'Augusto', 'Augusto', '05530000052', 'felipe.augusto@example.com', 'https://www.linkedin.com/in/felipe-augusto', '1993-03-30', '2025-12-04 16:52:59', '2025-12-04 16:52:59'),
 (53, 'Paul', 'Onuachu', 'Onuachu', '05530000053', 'paul.onuachu@example.com', 'https://www.linkedin.com/in/paul-onuachu', '1994-05-28', '2025-12-04 16:52:59', '2025-12-04 16:52:59'),
-(54, 'Ernest', 'Muci', 'Ernest Muci', '05530000054', 'ernest.muci@example.com', 'https://www.linkedin.com/in/ernest-muci', '2001-03-19', '2025-12-04 16:52:59', '2025-12-04 16:52:59');
+(54, 'Ernest', 'Muci', 'Ernest Muci', '05530000054', 'ernest.muci@example.com', 'https://www.linkedin.com/in/ernest-muci', '2001-03-19', '2025-12-04 16:52:59', '2025-12-04 16:52:59'),
+(60, 'Ayhanım', 'Kökçü', 'kkökökk', '05337918334', 'kökçü@hotmail.com', 'asd@ads.com', '2000-01-01', '2025-12-06 09:53:08', '2025-12-06 09:53:08');
 
 -- --------------------------------------------------------
 
@@ -122,13 +123,18 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password_hash`, `name`, `surname`, `role`, `created_at`) VALUES
 (1, 'bellingham', 'd96d530c92b0ebb871ca52b6d6f31e48fc06c83cecc0c17a4202b76770544392', 'Ayhan', 'Öner', 'TESTER', '2025-12-04 16:00:04'),
-(2, 'tester', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', 'Okan', 'Buruk', 'TESTER', '2025-12-04 16:00:04'),
+(2, 'tester', '9bba5c53a0545e0c80184b946153c9f58387e3bd1d4ee35740f29ac2e718b019', 'Okan', 'Buruk', 'TESTER', '2025-12-04 16:00:04'),
 (3, 'terminatör', '6e7b21d1178f415c69ab23e7330355943a6ef8bb71c047bca0391643997cc760', 'Bilal', 'Keleş', 'JUNIOR_DEV', '2025-12-04 16:00:04'),
 (4, 'junior', '8fdd880f097cddfef86895d2c48f649e943bed14639f0ad29671508b536c9fc1', 'Fatih', 'Tekke', 'JUNIOR_DEV', '2025-12-04 16:00:04'),
 (5, 'dede', 'bfccfeb7726160d74f8a18407853846aab2ebd57db1dc32409acd6aefc7c4b33', 'Tunahan', 'Tuze', 'SENIOR_DEV', '2025-12-04 16:00:04'),
 (6, 'senior', '2161403032b8314a5249774f9418acf04317a84cc1dddba989d108e763d557ac', 'Dominico', 'Tedesco', 'SENIOR_DEV', '2025-12-04 16:00:04'),
 (7, 'sezo', '9ad3e9023704376a56cceb23c7486186507546991c151ea63fe274f1f3f4e734', 'Sezai', 'Araplarlı', 'MANAGER', '2025-12-04 16:00:04'),
-(8, 'manager', '6ee4a469cd4e91053847f5d3fcb61dbcc91e8f0ef10be7748da4c4a1ba382d17', 'Sergen', 'Yalçın', 'MANAGER', '2025-12-04 16:00:04');
+(8, 'manager', '6ee4a469cd4e91053847f5d3fcb61dbcc91e8f0ef10be7748da4c4a1ba382d17', 'Sergen', 'Yalçın', 'MANAGER', '2025-12-04 16:00:04'),
+(11, 'ayhan', 'd96d530c92b0ebb871ca52b6d6f31e48fc06c83cecc0c17a4202b76770544392', 'Ayhan', 'Ayhan', 'MANAGER', '2025-12-06 05:17:05'),
+(16, 'tt', '0e07cf830957701d43c183f1515f63e6b68027e528f43ef52b1527a520ddec82', 'Tt', 'Tt', 'TESTER', '2025-12-06 09:58:22'),
+(17, 'jd', 'ad3e69e9aa860657cc6476770fe253d08198746b9fcf9dc3186b47eb85c30335', 'Jd', 'Jd', 'JUNIOR_DEV', '2025-12-06 09:58:35'),
+(18, 'sd', '03042cf8100db386818cee4ff0f2972431a62ed78edbd09ac08accfabbefd818', 'Sd', 'Sd', 'SENIOR_DEV', '2025-12-06 09:58:42'),
+(19, 'man', '48b676e2b107da679512b793d5fd4cc4329f0c7c17a97cf6e0e3d1005b600b03', 'Man', 'Man', 'MANAGER', '2025-12-06 09:58:51');
 
 --
 -- Dökümü yapılmış tablolar için indeksler
@@ -159,13 +165,13 @@ ALTER TABLE `users`
 -- Tablo için AUTO_INCREMENT değeri `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- Tablo için AUTO_INCREMENT değeri `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

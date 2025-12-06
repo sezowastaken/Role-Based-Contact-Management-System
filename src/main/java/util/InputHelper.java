@@ -183,7 +183,7 @@ public class InputHelper {
                  continue;
             }
             
-            if (!input.matches("^[A-Za-z0-9_.]+$")) {
+            if (!input.matches("^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\\s\\-]+$")) {
                 System.out.println(ERR_PREFIX + "Username can only contain letters, numbers, dot, and underscore.");
                 continue;
             }

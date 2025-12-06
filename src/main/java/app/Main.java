@@ -19,6 +19,7 @@ public class Main {
     public static void main(String[] args) {
         AuthService authService = new AuthService();
         LoginScreen loginScreen = new LoginScreen(authService);
+        AsciiAnimator.runIntro();
         loginScreen.start();
     }
 }
