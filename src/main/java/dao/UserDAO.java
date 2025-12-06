@@ -264,4 +264,43 @@ public class UserDAO {
             return false;
         }
     }
+
+    /**
+     * Silinmiş bir kullanıcıyı, eski user_id değeri ile birlikte geri yüklemek için kullanılır.
+     * Özellikle UNDO işlemlerinde çağrılır.
+     *
+     * NOT:
+     *  - Burada user.getId() değeri veritabanındaki user_id kolonu olarak kullanılır.
+     *  - Böylece DELETE → UNDO_DELETE senaryosunda ID kayması olmaz.
+     */
+    public boolean restoreUser(User user) {
+        if (user == null) {
+            return false;
+        }
+
+        String sql = """
+                INSERT INTO users (user_id, username, password_hash, name, surname, role)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setInt(1, user.getId());
+                ps.setString(2, user.getUsername());
+                ps.setString(3, user.getPasswordHash());
+                ps.setString(4, user.getName());
+                ps.setString(5, user.getSurname());
+                ps.setString(6, mapRoleToDb(user.getRole()));
+
+                int affected = ps.executeUpdate();
+                return affected > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("restoreUser hata: " + e.getMessage());
+            return false;
+        }
+    }
+
 }

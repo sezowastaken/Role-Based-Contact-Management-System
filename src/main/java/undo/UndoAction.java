@@ -239,17 +239,24 @@ public class UndoAction {
         }
     }
 
+    /**
+     * CONTACT_DELETE aksiyonunu geri alır.
+     * Daha önce silinmiş olan contact kaydını, eski contact_id değeriyle tekrar ekler.
+     */
     private void undoContactDelete() {
         if (contactDAO == null || contactSnapshot == null) {
             System.out.println("Cannot undo contact delete: missing DAO or contact snapshot.");
             return;
         }
-        boolean success = contactDAO.insertContact(contactSnapshot);
+
+        boolean success = contactDAO.restoreContact(contactSnapshot);
         if (!success) {
-            System.out.println("Undo failed: contact could not be re-inserted (ID="
-                    + contactSnapshot.getContactId() + ").");
+            System.out.println(
+                    "Undo failed: contact could not be re-inserted (ID=" + contactSnapshot.getContactId() + ")."
+            );
         }
     }
+
 
     private void undoContactUpdate() {
         if (contactDAO == null || contactSnapshot == null) {
@@ -274,17 +281,24 @@ public class UndoAction {
         }
     }
 
+    /**
+     * USER_DELETE aksiyonunu geri alır.
+     * Yani daha önce silinmiş olan kullanıcıyı, eski user_id değeriyle tekrar veritabanına ekler.
+     */
     private void undoUserDelete() {
         if (userDAO == null || userSnapshot == null) {
             System.out.println("Cannot undo user delete: missing DAO or user snapshot.");
             return;
         }
-        boolean success = userDAO.insert(userSnapshot);
+
+        boolean success = userDAO.restoreUser(userSnapshot);
         if (!success) {
-            System.out.println("Undo failed: user could not be re-inserted (ID="
-                    + userSnapshot.getId() + ").");
+            System.out.println(
+                    "Undo failed: user could not be re-inserted (ID=" + userSnapshot.getId() + ")."
+            );
         }
     }
+
 
     private void undoUserUpdate() {
         if (userDAO == null || userSnapshot == null) {

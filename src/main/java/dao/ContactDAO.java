@@ -210,6 +210,50 @@ public class ContactDAO {
         }
     }
 
+    /**
+     * Silinmiş bir contact kaydını, eski contact_id değeri ile birlikte geri yüklemek için kullanılır.
+     * Özellikle UNDO işlemlerinde çağrılır.
+     *
+     * NOT:
+     *  - Burada contact.getContactId() veritabanındaki contact_id kolonu olarak kullanılır.
+     */
+    public boolean restoreContact(Contact contact) {
+        if (contact == null) {
+            return false;
+        }
+
+        String sql = "INSERT INTO contacts " +
+                "(contact_id, first_name, last_name, nickname, phone_number, email, linkedin_url, birth_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setInt(1, contact.getContactId());
+            ps.setString(2, contact.getFirstName());
+            ps.setString(3, contact.getLastName());
+            ps.setString(4, contact.getNickname());
+            ps.setString(5, contact.getPhoneNumber());
+            ps.setString(6, contact.getEmail());
+            ps.setString(7, contact.getLinkedinUrl());
+
+            if (contact.getBirthDate() != null) {
+                ps.setDate(8, Date.valueOf(contact.getBirthDate()));
+            } else {
+                ps.setNull(8, Types.DATE);
+            }
+
+            int affected = ps.executeUpdate();
+            return affected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
     // =====================================================
     // SINGLE-FIELD SEARCH
     // =====================================================
