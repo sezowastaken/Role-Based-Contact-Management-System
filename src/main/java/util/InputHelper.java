@@ -27,6 +27,7 @@ public class InputHelper {
     // 1) Boş Olmayan Satır Oku (PASSWORD/GENEL)
     // ==========================================
     public static String readNonEmptyLine(Scanner scanner, String prompt) {
+        
         while (true) {
             System.out.print(prompt);
             String line = scanner.nextLine();
@@ -49,6 +50,9 @@ public class InputHelper {
     // 2) Satır Oku (Boş olabilir)
     // ==========================================
     public static String readLine(Scanner scanner, String prompt) {
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
         System.out.print(prompt);
         String line = scanner.nextLine();
         return (line == null) ? "" : line.trim();
@@ -252,7 +256,9 @@ public class InputHelper {
     // 8) Email Doğrulama (UZUNLUK KONTROLLÜ)
     // ==========================================
     public static String readValidEmail(Scanner scanner, String prompt) {
-        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        String regex = "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
+                        "[A-Za-z0-9.-]+\\." +
+                        "[A-Za-z]{2,}$";
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();

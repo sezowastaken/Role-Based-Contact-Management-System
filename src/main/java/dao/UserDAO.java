@@ -7,6 +7,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Data Access Object (DAO) class that manages CRUD (Create, Read, Update, Delete)
@@ -21,10 +22,44 @@ public class UserDAO {
      * @return Role equivalent or null
      */
     private Role mapRoleFromDb(String dbRole) {
-        if (dbRole == null) {
-            return null;
+        if (dbRole == null) return null;
+
+        String raw = dbRole.trim();
+        if (raw.isEmpty()) return null;
+
+        try {
+            return Role.valueOf(raw);
+        } catch (IllegalArgumentException ignored) { }
+
+        for (Role r : Role.values()) {
+            if (r.name().equalsIgnoreCase(raw)) return r;
         }
-        return Role.valueOf(dbRole); 
+
+        String normalized = raw.toUpperCase(Locale.ROOT).replaceAll("[^A-Z0-9]+", "_");
+        for (Role r : Role.values()) {
+            if (r.name().equals(normalized)) return r;
+        }
+
+        // alias map
+        switch (raw.toLowerCase(Locale.ROOT)) {
+            case "junior":
+            case "junior dev":
+            case "junior-dev":
+                return Role.JUNIOR_DEV;
+            case "senior":
+            case "senior dev":
+            case "senior-dev":
+                return Role.SENIOR_DEV;
+            case "tester":
+            case "test":
+                return Role.TESTER;
+            case "manager":
+            case "mgr":
+                return Role.MANAGER;
+            default:
+                System.err.println("Unknown role string from DB: '" + dbRole + "'");
+                return null;
+        }
     }
 
     /**

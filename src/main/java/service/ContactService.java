@@ -321,10 +321,10 @@ public class ContactService {
             if (input.isEmpty()) break;
 
             // Türkçe karakterleri de destekleyen basit ama sağlam regex
-            String emailRegex =
-                    "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
-                    "[A-Za-z0-9çÇğĞıİöÖşŞüÜ.-]+\\." +
-                    "[A-Za-zçÇğĞıİöÖşŞüÜ]{2,}$";
+            String emailRegex = "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
+                                "[A-Za-z0-9.-]+\\." +
+                                "[A-Za-z]{2,}$";
+
 
             if (input.matches(emailRegex)) {
                 existing.setEmail(input);
