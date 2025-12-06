@@ -29,21 +29,41 @@ public class SeniorDevMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
-        System.out.println("│                        SENIOR DEVELOPER MENU                         │");
+        System.out.println(
+                ConsoleColors.GREEN + "┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println(
+                "│  " + ConsoleColors.WHITE + "                      SENIOR DEVELOPER MENU                "
+                        + ConsoleColors.GREEN + "         │");
         System.out.println("├──────────────────────────────────────────────────────────────────────┤");
-        System.out.println("│ 1 - Change password                                                  │");
-        System.out.println("│ 2 - List all contacts                                                │");
-        System.out.println("│ 3 - Search contacts by selected field(s)                             │");
-        System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
-        System.out.println("│ 5 - Update existing contact                                          │");
-        System.out.println("│ 6 - Add new contact(s)                                               │");
-        System.out.println("│ 7 - Delete existing contact(s)                                       │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "1 - Change password                                  "
+                        + ConsoleColors.GREEN + "                │");
+        System.out.println("│ " + ConsoleColors.WHITE + "2 - List all contacts                    "
+                + ConsoleColors.GREEN + "                            │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "3 - Search contacts by selected field(s)        " + ConsoleColors.GREEN
+                        + "                     │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "4 - Sort results by selected field (ascending / descending)   "
+                        + ConsoleColors.GREEN + "       │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "5 - Update existing contact                " + ConsoleColors.GREEN
+                        + "                          │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "6 - Add new contact(s)                          " + ConsoleColors.GREEN
+                        + "                     │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "7 - Delete existing contact(s)                             "
+                        + ConsoleColors.GREEN + "          │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("| 8 - Undo last operation                                            │");
+            System.out.println("|" + ConsoleColors.WHITE
+                    + " 8 - Undo last operation                             " + ConsoleColors.GREEN
+                    + "                 │");
         }
-        System.out.println("│ 0 - Logout                                                           │");
-        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
+        System.out.println("│ " + ConsoleColors.RED + "0 - Logout           " + ConsoleColors.GREEN
+                + "                                                │");
+        System.out.println(
+                "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
     @Override
@@ -77,7 +97,7 @@ public class SeniorDevMenu extends BaseMenu {
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo(); // BaseMenu'deki ortak UNDO davranışı
                 } else {
-                    System.out.println("\nThere is nothing to undo.");
+                    System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
             default:

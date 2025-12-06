@@ -48,11 +48,11 @@ public class JuniorDevMenu extends BaseMenu {
         System.out.println("│ " + ConsoleColors.WHITE + "5 - Update existing contact    " + ConsoleColors.BLUE
                 + "                                      │");
         if (undoManager != null && undoManager.canUndo()) {
-             System.out.println("│ " + ConsoleColors.WHITE + "6 - Undo last operation     " + ConsoleColors.BLUE
+            System.out.println("│ " + ConsoleColors.WHITE + "6 - Undo last operation     " + ConsoleColors.BLUE
                     + "                                         │");
         }
         System.out.println(
-                "│ " + ConsoleColors.WHITE + "0 - Logout    " + ConsoleColors.BLUE
+                "│ " + ConsoleColors.RED + "0 - Logout    " + ConsoleColors.BLUE
                         + "                                                       │");
         System.out.println(
                 "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
@@ -83,7 +83,7 @@ public class JuniorDevMenu extends BaseMenu {
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo(); // BaseMenu'deki ortak UNDO davranışı
                 } else {
-                    System.out.println("\nThere is nothing to undo.");
+                    System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
             default:

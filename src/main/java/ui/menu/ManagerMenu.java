@@ -32,20 +32,36 @@ public class ManagerMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
-        System.out.println("│                             MANAGER MENU                             │");
+        System.out.println(
+                ConsoleColors.MAGENTA + "┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "                            MANAGER MENU                    "
+                        + ConsoleColors.MAGENTA + "         │");
         System.out.println("├──────────────────────────────────────────────────────────────────────┤");
-        System.out.println("│ 1 - Change password                                                  │");
-        System.out.println("│ 2 - View contacts statistical info                                   │");
-        System.out.println("│ 3 - List all users                                                   │");
-        System.out.println("│ 4 - Update existing user                                             │");
-        System.out.println("│ 5 - Add/employ new user                                              │");
-        System.out.println("│ 6 - Delete/fire existing user                                        │");
+        System.out.println("│ " + ConsoleColors.WHITE + "1 - Change password                               "
+                + ConsoleColors.MAGENTA + "                   │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "2 - View contacts statistical info              " + ConsoleColors.MAGENTA
+                        + "                     │");
+        System.out.println("│" + ConsoleColors.WHITE + " 3 - List all users                          "
+                + ConsoleColors.MAGENTA + "                         │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "4 - Update existing user                           "
+                        + ConsoleColors.MAGENTA + "                  │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "5 - Add/employ new user         " + ConsoleColors.MAGENTA
+                        + "                                     │");
+        System.out.println("│ " + ConsoleColors.WHITE + "6 - Delete/fire existing user        " + ConsoleColors.MAGENTA
+                + "                                │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("| 7 - Undo last operation                                            │");
+            System.out.println("|" + ConsoleColors.WHITE + " 7 - Undo last operation                  "
+                    + ConsoleColors.MAGENTA + "                            │");
         }
-        System.out.println("│ 0 - Logout                                                           │");
-        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
+        System.out.println(
+                "│ " + ConsoleColors.RED + "0 - Logout                                                  "
+                        + ConsoleColors.MAGENTA + "         │");
+        System.out.println(
+                "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
     @Override
@@ -70,7 +86,8 @@ public class ManagerMenu extends BaseMenu {
                 userService.addUserInteractive(scanner);
                 break;
             case "6":
-                // Delegate delete interaction to service (providing current user for self-delete check)
+                // Delegate delete interaction to service (providing current user for
+                // self-delete check)
                 userService.deleteUserInteractive(scanner, currentUser);
                 break;
 
@@ -79,7 +96,7 @@ public class ManagerMenu extends BaseMenu {
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo(); // BaseMenu'deki ortak undo metodu
                 } else {
-                    System.out.println("\nThere is nothing to undo.");
+                    System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
 
@@ -88,7 +105,8 @@ public class ManagerMenu extends BaseMenu {
                 return;
 
             default:
-                System.out.println("\nInvalid choice. Please select one of the options above.");
+                System.out.println(ConsoleColors.RED + "\nInvalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
         }
     }
 }
