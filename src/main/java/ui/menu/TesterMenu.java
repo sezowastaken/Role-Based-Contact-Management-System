@@ -6,28 +6,45 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
-import util.ConsoleColors; // Renkler
-import util.InputHelper; // Güvenli Input
+import util.ConsoleColors; // Colors
+import util.InputHelper; // Safe Input
 
+/**
+ * Menu for Tester role.
+ * Allows Tester to change own password, list all contacts, search contacts by selected fields, sort results by selected field, and undo last operation.
+ */
 public class TesterMenu extends BaseMenu {
 
     private final ContactService contactService;
     private final UserService userService;
 
+    /**
+     * Creates a new TesterMenu with the given current user, scanner, and undo manager.
+     * @param currentUser the current user
+     * @param scanner the scanner
+     * @param undoManager the undo manager
+     */
     public TesterMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
-        // UndoManager alan constructor'lar
+        // UndoManager constructor
         this.contactService = new ContactService(undoManager);
         this.userService = new UserService(undoManager);
-        // Eğer UserService tarafında UserDAO alan başka bir constructor kullanıyorsan:
+        // If UserService has another constructor for UserDAO:
         // this.userService = new UserService(new UserDAO(), undoManager);
     }
 
+    /**
+     * Returns the title of the menu.
+     * @return the title of the menu
+     */
     @Override
     protected String getTitle() {
         return "Tester Panel";
     }
 
+    /**
+     * Prints the options of the menu.
+     */
     @Override
     protected void printOptions() {
         System.out.println(
@@ -59,6 +76,10 @@ public class TesterMenu extends BaseMenu {
                 "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
+    /**
+     * Handles the option selected by the user.
+     * @param choice the choice selected by the user
+     */
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
