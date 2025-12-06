@@ -117,12 +117,14 @@ public class ContactService {
         System.out.println(ConsoleColors.WHITE + "1 - Search by first name");
         System.out.println("2 - Search by last name");
         System.out.println("3 - Search by phone number");
-        System.out.println("4 - First name + birth month");
-        System.out.println("5 - Phone prefix + birth year");
-        System.out.println("6 - First name + last name" + ConsoleColors.RESET);
+        System.out.println("4 - Search by birth month");
+        System.out.println("5 - Search by birth year");
+        System.out.println("6 - First name + birth month");
+        System.out.println("7 - Phone prefix + birth year");
+        System.out.println("8 - First name + last name" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.RED + "0 - Cancel" + ConsoleColors.RESET);
 
-        int choice = InputHelper.readIntInRange(scanner, ConsoleColors.YELLOW + "Choice: " + ConsoleColors.RESET, 0, 6);
+        int choice = InputHelper.readIntInRange(scanner, ConsoleColors.YELLOW + "Choice: " + ConsoleColors.RESET, 0, 8);
 
         List<Contact> results;
 
@@ -149,13 +151,26 @@ public class ContactService {
                 break;
             }
             case 4: {
-                String first = InputHelper.readValidName(scanner,
-                        ConsoleColors.WHITE + "First name: " + ConsoleColors.RESET);
-                int month = InputHelper.readIntInRange(scanner, "Birth month (1-12): ", 1, 12);
-                results = searchByFirstNameAndBirthMonth(first, month);
+                int month = InputHelper.readIntInRange(scanner,
+                        ConsoleColors.WHITE + "Birth month (1-12): " + ConsoleColors.RESET, 1, 12);
+                results = contactDAO.searchByBirthMonth(month);
                 break;
             }
             case 5: {
+                int year = InputHelper.readIntInRange(scanner,
+                        ConsoleColors.WHITE + "Birth year (e.g., 1990): " + ConsoleColors.RESET, 1900, 2100);
+                results = contactDAO.searchByBirthYear(year);
+                break;
+            }
+            case 6: {
+                String first = InputHelper.readValidName(scanner,
+                        ConsoleColors.WHITE + "First name: " + ConsoleColors.RESET);
+                int month = InputHelper.readIntInRange(scanner,
+                        ConsoleColors.WHITE + "Birth month (1-12): " + ConsoleColors.RESET, 1, 12);
+                results = searchByFirstNameAndBirthMonth(first, month);
+                break;
+            }
+            case 7: {
                 String prefix = InputHelper.readLine(scanner,
                         ConsoleColors.WHITE + "Phone number prefix: " + ConsoleColors.RESET);
                 int year = InputHelper.readIntInRange(scanner,
@@ -163,7 +178,7 @@ public class ContactService {
                 results = searchByPhonePrefixAndBirthYear(prefix, year);
                 break;
             }
-            case 6: {
+            case 8: {
                 String firstPart = InputHelper.readValidName(scanner,
                         ConsoleColors.WHITE + "First name contains: " + ConsoleColors.RESET);
                 String lastPart = InputHelper.readValidName(scanner,

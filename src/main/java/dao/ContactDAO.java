@@ -281,6 +281,56 @@ public class ContactDAO {
     }
 
     /**
+     * Searches contacts by birth month only.
+     * @param month the birth month (1-12)
+     * @return List of matching contacts
+     */
+    public List<Contact> searchByBirthMonth(int month) {
+        List<Contact> results = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE birth_date IS NOT NULL AND MONTH(birth_date) = ?";
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, month);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    /**
+     * Searches contacts by birth year only.
+     * @param year the birth year
+     * @return List of matching contacts
+     */
+    public List<Contact> searchByBirthYear(int year) {
+        List<Contact> results = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE birth_date IS NOT NULL AND YEAR(birth_date) = ?";
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, year);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    /**
      * Searches contacts by first name and birth month.
      * Matches first_name LIKE pattern AND birth month equals specified month.
      * @param namePart the first name substring to search for
