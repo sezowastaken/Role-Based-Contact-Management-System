@@ -111,6 +111,5 @@ public abstract class BaseMenu {
             return;
         }
         undoManager.undoLast();
-        pause();
     }
 }

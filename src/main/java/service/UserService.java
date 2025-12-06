@@ -194,31 +194,29 @@ public class UserService {
 
     // Interactive helper used by menus
     public void changeOwnPasswordInteractive(User currentUser, Scanner scanner) {
-        System.out.println("\n=== Change Password ===");
+        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
-        if (currentUser == null) {
-            System.out.println("Current user is null, cannot change password.");
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password (0 to cancel): ");
+        if (oldPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
             return;
         }
 
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password: ");
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New password: ");
-        String confirm = InputHelper.readNonEmptyLine(scanner, "Confirm new password: ");
-
-        if (!newPass.equals(confirm)) {
-            System.out.println("New password and confirmation do not match.");
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password (0 to cancel): ");
+        if (newPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
             return;
         }
 
         try {
             changePassword(currentUser, oldPass, newPass);
-            System.out.println("Password changed successfully.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("!!! " + e.getMessage());
-        } catch (IllegalStateException e) {
-            System.out.println("Failed to update password in the system.");
+            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
+        } catch (Exception e) {
+            System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
         }
     }
+
 
     // --- Create user (with incoming validations) ---
     public void createUser(String username, String rawPassword,

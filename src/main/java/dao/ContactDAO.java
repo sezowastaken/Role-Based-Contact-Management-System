@@ -119,7 +119,6 @@ public class ContactDAO {
 
     /**
      * Updates an existing contact record in the database.
-     * The contact must have a valid contactId.
      * @param contact the Contact object with updated information
      * @return true if successful, false otherwise
      */
@@ -281,8 +280,6 @@ public class ContactDAO {
      * @param phonePart the phone number substring to search for
      * @param emailPart the email substring to search for
      * @return List of matching contacts
-     * Search by phone prefix and birth year.
-     * Matches phone numbers that start with the given prefix and birth year equals the given year.
      */
     public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
         List<Contact> results = new ArrayList<>();
@@ -332,7 +329,6 @@ public class ContactDAO {
 
     /**
      * Searches contacts by both first name and last name using LIKE pattern matching.
-     * Both conditions must match.
      * @param firstPart the first name substring to search for
      * @param lastPart the last name substring to search for
      * @return List of matching contacts
@@ -366,7 +362,6 @@ public class ContactDAO {
     /**
      * Returns all contacts sorted by the specified field.
      * Supported fields: "first_name", "last_name", "phone", "birth_date", "created_at", "age".
-     * If field is not recognized, defaults to sorting by contact_id.
      * @param sortField the field name to sort by
      * @param ascending true for ascending order, false for descending
      * @return List of contacts sorted by the specified field
@@ -426,12 +421,11 @@ public class ContactDAO {
     /**
      * Returns all contacts sorted by age (calculated from birth_date).
      * Contacts without birth_date are placed at the end of the list.
-     * @param ascending true for youngest first (ascending by age), false for oldest first (descending by age)
+     * @param ascending true for youngest first, false for oldest first
      * @return List of contacts sorted by age
      */
     private List<Contact> getAllSortedByAge(boolean ascending) {
         List<Contact> contacts = new ArrayList<>();
-        // Sort by age: NULL birth_date contacts go to the end
         // For ascending (youngest first): smallest age first, so DESC by birth_date
         // For descending (oldest first): largest age first, so ASC by birth_date
         String direction = ascending ? "DESC" : "ASC"; // DESC = youngest first (largest birth_date = youngest)
@@ -557,7 +551,7 @@ public class ContactDAO {
 
     /**
      * Returns the count of contacts with the specified first name.
-     * Performs an exact match (case-sensitive). 
+     * (case-sensitive)
      * @param firstName the first name to count
      * @return number of contacts with the given first name
      */
@@ -622,7 +616,6 @@ public class ContactDAO {
 
     /**
      * Returns a map showing the distribution of birth months.
-     * Keys are month names (January, February, etc.), values are counts.
      * @return LinkedHashMap with month names as keys and counts as values,
      *         ordered by count descending, then by month number ascending
      */
@@ -654,7 +647,6 @@ public class ContactDAO {
 
     /**
      * Returns a map showing the distribution of contacts by age groups.
-     * Age groups: "0-18", "19-30", "31-50", "50+"
      * Only considers contacts with valid birth date information.
      * @return LinkedHashMap with age group names as keys and counts as values,
      *         ordered by age group
