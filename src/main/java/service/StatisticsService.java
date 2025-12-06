@@ -31,13 +31,21 @@ public class StatisticsService {
         // Total Contact Count
         int totalCount = contactDAO.getTotalContactCount();
         System.out.println(ConsoleColors.YELLOW + "Total Contact Count:" + ConsoleColors.RESET);
-        System.out.printf(ConsoleColors.WHITE + "%d contact(s)%n%n", totalCount + ConsoleColors.RESET);
+        System.out.printf("%s%d contact(s)%s%n%n",
+                ConsoleColors.WHITE,
+                totalCount,
+                ConsoleColors.RESET
+        );
 
         // Average Age
         double avgAge = contactDAO.getAverageAge();
         System.out.println(ConsoleColors.YELLOW + "Average Age:" + ConsoleColors.RESET);
         if (avgAge > 0) {
-            System.out.printf(ConsoleColors.WHITE + "%.2f years%n%n", avgAge + ConsoleColors.WHITE);
+            System.out.printf("%s%.2f years%s%n%n",
+                    ConsoleColors.WHITE,
+                    avgAge,
+                    ConsoleColors.RESET
+            );
         } else {
             System.out.println(ConsoleColors.RED + "No contacts with birth date information.\n" + ConsoleColors.RESET);
         }
@@ -48,10 +56,11 @@ public class StatisticsService {
         if (youngest != null && youngest.getBirthDate() != null) {
             Period period = Period.between(youngest.getBirthDate(), LocalDate.now());
             int age = period.getYears();
-            System.out.printf("  %s %s (Age: %d)%n%n",
+            System.out.printf("%s %s (Age: %d)%n%n",
                     youngest.getFirstName() != null ? youngest.getFirstName() : "-",
                     youngest.getLastName() != null ? youngest.getLastName() : "-",
-                    age);
+                    age
+            );
         } else {
             System.out.println(ConsoleColors.RED + "No contact with birth date information.\n" + ConsoleColors.RESET);
         }
@@ -62,10 +71,11 @@ public class StatisticsService {
         if (oldest != null && oldest.getBirthDate() != null) {
             Period period = Period.between(oldest.getBirthDate(), LocalDate.now());
             int age = period.getYears();
-            System.out.printf("  %s %s (Age: %d)%n%n",
+            System.out.printf("%s %s (Age: %d)%n%n",
                     oldest.getFirstName() != null ? oldest.getFirstName() : "-",
                     oldest.getLastName() != null ? oldest.getLastName() : "-",
-                    age);
+                    age
+            );
         } else {
             System.out.println(ConsoleColors.RED + "No contact with birth date information.\n" + ConsoleColors.RESET);
         }
@@ -74,8 +84,16 @@ public class StatisticsService {
         int withLinkedin = contactDAO.countWithLinkedin();
         int withoutLinkedin = contactDAO.countWithoutLinkedin();
         System.out.println(ConsoleColors.YELLOW + "LinkedIn Profile Statistics:" + ConsoleColors.RESET);
-        System.out.printf(ConsoleColors.WHITE + "Contacts with LinkedIn: %d%n", withLinkedin);
-        System.out.printf("Contacts without LinkedIn: %d%n%n", withoutLinkedin + ConsoleColors.RESET);
+        System.out.printf("%sContacts with LinkedIn: %d%s%n",
+                ConsoleColors.WHITE,
+                withLinkedin,
+                ConsoleColors.RESET
+        );
+        System.out.printf("%sContacts without LinkedIn: %d%s%n%n",
+                ConsoleColors.WHITE,
+                withoutLinkedin,
+                ConsoleColors.RESET
+        );
 
         // Birth Month Distribution
         Map<String, Integer> birthMonthDist = contactDAO.getBirthMonthDistribution();
@@ -84,8 +102,12 @@ public class StatisticsService {
             System.out.println(ConsoleColors.RED + "No contacts with birth date information.\n" + ConsoleColors.RESET);
         } else {
             for (Map.Entry<String, Integer> entry : birthMonthDist.entrySet()) {
-                System.out.printf(ConsoleColors.WHITE + "%s: %d person(s)%n", entry.getKey(),
-                        entry.getValue() + ConsoleColors.RESET);
+                System.out.printf("%s%s: %d person(s)%s%n",
+                        ConsoleColors.WHITE,
+                        entry.getKey(),
+                        entry.getValue(),
+                        ConsoleColors.RESET
+                );
             }
             System.out.println();
         }
@@ -103,8 +125,12 @@ public class StatisticsService {
             for (Map.Entry<String, Integer> entry : ageGroups.entrySet()) {
                 int count = entry.getValue();
                 if (count > 0) {
-                    System.out.printf(ConsoleColors.WHITE + "%s: %d person(s)%n", entry.getKey(),
-                            count + ConsoleColors.RESET);
+                    System.out.printf("%s%s: %d person(s)%s%n",
+                            ConsoleColors.WHITE,
+                            entry.getKey(),
+                            count,
+                            ConsoleColors.RESET
+                    );
                 }
             }
             System.out.println();
@@ -121,7 +147,12 @@ public class StatisticsService {
                 String name = entry.getKey() != null ? entry.getKey() : "(null)";
                 int count = entry.getValue();
                 if (count > 1) {
-                    System.out.printf(ConsoleColors.WHITE + "%s: %d persons%n", name, count + ConsoleColors.WHITE);
+                    System.out.printf("%s%s: %d persons%s%n",
+                            ConsoleColors.WHITE,
+                            name,
+                            count,
+                            ConsoleColors.RESET
+                    );
                     hasDuplicates = true;
                 }
             }
