@@ -45,42 +45,34 @@ public class LoginScreen {
             System.out.println("===========================================\n" + ConsoleColors.RESET);
             System.out.println(ConsoleColors.CYAN + "Enter your username and password to log in." + ConsoleColors.RESET);
             System.out.println(ConsoleColors.YELLOW + "(To exit, type 'q' as the username.)\n" + ConsoleColors.RESET);
-
-            System.out.print(ConsoleColors.WHITE + "Username: " + ConsoleColors.RESET);
-            String username = scanner.nextLine();
-            if (username == null) username = "";
-            username = username.trim();
-
+    
+            // ✅ Username girişini InputHelper ile al
+            String username = InputHelper.readValidUsername(scanner, ConsoleColors.WHITE + "Username: " + ConsoleColors.RESET);
             if (username.equalsIgnoreCase("q")) {
                 InputHelper.clearScreen();
                 System.out.println(ConsoleColors.GREEN + "\nExiting the application. See you next time!" + ConsoleColors.RESET);
                 return;
             }
-
-            if (username.isEmpty()) {
-                System.out.println(ConsoleColors.RED + "\nUsername cannot be empty. Please try again." + ConsoleColors.RESET);
-                pressEnterToContinue();
-                continue;
-            }
-
-            System.out.print(ConsoleColors.WHITE + "Password: " + ConsoleColors.RESET);
-            String password = scanner.nextLine();
-            if (password == null) password = "";
-
+    
+            // ✅ Password girişini InputHelper ile al
+            String password = InputHelper.readNonEmptyLine(scanner, ConsoleColors.WHITE + "Password: " + ConsoleColors.RESET);
+    
+            // Giriş kontrolü
             User loggedIn = authService.login(username, password);
             if (loggedIn == null) {
                 System.out.println(ConsoleColors.RED + "\nLogin failed. Incorrect username or password." + ConsoleColors.RESET);
                 pressEnterToContinue();
                 continue;
             }
-
+    
             System.out.println(ConsoleColors.GREEN + "\nLogin successful. Welcome, "
                     + loggedIn.getName() + " " + loggedIn.getSurname() + "!" + ConsoleColors.RESET);
             pressEnterToContinue();
-
+    
             openMenuForUser(loggedIn);
         }
     }
+    
 
     /**
      * Opens the appropriate menu based on user's role.
