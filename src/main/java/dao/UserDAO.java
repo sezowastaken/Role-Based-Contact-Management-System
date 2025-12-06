@@ -8,16 +8,32 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) class that manages CRUD (Create, Read, Update, Delete)
+ * operations on the 'users' table in the database.
+ */
+
 public class UserDAO {
 
-    // --- TEMEL YARDIMCI METOTLAR ---
-
+      /**
+     * Converts the role string in the database to the Role enum
+     *
+     * @param dbRole Role value in the database
+     * @return Role equivalent or null
+     */
     private Role mapRoleFromDb(String dbRole) {
         if (dbRole == null) {
             return null;
         }
         return Role.valueOf(dbRole); 
     }
+
+    /**
+     * Converts the role string in the database to the Role enum
+     *
+     * @param role uygulamadaki rol enum değeri
+     * @return DB’de saklanacak string veya null
+     */
 
     private String mapRoleToDb(Role role) {
         if (role == null) {
@@ -41,12 +57,14 @@ public class UserDAO {
         return new User(id, username, passwordHash, name, surname, role, createdAt);
     }
 
-    // --- KULLANILACAK OPERASYONLAR ---
-
     /**
-     * Login için: username'e göre kullanıcıyı bulur.
-     * Bulamazsa null döner.
+     * Finds a user in the database by their username.
+     * Typically used for Login operations.
+     *
+     * @param username The username to search for.
+     * @return The User object if found, otherwise null.
      */
+
     public User findByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -67,8 +85,12 @@ public class UserDAO {
     }
 
     /**
-     * Manager menüsü için: tüm kullanıcıları döner.
+     * Lists all users from the database.
+     * Used to display the user list in the Manager menu.
+     *
+     * @return A list containing all users.
      */
+
     public List<User> getAll() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY user_id";
