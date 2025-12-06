@@ -129,6 +129,8 @@ public class InputHelper {
             if (input == null) input = "";
             input = input.trim();
 
+            if(input.equals("0")) return "0";
+
             if (input.isEmpty()) {
                 System.out.println(ERR_PREFIX + "Name field cannot be empty.");
                 continue;
@@ -172,6 +174,8 @@ public class InputHelper {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
 
+            if(input.equals("0")) return "0";
+
             if (input.isEmpty()) {
                 System.out.println(ERR_PREFIX + "Nickname cannot be empty.");
                 continue;
@@ -198,6 +202,8 @@ public class InputHelper {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
+
+            if(input.equals("0")) return "0";
 
             if (input.isEmpty()) {
                 System.out.println(ERR_PREFIX + "Username cannot be empty.");
@@ -227,6 +233,8 @@ public class InputHelper {
             System.out.print(prompt + " (+90) "); 
             String input = scanner.nextLine().trim();
 
+            if(input.equals("0")) return "0";
+
             String clean = input.replaceAll("[^0-9]", "");
             if (clean.length() == 11 && clean.startsWith("0")) {
                 clean = clean.substring(1);
@@ -248,6 +256,8 @@ public class InputHelper {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
+
+            if(input.equals("0")) return "0";
             
             if (input.length() > MAX_EMAIL_LENGTH) {
                  System.out.printf(ERR_PREFIX + "Email exceeds maximum length of %d characters.\n", MAX_EMAIL_LENGTH);
@@ -268,6 +278,8 @@ public class InputHelper {
         while (true) {
             System.out.print(prompt + " (" + util.DateUtil.getDateFormat() + "): ");
             String input = scanner.nextLine().trim();
+
+            if(input.equals("0")) return LocalDate.now();
             
             String error = util.DateUtil.checkDateValidity(input);
             if (error == null) {
@@ -286,6 +298,8 @@ public class InputHelper {
         while (true) {
             System.out.print(prompt + " (https://www.linkedin.com/in/______ ) [Type 'skip' to pass]: ");
             String input = scanner.nextLine().trim();
+            
+            if(input.equals("0")) return "0";
 
             if (input.equalsIgnoreCase("skip") || input.isEmpty()) {
                 return null; 

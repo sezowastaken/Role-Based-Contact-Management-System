@@ -289,11 +289,10 @@ public class ContactService {
         }
 
         // Nickname
-        String nickPrompt = ConsoleColors.WHITE + "Nickname ["
-                + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ";
-        String nick = InputHelper.readLine(scanner, ConsoleColors.CYAN + nickPrompt + ConsoleColors.RESET);
-        if (!nick.isEmpty())
-            existing.setNickname(nick);
+        String nickPrompt = "Nickname [" + (existing.getNickname() == null ? "" : existing.getNickname()) + "]: ";
+        String nick = InputHelper.readValidNickname(scanner, ConsoleColors.CYAN + nickPrompt + ConsoleColors.RESET);
+        existing.setNickname(nick);
+        
 
         // Phone
         while (true) {
@@ -391,14 +390,15 @@ public class ContactService {
                 return;
             }
 
-            String nick = InputHelper.readLine(scanner, "Nickname (optional, 'skip', or 0 to cancel): ");
+            String nick = InputHelper.readValidNickname(scanner, "Nickname (optional, type 'skip' to leave empty, 0 to cancel): ");
             if (nick.equals("0")) {
-                System.out.println(ConsoleColors.RED + "Add contact cancelled." + ConsoleColors.RESET);
+                System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
             if (nick.equalsIgnoreCase("skip")) {
                 nick = null;
             }
+            
 
             String phone = InputHelper.readValidPhoneTR(scanner, "Phone number (0 to cancel) (+90) ");
             if (phone.equals("0")) {
