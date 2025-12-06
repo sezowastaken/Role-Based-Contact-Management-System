@@ -62,7 +62,7 @@ public class JuniorDevMenu extends BaseMenu {
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                handleChangePassword();
+                userService.changeOwnPasswordInteractive(currentUser, scanner);
                 break;
             case "2":
                 contactService.displayAllContacts();
@@ -93,27 +93,5 @@ public class JuniorDevMenu extends BaseMenu {
     }
 
     // Şifre değiştirme işlemini burada InputHelper ile yapıyoruz
-    private void handleChangePassword() {
-        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
-
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password (0 to cancel): ");
-        if (oldPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
-            return;
-        }
-
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password (0 to cancel): ");
-        if (newPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
-            return;
-        }
-
-        try {
-            userService.changePassword(currentUser, oldPass, newPass);
-            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
-        } catch (Exception e) {
-            System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
-        }
-    }
+    
 }
