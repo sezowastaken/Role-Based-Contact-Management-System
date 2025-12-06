@@ -17,7 +17,6 @@ public class UserDAO {
 
       /**
      * Converts the role string in the database to the Role enum
-     *
      * @param dbRole Role value in the database
      * @return Role equivalent or null
      */
@@ -30,9 +29,8 @@ public class UserDAO {
 
     /**
      * Converts the role string in the database to the Role enum
-     *
-     * @param role uygulamadaki rol enum değeri
-     * @return DB’de saklanacak string veya null
+     * @param role enum Role value
+     * @return String to be stored in the DB or null
      */
 
     private String mapRoleToDb(Role role) {
@@ -60,7 +58,6 @@ public class UserDAO {
     /**
      * Finds a user in the database by their username.
      * Typically used for Login operations.
-     *
      * @param username The username to search for.
      * @return The User object if found, otherwise null.
      */
@@ -87,7 +84,6 @@ public class UserDAO {
     /**
      * Lists all users from the database.
      * Used to display the user list in the Manager menu.
-     *
      * @return A list containing all users.
      */
 
@@ -111,7 +107,7 @@ public class UserDAO {
     }
 
     /**
-     * ID ile tek kullanıcıyı getirir (update/delete ekranları için).
+     * Gets user with given ID (for update/delete screens).
      */
     public User getById(int userId) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
@@ -133,9 +129,9 @@ public class UserDAO {
     }
 
     /**
-     * Username çakışmasın diye kontrol (yeni user eklerken).
-     * excludeId != null ise, o ID'li kullanıcı hariç kontrol eder
-     * (update ekranı için).
+     * Controlling due to user crashing (when adding a new user).
+     * If excludeId != null, it checks excluding the user with that ID
+     * (for update screen).
      */
     public boolean existsByUsername(String username, Integer excludeId) {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
@@ -163,8 +159,8 @@ public class UserDAO {
     }
 
     /**
-     * Yeni user ekleme (Manager → employ new user).
-     * user içindeki passwordHash alanı zaten HASH edilmiş olmalı!
+     * New user insertion (Manager → employ new user).
+     * The passwordHash field in the user should already be hashed.
      */
     public boolean insert(User user) {
         String sql = """
@@ -199,8 +195,8 @@ public class UserDAO {
     }
 
     /**
-     * Manager → kullanıcı bilgilerini güncelle (username, name, surname, role).
-     * Şifreyi değiştirmez.
+     * Manager → update user information (username, name, surname, role).
+     * Does not change the password.
      */
     public boolean update(User user) {
         String sql = """
@@ -228,8 +224,8 @@ public class UserDAO {
     }
 
     /**
-     * Tüm roller için “change password” işlemi.
-     * newPasswordHash parametresi HASH edilmiş string olmalı.
+     * Change password operation for all roles.
+     * The newPasswordHash parameter should be a HASHHed string.
      */
     public boolean updatePassword(int userId, String newPasswordHash) {
         String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
@@ -250,7 +246,7 @@ public class UserDAO {
     }
 
     /**
-     * Manager → kullanıcı silme (fire existing user).
+     * Manager → delete user (fire existing user).
      */
     public boolean delete(int userId) {
         String sql = "DELETE FROM users WHERE user_id = ?";
