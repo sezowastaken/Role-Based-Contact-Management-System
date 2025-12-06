@@ -294,12 +294,21 @@ public class ContactService {
             System.out.print(ConsoleColors.CYAN + "Email [" + (existing.getEmail() == null ? "" : existing.getEmail()) + "]: " + ConsoleColors.RESET);
             String input = scanner.nextLine().trim();
             if (input.isEmpty()) break;
-            if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+
+            // Türkçe karakterleri de destekleyen basit ama sağlam regex
+            String emailRegex =
+                    "^[A-Za-z0-9çÇğĞıİöÖşŞüÜ+_.-]+@" +
+                    "[A-Za-z0-9çÇğĞıİöÖşŞüÜ.-]+\\." +
+                    "[A-Za-zçÇğĞıİöÖşŞüÜ]{2,}$";
+
+            if (input.matches(emailRegex)) {
                 existing.setEmail(input);
                 break;
             }
+
             System.out.println(ConsoleColors.RED + "Error: Invalid email format! Try again." + ConsoleColors.RESET);
         }
+
 
         // LinkedIn
         String currentLi = existing.getLinkedinUrl() == null ? "" : existing.getLinkedinUrl();
