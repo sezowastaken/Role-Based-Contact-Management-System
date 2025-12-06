@@ -3,6 +3,7 @@ package ui.screen;
 /**
  * Handles ASCII art animations displayed at application startup and logout.
  * Shows intro & outro animations with Star Wars-style effects.
+ * Uses ANSI escape codes for color and formatting.
  */
 public class AsciiAnimator {
 
@@ -12,10 +13,6 @@ public class AsciiAnimator {
     private static final String YELLOW  = "\u001B[33m";
     private static final String WHITE   = "\u001B[97m";
     private static final String MAGENTA = "\u001B[35m";
-
-    // ----------------------------------------------------------
-    // INTRO ART
-    // ----------------------------------------------------------
 
     private static final String PRELUDE_ART = YELLOW + """
                     ______   ______    _______   _______
@@ -65,10 +62,6 @@ public class AsciiAnimator {
     };
 
 
-    // ----------------------------------------------------------
-    // CORE UTILITIES
-    // ----------------------------------------------------------
-
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").contains("Windows"))
@@ -92,10 +85,6 @@ public class AsciiAnimator {
         return " ".repeat((width - len) / 2) + text;
     }
 
-
-    // ----------------------------------------------------------
-    // INTRO SEQUENCE
-    // ----------------------------------------------------------
 
     private static void showPrelude() {
         clearScreen();
@@ -157,10 +146,6 @@ public class AsciiAnimator {
     }
 
 
-    // ----------------------------------------------------------
-    // OUTRO SEQUENCE
-    // ----------------------------------------------------------
-
     public static void runOutro() {
         showStarfield(15);
         clearScreen();
@@ -171,7 +156,6 @@ public class AsciiAnimator {
 
     private static void showOutroTitle() {
 
-        // === GROUP 25 block ===
         String groupBlock = CYAN + """
  _____                         _____  _____  
 |  __ \\                       / __  \\|  ___| 
@@ -186,7 +170,6 @@ public class AsciiAnimator {
         System.out.println(center(groupBlock, 95));
         sleep(700);
 
-        // TEAM NAMES
         String[] names = {
                 "SEZAİ ARAPLARLI",
                 "TUNAHAN TUZE",
@@ -199,11 +182,9 @@ public class AsciiAnimator {
             sleep(350);
         }
 
-        // EXTRA SPACING
         System.out.println("\n\n");
         sleep(400);
 
-        // === COMPACT ASCII "MAY THE GRADE BE WITH US" ===
         String mayGrade = CYAN + """
 ▙▗▌       ▐  ▌                 ▌    ▌          ▗▐  ▌         
 ▌▘▌▝▀▖▌ ▌ ▜▀ ▛▀▖▞▀▖ ▞▀▌▙▀▖▝▀▖▞▀▌▞▀▖ ▛▀▖▞▀▖ ▌  ▌▄▜▀ ▛▀▖ ▌ ▌▞▀▘

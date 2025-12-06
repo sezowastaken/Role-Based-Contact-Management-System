@@ -82,8 +82,6 @@ public abstract class BaseMenu {
      */
     protected abstract void handleOption(String choice);
 
-    // ----------------- Helper methods for subclasses -----------------
-
     protected void printHeader() {
         String title = getTitle();
         String line = (ConsoleColors.YELLOW + "=".repeat(Math.max(10, title.length() + 8)) + ConsoleColors.RESET);

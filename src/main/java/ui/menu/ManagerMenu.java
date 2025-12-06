@@ -95,34 +95,27 @@ public class ManagerMenu extends BaseMenu {
                 statisticsService.displayContactStatistics();
                 break;
             case "3":
-                // Delegate to service - interactive listing handled inside UserService
                 userService.listAllUsersInteractive();
                 break;
             case "4":
-                // Delegate update interaction to service
                 userService.updateUserInteractive(scanner);
                 break;
             case "5":
-                // Delegate create interaction to service
                 userService.addUserInteractive(scanner);
                 break;
             case "6":
-                // Delegate delete interaction to service (providing current user for
-                // self-delete check)
                 userService.deleteUserInteractive(scanner, currentUser);
                 break;
 
             case "7":
-                // Check if the user can undo even if the option is not shown
                 if (undoManager != null && undoManager.canUndo()) {
-                    handleUndo(); // Common UNDO behavior in BaseMenu
+                    handleUndo();
                 } else {
                     System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
 
             case "0":
-                // BaseMenu's show() already handles logout for 0 → just return
                 return;
 
             default:

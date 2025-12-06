@@ -89,7 +89,6 @@ public class LoginScreen {
             return;
         }
 
-        // create a per-session UndoManager and pass it to menus
         UndoManager undoManager = new UndoManager();
         BaseMenu menu;
         switch (role) {

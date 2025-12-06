@@ -22,10 +22,6 @@ public class UserService {
         this(new UserDAO(), null);
     }
 
-    // --------------------
-    // Interactive wrappers (UI + 0 Cancel Support)
-    // --------------------
-
     /**
      * Print a user list to console.
      */
@@ -206,7 +202,6 @@ public class UserService {
         this.undoManager = undoManager;
     }
 
-    // --- Simple finders ---
     public User findUserById(int id) {
         return userDAO.getById(id);
     }
@@ -219,7 +214,6 @@ public class UserService {
         return userDAO.getAll();
     }
 
-    // --- Change password (non-interactive) ---
     public void changePassword(User user, String oldPassword, String newPassword) {
         if (user == null)
             throw new IllegalArgumentException(ConsoleColors.RED + "User cannot be null.");
@@ -245,7 +239,6 @@ public class UserService {
         user.setPasswordHash(newHash);
     }
 
-    // Interactive helper used by menus (0 Cancel Added)
     public void changeOwnPasswordInteractive(User currentUser, Scanner scanner) {
         System.out.println(ConsoleColors.BLUE + "\n=== Change Password ===" + ConsoleColors.RESET);
         System.out.println(ConsoleColors.YELLOW + "(Enter '0' to cancel)" + ConsoleColors.RESET);
@@ -283,7 +276,6 @@ public class UserService {
         }
     }
 
-    // --- Create user (Validation) ---
     public void createUser(String username, String rawPassword,
             String firstName, String lastName,
             Role role) {
@@ -327,7 +319,6 @@ public class UserService {
         }
     }
 
-    // --- Update user (Validation + Undo) ---
     public void updateUser(int userId, String newUsername,
             String newFirstName, String newLastName,
             Role newRole) {
@@ -378,7 +369,6 @@ public class UserService {
         System.out.println(ConsoleColors.GREEN + "\nUser updated successfully." + ConsoleColors.RESET);
     }
 
-    // --- Delete user (Validation + Undo) ---
     public void deleteUser(int userId, int managerUserId) {
         if (userId == managerUserId)
             throw new IllegalArgumentException(

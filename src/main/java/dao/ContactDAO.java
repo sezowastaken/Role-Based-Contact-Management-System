@@ -254,10 +254,6 @@ public class ContactDAO {
     }
 
 
-    // =====================================================
-    // SINGLE-FIELD SEARCH
-    // =====================================================
-
     /**
      * Searches contacts by first name and last name using LIKE pattern matching.
      * Supports Turkish character case-insensitive search.
@@ -283,10 +279,6 @@ public class ContactDAO {
         String sql = "SELECT * FROM contacts WHERE phone_number LIKE ?";
         return searchListWithSingleLike(sql, digits);
     }
-
-    // =====================================================
-    // MULTI-FIELD SEARCH
-    // =====================================================
 
     /**
      * Searches contacts by first name and birth month.
@@ -399,10 +391,6 @@ public class ContactDAO {
         return results;
     }
 
-    // =====================================================
-    // SORT
-    // =====================================================
-
     /**
      * Returns all contacts sorted by the specified field.
      * Supported fields: "first_name", "last_name", "phone", "birth_date", "created_at", "age".
@@ -470,9 +458,7 @@ public class ContactDAO {
      */
     private List<Contact> getAllSortedByAge(boolean ascending) {
         List<Contact> contacts = new ArrayList<>();
-        // For ascending (youngest first): smallest age first, so DESC by birth_date
-        // For descending (oldest first): largest age first, so ASC by birth_date
-        String direction = ascending ? "DESC" : "ASC"; // DESC = youngest first (largest birth_date = youngest)
+        String direction = ascending ? "DESC" : "ASC";
         String sql = "SELECT * FROM contacts " +
                 "ORDER BY " +
                 "CASE WHEN birth_date IS NULL THEN 1 ELSE 0 END, " + // NULLs go to end
@@ -492,10 +478,6 @@ public class ContactDAO {
 
         return contacts;
     }
-
-    // =====================================================
-    // STATISTICS
-    // =====================================================
 
     /**
      * Calculates the average age of all contacts.
@@ -731,10 +713,6 @@ public class ContactDAO {
         }
         return ageGroups;
     }
-
-    // =====================================================
-    // PRIVATE HELPER METHODS
-    // =====================================================
 
     /**
      * Helper method to execute a single LIKE search query.

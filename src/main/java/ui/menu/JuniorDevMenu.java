@@ -7,8 +7,8 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
-import util.ConsoleColors; // Colors
-import util.InputHelper; // Safe Input
+import util.ConsoleColors;
+import util.InputHelper;
 
 /**
  * Menu for Junior Developer role.
@@ -27,7 +27,6 @@ public class JuniorDevMenu extends BaseMenu {
      */
     public JuniorDevMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
-        // Undo supported service examples
         this.contactService = new ContactService(undoManager);
         this.userService = new UserService(new UserDAO(), undoManager);
     }
@@ -89,18 +88,15 @@ public class JuniorDevMenu extends BaseMenu {
                 contactService.displayAllContacts();
                 break;
             case "3":
-                // Safe Input in ContactService
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
                 contactService.sortContactsInteractive(scanner);
                 break;
             case "5":
-                // Safe Input in ContactService
                 contactService.updateContactInteractive(scanner);
                 break;
             case "6":
-                // Check if the user can undo even if the option is not shown
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo(); // Common UNDO behavior in BaseMenu
                 } else {
@@ -112,7 +108,4 @@ public class JuniorDevMenu extends BaseMenu {
                         + ConsoleColors.RESET);
         }
     }
-
-    // Change password using InputHelper
-    
 }
