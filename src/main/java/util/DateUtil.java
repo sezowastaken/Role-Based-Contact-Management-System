@@ -15,8 +15,7 @@ public class DateUtil {
     // CRITICAL: ResolverStyle.STRICT modu, Java'nın otomatik yuvarlama yapmasını engeller.
     // "2023-02-30" girilirse hata verir.
     // Artık Yıl (Leap Year) hesabını otomatik yapar (2023-02-29'u reddeder, 2024-02-29'u kabul eder).
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
 
     /**
      * Returns the standard date format string used in the application.

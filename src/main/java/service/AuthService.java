@@ -5,8 +5,8 @@ import model.User;
 import util.HashUtil;
 
 /**
- * Kullanıcı adı + şifre ile giriş doğrulamasını yapan servis.
- * DB erişimini UserDAO üzerinden yapar, şifre doğrulamasını HashUtil.verify ile kontrol eder.
+ * Checks username and password against database.
+ * Accesses database through UserDAO, verifies password with HashUtil.verify.
  */
 public class AuthService {
 
@@ -17,11 +17,8 @@ public class AuthService {
     }
 
     /**
-     * Login denemesi yapar.
-     *
-     * @param username      Kullanıcı adı (boş / null ise direkt başarısız).
-     * @param plainPassword Düz (hashlenmemiş) parola.
-     * @return Başarılıysa dolu User, başarısızsa null.
+     * Login attempt.
+     * @return Successful User object, null if failed.
      */
     public User login(String username, String plainPassword) {
         if (username == null || plainPassword == null) {
@@ -33,14 +30,13 @@ public class AuthService {
             return null;
         }
 
-        // 1) Kullanıcıyı DB'den çek
+        // 1) Fetch user from database
         User user = userDAO.findByUsername(username);
         if (user == null) {
-            // Böyle bir kullanıcı yok
             return null;
         }
 
-        // 2) Şifre hash kontrolü
+        // 2) Password hash check
         String storedHash = user.getPasswordHash();
         if (storedHash == null || storedHash.isEmpty()) {
             return null;
