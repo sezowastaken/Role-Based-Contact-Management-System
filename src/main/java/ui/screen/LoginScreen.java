@@ -15,15 +15,28 @@ import ui.menu.ManagerMenu;
 import util.ConsoleColors;
 import util.InputHelper;
 
+/**
+ * Handles the login screen where users enter their credentials.
+ * After successful login, redirects users to their role-specific menu.
+ */
 public class LoginScreen {
 
     private final AuthService authService;
     private final Scanner scanner;
+    
+    /**
+     * Creates a new LoginScreen with the given authentication service.
+     * @param authService the authentication service to use for login
+     */
     public LoginScreen(AuthService authService) {
         this.authService = authService;
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Starts the login loop. Continues until user successfully logs in or exits.
+     * Type 'q' as username to exit the application.
+     */
     public void start() {
         while (true) {
             InputHelper.clearScreen();
@@ -69,6 +82,10 @@ public class LoginScreen {
         }
     }
 
+    /**
+     * Opens the appropriate menu based on user's role.
+     * @param user the logged-in user
+     */
     private void openMenuForUser(User user) {
         InputHelper.clearScreen();
         Role role = user.getRole();
@@ -104,6 +121,9 @@ public class LoginScreen {
         menu.show();
     }
 
+    /**
+     * Waits for user to press Enter before continuing.
+     */
     private void pressEnterToContinue() {
         System.out.print(ConsoleColors.YELLOW + "\nPress Enter to continue..." + ConsoleColors.RESET);
         scanner.nextLine();
