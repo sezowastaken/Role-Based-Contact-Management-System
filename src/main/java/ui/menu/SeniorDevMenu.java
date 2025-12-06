@@ -7,26 +7,43 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
-import util.ConsoleColors; // Renkler eklendi
-import util.InputHelper; // InputHelper eklendi
+import util.ConsoleColors; // Colors
+import util.InputHelper; // Safe Input
 
+/**
+ * Menu for Senior Developer role.
+ * Allows Senior Developer to change own password, list all contacts, search contacts by selected fields, sort results by selected field, update existing contact, add new contact, delete existing contact, and undo last operation.
+ */
 public class SeniorDevMenu extends BaseMenu {
 
     private final ContactService contactService;
     private final UserService userService;
 
+    /**
+     * Creates a new SeniorDevMenu with the given current user, scanner, and undo manager.
+     * @param currentUser the current user
+     * @param scanner the scanner
+     * @param undoManager the undo manager
+     */
     public SeniorDevMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
-        // Undo destekli service örnekleri
+        // Undo supported service examples
         this.contactService = new ContactService(undoManager);
         this.userService = new UserService(new UserDAO(), undoManager);
     }
 
+    /**
+     * Returns the title of the menu.
+     * @return the title of the menu
+     */
     @Override
     protected String getTitle() {
         return "Senior Developer Menu";
     }
 
+    /**
+     * Prints the options of the menu.
+     */
     @Override
     protected void printOptions() {
         System.out.println(
@@ -66,18 +83,22 @@ public class SeniorDevMenu extends BaseMenu {
                 "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
+    /**
+     * Handles the option selected by the user.
+     * @param choice the choice selected by the user
+     */
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                // [DÜZELTME] UserService'ten sildiğimiz metodu burada lokal olarak yapıyoruz
+                // Change password using UserService
                 userService.changeOwnPasswordInteractive(currentUser, scanner);
                 break;
             case "2":
                 contactService.displayAllContacts();
                 break;
             case "3":
-                // ContactService içindeki metodun artık InputHelper kullandığını varsayıyoruz
+                // ContactService now uses InputHelper
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
@@ -93,9 +114,9 @@ public class SeniorDevMenu extends BaseMenu {
                 contactService.deleteContactInteractive(scanner);
                 break;
             case "8":
-                // Menüde gösterilmese bile kullanıcı 8 yazarsa kontrol et
+                // Even if the option is not shown, check if the user can undo
                 if (undoManager != null && undoManager.canUndo()) {
-                    handleUndo(); // BaseMenu'deki ortak UNDO davranışı
+                    handleUndo(); // Common UNDO behavior in BaseMenu
                 } else {
                     System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }

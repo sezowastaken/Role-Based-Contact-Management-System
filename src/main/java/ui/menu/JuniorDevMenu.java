@@ -7,26 +7,43 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
-import util.ConsoleColors; // Renkler için
-import util.InputHelper; // Regexli inputlar için
+import util.ConsoleColors; // Colors
+import util.InputHelper; // Safe Input
 
+/**
+ * Menu for Junior Developer role.
+ * Allows Junior Developer to change own password, list all contacts, search contacts by selected fields, sort results by selected field, update existing contact, and undo last operation.
+ */
 public class JuniorDevMenu extends BaseMenu {
 
     private final ContactService contactService;
     private final UserService userService;
 
+    /**
+     * Creates a new JuniorDevMenu with the given current user, scanner, and undo manager.
+     * @param currentUser the current user
+     * @param scanner the scanner
+     * @param undoManager the undo manager
+     */
     public JuniorDevMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
-        // Undo destekli service örnekleri
+        // Undo supported service examples
         this.contactService = new ContactService(undoManager);
         this.userService = new UserService(new UserDAO(), undoManager);
     }
 
+    /**
+     * Returns the title of the menu.
+     * @return the title of the menu
+     */
     @Override
     protected String getTitle() {
         return "Junior Developer Panel";
     }
 
+    /**
+     * Prints the options of the menu.
+     */
     @Override
     protected void printOptions() {
         System.out.println(
@@ -58,6 +75,10 @@ public class JuniorDevMenu extends BaseMenu {
                 "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
+    /**
+     * Handles the option selected by the user.
+     * @param choice the choice selected by the user
+     */
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
@@ -68,20 +89,20 @@ public class JuniorDevMenu extends BaseMenu {
                 contactService.displayAllContacts();
                 break;
             case "3":
-                // Regex ve InputHelper ContactService'in içinde
+                // Safe Input in ContactService
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
                 contactService.sortContactsInteractive(scanner);
                 break;
             case "5":
-                // Regex ve InputHelper ContactService'in içinde
+                // Safe Input in ContactService
                 contactService.updateContactInteractive(scanner);
                 break;
             case "6":
-                // Menüde gösterilmese bile kullanıcı 6 yazarsa kontrol et
+                // Check if the user can undo even if the option is not shown
                 if (undoManager != null && undoManager.canUndo()) {
-                    handleUndo(); // BaseMenu'deki ortak UNDO davranışı
+                    handleUndo(); // Common UNDO behavior in BaseMenu
                 } else {
                     System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
@@ -92,6 +113,6 @@ public class JuniorDevMenu extends BaseMenu {
         }
     }
 
-    // Şifre değiştirme işlemini burada InputHelper ile yapıyoruz
+    // Change password using InputHelper
     
 }
