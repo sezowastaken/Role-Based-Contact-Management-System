@@ -6,6 +6,8 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
+import util.ConsoleColors; // Renkler
+import util.InputHelper; // Güvenli Input
 
 public class TesterMenu extends BaseMenu {
 
@@ -23,22 +25,23 @@ public class TesterMenu extends BaseMenu {
 
     @Override
     protected String getTitle() {
-        return "Tester Menu";
+        return "Tester Panel";
     }
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - List all contacts");
-        System.out.println("3 - Search contacts by selected field(s)");
-        System.out.println("4 - Sort contacts by selected field (ascending / descending)");
-
-        // Stack'te en az bir işlem varsa UNDO seçeneğini göster
+        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│                             TESTER MENU                              │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ 1 - Change password                                                  │");
+        System.out.println("│ 2 - List all contacts                                                │");
+        System.out.println("│ 3 - Search contacts by selected field(s)                             │");
+        System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("5 - Undo last operation");
+            System.out.println("| 5 - Undo last operation |                                          │");
         }
-
-        System.out.println("0 - Logout");
+        System.out.println("│ 0 - Logout                                                           │");
+        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
     }
 
     @Override
@@ -52,6 +55,7 @@ public class TesterMenu extends BaseMenu {
                 contactService.displayAllContacts();
                 break;
             case "3":
+                // ContactService içindeki Regex/InputHelper korumalı metodu çağırır
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
@@ -66,7 +70,8 @@ public class TesterMenu extends BaseMenu {
                 }
                 break;
             default:
-                System.out.println("\nInvalid choice. Please select one of the options above.");
+                System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
         }
     }
 }

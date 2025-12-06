@@ -8,6 +8,9 @@ import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
 import service.StatisticsService;
+import model.Role;
+import util.InputHelper;
+import util.ConsoleColors;
 
 public class ManagerMenu extends BaseMenu {
 
@@ -24,24 +27,25 @@ public class ManagerMenu extends BaseMenu {
 
     @Override
     protected String getTitle() {
-        return "Manager Menu";
+        return "Manager Panel";
     }
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - Show statistical summary of contacts");
-        System.out.println("3 - List all users");
-        System.out.println("4 - Add new user");
-        System.out.println("5 - Update user");
-        System.out.println("6 - Delete user");
-
-        // Undo seçeneğini sadece stack boş değilse gösteriyoruz
+        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│                             MANAGER MENU                             │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ 1 - Change password                                                  │");
+        System.out.println("│ 2 - View contacts statistical info                                   │");
+        System.out.println("│ 3 - List all users                                                   │");
+        System.out.println("│ 4 - Update existing user                                             │");
+        System.out.println("│ 5 - Add/employ new user                                              │");
+        System.out.println("│ 6 - Delete/fire existing user                                        │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("7 - Undo last operation");
+            System.out.println("| 7 - Undo last operation                                            │");
         }
-
-        System.out.println("0 - Logout");
+        System.out.println("│ 0 - Logout                                                           │");
+        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
     }
 
     @Override
@@ -54,16 +58,20 @@ public class ManagerMenu extends BaseMenu {
                 statisticsService.displayContactStatistics();
                 break;
             case "3":
-                userService.listAllUsers();
+                // Delegate to service — interactive listing handled inside UserService
+                userService.listAllUsersInteractive();
                 break;
             case "4":
-                userService.addUserInteractive(scanner);
-                break;
-            case "5":
+                // Delegate update interaction to service
                 userService.updateUserInteractive(scanner);
                 break;
+            case "5":
+                // Delegate create interaction to service
+                userService.addUserInteractive(scanner);
+                break;
             case "6":
-                userService.deleteUserInteractive(scanner);
+                // Delegate delete interaction to service (providing current user for self-delete check)
+                userService.deleteUserInteractive(scanner, currentUser);
                 break;
 
             case "7":

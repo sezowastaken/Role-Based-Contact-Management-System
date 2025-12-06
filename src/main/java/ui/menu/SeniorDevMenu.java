@@ -7,6 +7,8 @@ import model.User;
 import service.ContactService;
 import service.UserService;
 import undo.UndoManager;
+import util.ConsoleColors; // Renkler eklendi
+import util.InputHelper; // InputHelper eklendi
 
 public class SeniorDevMenu extends BaseMenu {
 
@@ -27,32 +29,35 @@ public class SeniorDevMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("1 - Change password");
-        System.out.println("2 - List all contacts");
-        System.out.println("3 - Search contacts by selected field(s)");
-        System.out.println("4 - Sort contacts by selected field (ascending / descending)");
-        System.out.println("5 - Update existing contact");
-        System.out.println("6 - Add new contact(s)");
-        System.out.println("7 - Delete existing contact(s)");
-
-        // Stack'te en az bir undoable action varsa, UNDO seçeneğini göster
+        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│                        SENIOR DEVELOPER MENU                         │");
+        System.out.println("├──────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ 1 - Change password                                                  │");
+        System.out.println("│ 2 - List all contacts                                                │");
+        System.out.println("│ 3 - Search contacts by selected field(s)                             │");
+        System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
+        System.out.println("│ 5 - Update existing contact                                          │");
+        System.out.println("│ 6 - Add new contact(s)                                               │");
+        System.out.println("│ 7 - Delete existing contact(s)                                       │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("8 - Undo last operation");
+            System.out.println("| 8 - Undo last operation                                            │");
         }
-
-        System.out.println("0 - Logout");
+        System.out.println("│ 0 - Logout                                                           │");
+        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
     }
 
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                userService.changeOwnPasswordInteractive(currentUser, scanner);
+                // [DÜZELTME] UserService'ten sildiğimiz metodu burada lokal olarak yapıyoruz
+                handleChangePassword();
                 break;
             case "2":
                 contactService.displayAllContacts();
                 break;
             case "3":
+                // ContactService içindeki metodun artık InputHelper kullandığını varsayıyoruz
                 contactService.searchContactsInteractive(scanner);
                 break;
             case "4":
@@ -76,7 +81,33 @@ public class SeniorDevMenu extends BaseMenu {
                 }
                 break;
             default:
-                System.out.println("\nInvalid choice. Please select one of the options above.");
+                System.out.println(ConsoleColors.RED + "\nInvalid choice. Please select one of the options above."
+                        + ConsoleColors.RESET);
+        }
+    }
+
+    // ==========================================
+    // ŞİFRE DEĞİŞTİRME (LOCAL IMPLEMENTATION)
+    // ==========================================
+    private void handleChangePassword() {
+        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+
+        // InputHelper kullanarak güvenli okuma yapıyoruz
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password: ");
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New password: ");
+
+        // İsteğe bağlı: Yeni şifre tekrarı sorulabilir
+        // String confirm = InputHelper.readNonEmptyLine(scanner, "Confirm new password:
+        // ");
+        // if (!newPass.equals(confirm)) { ... return; }
+
+        try {
+            // Saf backend metodunu çağırıyoruz
+            userService.changePassword(currentUser, oldPass, newPass);
+            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
+        } catch (Exception e) {
+            // Service'den gelen hatayı (yanlış eski şifre vb.) basıyoruz
+            System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
         }
     }
 }
