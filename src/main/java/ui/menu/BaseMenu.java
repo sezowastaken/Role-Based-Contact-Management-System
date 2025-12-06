@@ -4,6 +4,7 @@ import model.User;
 import util.ConsoleColors;
 import util.InputHelper;
 import undo.UndoManager;
+import ui.screen.AsciiAnimator;
 
 import java.util.Scanner;
 
@@ -51,9 +52,15 @@ public abstract class BaseMenu {
             if ("0".equals(choice)) {
                 System.out.println(ConsoleColors.GREEN + "\nLogging out... See you soon, "
                         + currentUser.getName() + "!" + ConsoleColors.RESET);
-                pause();
-                return;
+            
+                pause();  // kullanıcı logout mesajını görsün
+            
+                // ⭐ LOGOUT OUTRO ANİMASYONUN TAM DOĞRU YERİ ⭐
+                ui.screen.AsciiAnimator.runOutro();
+            
+                return;  // menüden çık, üst katman uygulamayı kapatsın
             }
+            
 
             handleOption(choice);
             pause();
