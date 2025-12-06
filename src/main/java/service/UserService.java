@@ -22,16 +22,16 @@ public class UserService {
     }
 
     // --------------------
-    // Interactive wrappers
+    // Interactive wrappers (UI + 0 Cancel Support)
     // --------------------
 
     /**
-     * Print a user list to console (menu-facing helper).
+     * Print a user list to console.
      */
     public void listAllUsersInteractive() {
         try {
             java.util.List<User> users = findAllUsers();
-            System.out.printf("%5s | %-15s | %-15s | %-15s | %-10s\n", "ID", "Username", "First Name", "Last Name", "Role");
+            System.out.printf(ConsoleColors.YELLOW + "%5s | %-15s | %-15s | %-15s | %-10s\n" + ConsoleColors.RESET, "ID", "Username", "First Name", "Last Name", "Role");
             System.out.println("---------------------------------------------------------------");
             for (User u : users) {
                 System.out.printf("%5d | %-15s | %-15s | %-15s | %-10s\n",
@@ -43,22 +43,33 @@ public class UserService {
     }
 
     /**
-     * Interactive flow to create a new user (uses InputHelper and delegates to createUser()).
+     * Interactive flow to create a new user (0 to cancel).
      */
     public void addUserInteractive(Scanner scanner) {
-        System.out.println("\n=== Add New User ===");
+        System.out.println(ConsoleColors.CYAN + "\n=== Add New User ===" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "(Enter '0' at any step to cancel)" + ConsoleColors.RESET);
+        
         try {
             String username = InputHelper.readNonEmptyLine(scanner, "Username: ");
-            String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
-            String firstName = InputHelper.readValidName(scanner, "First name: ");
-            String lastName = InputHelper.readValidName(scanner, "Last name: ");
+            if (username.equals("0")) return;
 
-            System.out.println("Select role:");
+            String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
+            if (password.equals("0")) return;
+
+            String firstName = InputHelper.readValidName(scanner, "First name: ");
+            if (firstName.equals("0")) return;
+
+            String lastName = InputHelper.readValidName(scanner, "Last name: ");
+            if (lastName.equals("0")) return;
+
+            System.out.println("Select role (0 to cancel):");
             Role[] roles = Role.values();
             for (int i = 0; i < roles.length; i++) {
                 System.out.printf("%d) %s\n", i + 1, roles[i]);
             }
-            int r = InputHelper.readIntInRange(scanner, "Choice (1-" + roles.length + "): ", 1, roles.length);
+            int r = InputHelper.readIntInRange(scanner, "Choice (0-" + roles.length + "): ", 0, roles.length);
+            if (r == 0) return;
+
             Role role = roles[r - 1];
 
             createUser(username, password, firstName, lastName, role);
@@ -71,29 +82,42 @@ public class UserService {
     }
 
     /**
-     * Interactive flow to update an existing user.
+     * Interactive flow to update an existing user (0 to cancel).
      */
     public void updateUserInteractive(Scanner scanner) {
-        System.out.println("\n=== Update User ===");
+        System.out.println(ConsoleColors.CYAN + "\n=== Update User ===" + ConsoleColors.RESET);
+        listAllUsersInteractive();
+
         try {
-            int uid = InputHelper.readInt(scanner, "User ID to update: ");
+            int uid = InputHelper.readInt(scanner, "User ID to update (0 to cancel): ");
+            if (uid == 0) return;
+
             User existing = findUserById(uid);
             if (existing == null) {
                 System.out.println(ConsoleColors.RED + "User not found with ID: " + uid + ConsoleColors.RESET);
                 return;
             }
 
-            System.out.println("Leave a field empty to keep current value.");
+            System.out.println(ConsoleColors.BLUE + "Updating: " + existing.getName() + " (" + existing.getUsername() + ")" + ConsoleColors.RESET);
+            System.out.println(ConsoleColors.YELLOW + "Leave empty to keep current. Enter '0' to cancel operation." + ConsoleColors.RESET);
+
             String newUsername = InputHelper.readLine(scanner, "New username (current: " + existing.getUsername() + "): ");
+            if (newUsername.equals("0")) return;
+
             String newFirst = InputHelper.readLine(scanner, "New first name (current: " + existing.getName() + "): ");
+            if (newFirst.equals("0")) return;
+
             String newLast = InputHelper.readLine(scanner, "New last name (current: " + existing.getSurname() + "): ");
+            if (newLast.equals("0")) return;
 
             System.out.println("Select new role or press Enter to keep current (current: " + existing.getRole() + "):");
             Role[] roles = Role.values();
             for (int i = 0; i < roles.length; i++) {
                 System.out.printf("%d) %s\n", i + 1, roles[i]);
             }
-            String roleInput = InputHelper.readLine(scanner, "Choice (1-" + roles.length + "): ");
+            String roleInput = InputHelper.readLine(scanner, "Choice (1-" + roles.length + ") or 0 to cancel: ");
+            if (roleInput.equals("0")) return;
+
             Role newRole = null;
             if (!roleInput.isEmpty()) {
                 try {
@@ -115,18 +139,28 @@ public class UserService {
     }
 
     /**
-     * Interactive flow to delete a user (checks self-delete and confirms).
+     * Interactive flow to delete a user (0 to cancel).
      */
     public void deleteUserInteractive(Scanner scanner, User currentUser) {
-        System.out.println("\n=== Delete User ===");
+        System.out.println(ConsoleColors.RED + "\n=== Delete User ===" + ConsoleColors.RESET);
+        listAllUsersInteractive();
+
         try {
-            int uid = InputHelper.readInt(scanner, "User ID to delete: ");
-            boolean confirm = InputHelper.readYesNo(scanner, "Are you sure you want to delete user ID " + uid + "?");
-            if (!confirm) {
-                System.out.println("Deletion cancelled.");
+            int uid = InputHelper.readInt(scanner, "User ID to delete (0 to cancel): ");
+            if (uid == 0) return;
+
+            if (uid == currentUser.getId()) {
+                System.out.println(ConsoleColors.RED + "You cannot delete your own account!" + ConsoleColors.RESET);
                 return;
             }
-            deleteUser(uid, currentUser != null ? currentUser.getId() : -1);
+
+            boolean confirm = InputHelper.readYesNo(scanner, ConsoleColors.RED + "Are you sure you want to delete user ID " + uid + "?" + ConsoleColors.RESET);
+            if (!confirm) {
+                System.out.println(ConsoleColors.YELLOW + "Deletion cancelled." + ConsoleColors.RESET);
+                return;
+            }
+            
+            deleteUser(uid, currentUser.getId());
             System.out.println(ConsoleColors.GREEN + "User deleted successfully." + ConsoleColors.RESET);
         } catch (IllegalArgumentException ex) {
             System.out.println(ConsoleColors.RED + ex.getMessage() + ConsoleColors.RESET);
@@ -162,10 +196,6 @@ public class UserService {
     }
 
     // --- Change password (non-interactive) ---
-    /**
-     * Low-level password change (no Scanner).
-     * Verifies old password and updates DB if valid.
-     */
     public void changePassword(User user, String oldPassword, String newPassword) {
         if (user == null) throw new IllegalArgumentException("User cannot be null.");
         if (oldPassword == null || newPassword == null) throw new IllegalArgumentException("Passwords cannot be null.");
@@ -177,73 +207,65 @@ public class UserService {
 
         String newHash = HashUtil.hash(newPassword);
 
-        // persist
         boolean ok = userDAO.updatePassword(user.getId(), newHash);
         if (!ok) {
             throw new IllegalStateException("Database error: Failed to update password.");
         }
 
-        // push undo: restore old hash if undo requested later
         if (undoManager != null) {
             undoManager.push(UndoAction.forPasswordChange(userDAO, user.getId(), currentHash, newHash));
         }
 
-        // update in-memory
         user.setPasswordHash(newHash);
     }
 
-    // Interactive helper used by menus
+    // Interactive helper used by menus (0 Cancel Added)
     public void changeOwnPasswordInteractive(User currentUser, Scanner scanner) {
-        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.CYAN + "\n=== Change Password ===" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "(Enter '0' to cancel)" + ConsoleColors.RESET);
 
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password (0 to cancel): ");
-        if (oldPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+        if (currentUser == null) {
+            System.out.println(ConsoleColors.RED + "Current user is null, cannot change password." + ConsoleColors.RESET);
             return;
         }
 
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password (0 to cancel): ");
-        if (newPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password: ");
+        if (oldPass.equals("0")) return;
+
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New password: ");
+        if (newPass.equals("0")) return;
+
+        String confirm = InputHelper.readNonEmptyLine(scanner, "Confirm new password: ");
+        if (confirm.equals("0")) return;
+
+        if (!newPass.equals(confirm)) {
+            System.out.println(ConsoleColors.RED + "New password and confirmation do not match." + ConsoleColors.RESET);
             return;
         }
 
         try {
             changePassword(currentUser, oldPass, newPass);
-            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
-        } catch (Exception e) {
+            System.out.println(ConsoleColors.GREEN + "Password changed successfully." + ConsoleColors.RESET);
+        } catch (IllegalArgumentException e) {
             System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
+        } catch (IllegalStateException e) {
+            System.out.println(ConsoleColors.RED + "Failed to update password in the system." + ConsoleColors.RESET);
         }
     }
 
-
-    // --- Create user (with incoming validations) ---
+    // --- Create user (Validation) ---
     public void createUser(String username, String rawPassword,
                            String firstName, String lastName,
                            Role role) {
-        // Validation
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be empty.");
-        }
-        if (!username.matches("^[A-Za-z0-9_.]+$")) {
-            throw new IllegalArgumentException("Username contains invalid characters (Only letters, numbers, _, . allowed).");
-        }
-        if (rawPassword == null || rawPassword.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty.");
-        }
-        if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null.");
-        }
-        if (userDAO.existsByUsername(username, null)) {
-            throw new IllegalArgumentException("Username already exists: " + username);
-        }
-        if (firstName != null && !firstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
-            throw new IllegalArgumentException("First name must contain only letters.");
-        }
-        if (lastName != null && !lastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
-            throw new IllegalArgumentException("Last name must contain only letters.");
-        }
+        if (username == null || username.trim().isEmpty()) throw new IllegalArgumentException("Username cannot be empty.");
+        if (!username.matches("^[A-Za-z0-9_.]+$")) throw new IllegalArgumentException("Username contains invalid characters (Only letters, numbers, _, . allowed).");
+        if (rawPassword == null || rawPassword.isEmpty()) throw new IllegalArgumentException("Password cannot be empty.");
+        if (role == null) throw new IllegalArgumentException("Role cannot be null.");
+        
+        if (userDAO.existsByUsername(username, null)) throw new IllegalArgumentException("Username already exists: " + username);
+        
+        if (firstName != null && !firstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) throw new IllegalArgumentException("First name must contain only letters.");
+        if (lastName != null && !lastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) throw new IllegalArgumentException("Last name must contain only letters.");
 
         String hash = HashUtil.hash(rawPassword);
 
@@ -254,59 +276,37 @@ public class UserService {
                 java.time.LocalDateTime.now());
 
         boolean ok = userDAO.insert(user);
-        if (!ok) {
-            throw new IllegalStateException("Failed to create user in database.");
-        }
+        if (!ok) throw new IllegalStateException("Failed to create user in database.");
 
         if (undoManager != null) {
-            // user.getId() should be set by DAO.insert (generated keys)
             undoManager.push(UndoAction.forUserInsert(userDAO, user.getId()));
         }
     }
 
-    // --- Update user (keep previousState for undo) ---
+    // --- Update user (Validation + Undo) ---
     public void updateUser(int userId, String newUsername,
                            String newFirstName, String newLastName,
                            Role newRole) {
 
         User existing = userDAO.getById(userId);
-        if (existing == null) {
-            throw new IllegalArgumentException("User not found with ID: " + userId);
-        }
+        if (existing == null) throw new IllegalArgumentException("User not found with ID: " + userId);
 
-        // capture previous state
-        User previousState = new User();
-        previousState.setId(existing.getId());
-        previousState.setUsername(existing.getUsername());
-        previousState.setPasswordHash(existing.getPasswordHash());
-        previousState.setName(existing.getName());
-        previousState.setSurname(existing.getSurname());
-        previousState.setRole(existing.getRole());
-        previousState.setCreatedAt(existing.getCreatedAt());
+        User previousState = new User(existing.getId(), existing.getUsername(), existing.getPasswordHash(),
+                existing.getName(), existing.getSurname(), existing.getRole(), existing.getCreatedAt());
 
-        // Username Update + validation
         if (newUsername != null && !newUsername.trim().isEmpty()) {
-            if (!newUsername.matches("^[A-Za-z0-9_.]+$")) {
-                throw new IllegalArgumentException("Username format is invalid.");
-            }
-            if (userDAO.existsByUsername(newUsername, userId)) {
-                throw new IllegalArgumentException("Username already exists: " + newUsername);
-            }
+            if (!newUsername.matches("^[A-Za-z0-9_.]+$")) throw new IllegalArgumentException("Username format is invalid.");
+            if (userDAO.existsByUsername(newUsername, userId)) throw new IllegalArgumentException("Username already exists: " + newUsername);
             existing.setUsername(newUsername.trim());
         }
 
-        // Name Validation & Update
         if (newFirstName != null) {
-            if (!newFirstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
-                throw new IllegalArgumentException("First name must contain only letters.");
-            }
+            if (!newFirstName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) throw new IllegalArgumentException("First name must contain only letters.");
             existing.setName(newFirstName.trim());
         }
 
         if (newLastName != null) {
-            if (!newLastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
-                throw new IllegalArgumentException("Last name must contain only letters.");
-            }
+            if (!newLastName.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) throw new IllegalArgumentException("Last name must contain only letters.");
             existing.setSurname(newLastName.trim());
         }
 
@@ -315,32 +315,23 @@ public class UserService {
         }
 
         boolean ok = userDAO.update(existing);
-        if (!ok) {
-            throw new IllegalStateException("Failed to update user.");
-        }
+        if (!ok) throw new IllegalStateException("Failed to update user.");
 
         if (undoManager != null) {
             undoManager.push(UndoAction.forUserUpdate(userDAO, previousState));
         }
-
         System.out.println("\n✓ User updated successfully.");
     }
 
-    // --- Delete user (snapshot before delete; prevent self-delete) ---
+    // --- Delete user (Validation + Undo) ---
     public void deleteUser(int userId, int managerUserId) {
-        if (userId == managerUserId) {
-            throw new IllegalArgumentException("You cannot delete your own account.");
-        }
+        if (userId == managerUserId) throw new IllegalArgumentException("You cannot delete your own account.");
 
         User toDelete = userDAO.getById(userId);
-        if (toDelete == null) {
-            throw new IllegalArgumentException("User not found with ID: " + userId);
-        }
+        if (toDelete == null) throw new IllegalArgumentException("User not found with ID: " + userId);
 
         boolean ok = userDAO.delete(userId);
-        if (!ok) {
-            throw new IllegalStateException("Delete operation failed or user not found.");
-        }
+        if (!ok) throw new IllegalStateException("Delete operation failed or user not found.");
 
         if (undoManager != null) {
             undoManager.push(UndoAction.forUserDelete(userDAO, toDelete));
