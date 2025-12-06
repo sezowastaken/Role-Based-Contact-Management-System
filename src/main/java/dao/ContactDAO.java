@@ -348,6 +348,11 @@ public class ContactDAO {
      * Only allowed fields are used; otherwise, contact_id is used.
      */
     public List<Contact> getAllSorted(String sortField, boolean ascending) {
+        // Special handling for age sorting
+        if (sortField.equals("age") || sortField.equals("Age")) {
+            return getAllSortedByAge(ascending);
+        }
+
         String column;
 
         switch (sortField) {
@@ -378,6 +383,39 @@ public class ContactDAO {
         String sql = "SELECT * FROM contacts ORDER BY " + column + " " + direction;
 
         List<Contact> contacts = new ArrayList<>();
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                contacts.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return contacts;
+    }
+
+    /**
+     * Returns all contacts sorted by age (calculated from birth_date).
+     * Contacts without birth_date are placed at the end.
+     * 
+     * @param ascending true for youngest first, false for oldest first
+     * @return List of contacts sorted by age
+     */
+    private List<Contact> getAllSortedByAge(boolean ascending) {
+        List<Contact> contacts = new ArrayList<>();
+        // Sort by age: NULL birth_date contacts go to the end
+        // For ascending (youngest first): smallest age first, so DESC by birth_date
+        // For descending (oldest first): largest age first, so ASC by birth_date
+        String direction = ascending ? "DESC" : "ASC"; // DESC = youngest first (largest birth_date = youngest)
+        String sql = "SELECT * FROM contacts " +
+                "ORDER BY " +
+                "CASE WHEN birth_date IS NULL THEN 1 ELSE 0 END, " + // NULLs go to end
+                "birth_date " + direction;
 
         try {
             Connection conn = DatabaseConnection.getConnection();

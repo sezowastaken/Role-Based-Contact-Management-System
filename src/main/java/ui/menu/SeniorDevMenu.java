@@ -91,10 +91,20 @@ public class SeniorDevMenu extends BaseMenu {
     // ==========================================
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
         // InputHelper kullanarak güvenli okuma yapıyoruz
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password: ");
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New password: ");
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current password (0 to cancel): ");
+        if (oldPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
+
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New password (0 to cancel): ");
+        if (newPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         // İsteğe bağlı: Yeni şifre tekrarı sorulabilir
         // String confirm = InputHelper.readNonEmptyLine(scanner, "Confirm new password:
