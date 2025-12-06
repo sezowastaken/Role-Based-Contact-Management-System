@@ -12,12 +12,22 @@ import model.Role;
 import util.InputHelper;
 import util.ConsoleColors;
 
+/**
+ * Menu for Manager role.
+ * Allows Manager to change own password, view contact statistics, list all users, update existing user, add new user, delete existing user, and undo last operation.
+ */
 public class ManagerMenu extends BaseMenu {
 
     private final ContactService contactService;
     private final UserService userService;
     private final StatisticsService statisticsService;
 
+    /**
+     * Creates a new ManagerMenu with the given current user, scanner, and undo manager.
+     * @param currentUser the current user
+     * @param scanner the scanner
+     * @param undoManager the undo manager
+     */
     public ManagerMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         super(currentUser, scanner, undoManager);
         this.contactService = new ContactService(undoManager);
@@ -25,11 +35,18 @@ public class ManagerMenu extends BaseMenu {
         this.statisticsService = new StatisticsService();
     }
 
+    /**
+     * Returns the title of the menu.
+     * @return the title of the menu
+     */
     @Override
     protected String getTitle() {
         return "Manager Panel";
     }
 
+    /**
+     * Prints the options of the menu.
+     */
     @Override
     protected void printOptions() {
         System.out.println(
@@ -64,6 +81,10 @@ public class ManagerMenu extends BaseMenu {
                 "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
+    /**
+     * Handles the option selected by the user.
+     * @param choice the choice selected by the user
+     */
     @Override
     protected void handleOption(String choice) {
         switch (choice) {
@@ -74,7 +95,7 @@ public class ManagerMenu extends BaseMenu {
                 statisticsService.displayContactStatistics();
                 break;
             case "3":
-                // Delegate to service — interactive listing handled inside UserService
+                // Delegate to service - interactive listing handled inside UserService
                 userService.listAllUsersInteractive();
                 break;
             case "4":
@@ -92,16 +113,16 @@ public class ManagerMenu extends BaseMenu {
                 break;
 
             case "7":
-                // Menüde gözükmese bile biri 7 girerse kontrol edelim
+                // Check if the user can undo even if the option is not shown
                 if (undoManager != null && undoManager.canUndo()) {
-                    handleUndo(); // BaseMenu'deki ortak undo metodu
+                    handleUndo(); // Common UNDO behavior in BaseMenu
                 } else {
                     System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
 
             case "0":
-                // BaseMenu'deki show() zaten 0 için logout yapıyor → burada sadece return
+                // BaseMenu's show() already handles logout for 0 → just return
                 return;
 
             default:
