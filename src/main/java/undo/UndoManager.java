@@ -4,14 +4,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Tek bir oturum (login) boyunca yapılmış geri alınabilir işlemleri LIFO mantığıyla tutar.
+ * Manages undo operations using a stack (LIFO - Last In First Out).
+ * Stores undoable actions during a single login session.
  */
 public class UndoManager {
 
     private final Deque<UndoAction> stack = new ArrayDeque<>();
 
     /**
-     * Null değilse stack'e ekler.
+     * Adds an undo action to the stack.
+     * @param action the action to add
      */
     public void push(UndoAction action) {
         if (action != null) {
@@ -20,22 +22,24 @@ public class UndoManager {
     }
 
     /**
-     * Geri alınabilir en az bir işlem var mı?
+     * Checks if there are any undoable actions.
+     * @return true if undo is possible, false otherwise
      */
     public boolean canUndo() {
         return !stack.isEmpty();
     }
 
     /**
-     * Tüm geçmişi temizler (logout'ta çağrılacak).
+     * Clears all undo history.
+     * Should be called when user logs out.
      */
     public void clear() {
         stack.clear();
     }
 
     /**
-     * Son işlemi geri alır.
-     * Stack boşsa kullanıcıya mesaj basar.
+     * Undoes the last operation.
+     * If stack is empty, prints a message to the user.
      */
     public void undoLast() {
         if (stack.isEmpty()) {

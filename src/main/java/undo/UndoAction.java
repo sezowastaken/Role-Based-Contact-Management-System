@@ -9,13 +9,15 @@ import model.Role;
 import java.time.LocalDate;
 
 /**
- * Tek bir geri alma (UNDO) işlemini temsil eder.
- *
- * Bu sınıf, farklı tipteki veritabanı yazma işlemlerini (insert / update / delete / password change)
- * geri alabilmek için gerekli bilgileri saklar.
+ * Represents a single undo operation.
+ * Stores the necessary information to reverse database write operations
+ * (insert, update, delete, password change).
  */
 public class UndoAction {
 
+    /**
+     * Types of undoable actions.
+     */
     public enum Type {
         CONTACT_INSERT,
         CONTACT_UPDATE,
@@ -31,21 +33,17 @@ public class UndoAction {
     private final ContactDAO contactDAO;
     private final UserDAO userDAO;
 
-    // Contact ile ilgili alanlar
     private final Integer contactId;
     private final Contact contactSnapshot;
 
-    // User ile ilgili alanlar
     private final Integer userId;
     private final User userSnapshot;
 
-    // Şifre değişimi için alanlar
     private final String oldPasswordHash;
     private final String newPasswordHash;
 
     /**
-     * Tüm alanları alan private ctor.
-     * Dışarıdan doğrudan new kullanma, factory metotları kullan.
+     * Private constructor. Use factory methods instead.
      */
     private UndoAction(
             Type type,
@@ -69,8 +67,14 @@ public class UndoAction {
         this.newPasswordHash = newPasswordHash;
     }
 
-    // ---------- FACTORY METOTLAR ----------
+    // ---------- FACTORY METHODS ----------
 
+    /**
+     * Creates an undo action for contact insertion.
+     * @param contactDAO the ContactDAO instance
+     * @param newContactId the ID of the newly inserted contact
+     * @return UndoAction for contact insert
+     */
     public static UndoAction forContactInsert(ContactDAO contactDAO, int newContactId) {
         return new UndoAction(
                 Type.CONTACT_INSERT,
@@ -85,6 +89,12 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for contact deletion.
+     * @param contactDAO the ContactDAO instance
+     * @param deletedContact the contact that was deleted (snapshot)
+     * @return UndoAction for contact delete
+     */
     public static UndoAction forContactDelete(ContactDAO contactDAO, Contact deletedContact) {
         return new UndoAction(
                 Type.CONTACT_DELETE,
@@ -99,6 +109,12 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for contact update.
+     * @param contactDAO the ContactDAO instance
+     * @param previousState the previous state of the contact before update
+     * @return UndoAction for contact update
+     */
     public static UndoAction forContactUpdate(ContactDAO contactDAO, Contact previousState) {
         return new UndoAction(
                 Type.CONTACT_UPDATE,
@@ -113,6 +129,12 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for user insertion.
+     * @param userDAO the UserDAO instance
+     * @param newUserId the ID of the newly inserted user
+     * @return UndoAction for user insert
+     */
     public static UndoAction forUserInsert(UserDAO userDAO, int newUserId) {
         return new UndoAction(
                 Type.USER_INSERT,
@@ -127,6 +149,12 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for user deletion.
+     * @param userDAO the UserDAO instance
+     * @param deletedUser the user that was deleted (snapshot)
+     * @return UndoAction for user delete
+     */
     public static UndoAction forUserDelete(UserDAO userDAO, User deletedUser) {
         return new UndoAction(
                 Type.USER_DELETE,
@@ -141,6 +169,12 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for user update.
+     * @param userDAO the UserDAO instance
+     * @param previousUser the previous state of the user before update
+     * @return UndoAction for user update
+     */
     public static UndoAction forUserUpdate(UserDAO userDAO, User previousUser) {
         return new UndoAction(
                 Type.USER_UPDATE,
@@ -155,6 +189,14 @@ public class UndoAction {
         );
     }
 
+    /**
+     * Creates an undo action for password change.
+     * @param userDAO the UserDAO instance
+     * @param userId the ID of the user whose password was changed
+     * @param oldPasswordHash the previous password hash
+     * @param newPasswordHash the new password hash
+     * @return UndoAction for password change
+     */
     public static UndoAction forPasswordChange(
             UserDAO userDAO,
             int userId,
@@ -174,11 +216,11 @@ public class UndoAction {
         );
     }
 
-    // ---------- KAMUSAL API ----------
+    // ---------- PUBLIC API ----------
 
     /**
-     * Gerçek geri alma işlemini yapar.
-     * DAO metotları false dönerse, basit konsol mesajı verir.
+     * Performs the actual undo operation.
+     * If DAO methods return false, prints a simple console message.
      */
     public void undo() {
         if (type == null) {
@@ -199,7 +241,8 @@ public class UndoAction {
     }
 
     /**
-     * Konsola yazdırmak için insan okunur açıklama.
+     * Returns a human-readable description of this undo action.
+     * @return description string for console display
      */
     public String getDescription() {
         return switch (type) {
@@ -222,12 +265,19 @@ public class UndoAction {
         };
     }
 
+    /**
+     * Gets the type of this undo action.
+     * @return the action type
+     */
     public Type getType() {
         return type;
     }
 
-    // ---------- ÖZEL UNDO YARDIMCI METOTLARI ----------
+    // ---------- PRIVATE UNDO HELPER METHODS ----------
 
+    /**
+     * Undoes a contact insert operation by deleting the contact.
+     */
     private void undoContactInsert() {
         if (contactDAO == null || contactId == null) {
             System.out.println("Cannot undo contact insert: missing DAO or contact ID.");
@@ -240,8 +290,7 @@ public class UndoAction {
     }
 
     /**
-     * CONTACT_DELETE aksiyonunu geri alır.
-     * Daha önce silinmiş olan contact kaydını, eski contact_id değeriyle tekrar ekler.
+     * Undoes a contact delete operation by restoring the deleted contact.
      */
     private void undoContactDelete() {
         if (contactDAO == null || contactSnapshot == null) {
@@ -258,6 +307,9 @@ public class UndoAction {
     }
 
 
+    /**
+     * Undoes a contact update by reverting to the previous state.
+     */
     private void undoContactUpdate() {
         if (contactDAO == null || contactSnapshot == null) {
             System.out.println("Cannot undo contact update: missing DAO or previous state.");
@@ -270,6 +322,9 @@ public class UndoAction {
         }
     }
 
+    /**
+     * Undoes a user insert operation by deleting the user.
+     */
     private void undoUserInsert() {
         if (userDAO == null || userId == null) {
             System.out.println("Cannot undo user insert: missing DAO or user ID.");
@@ -282,8 +337,7 @@ public class UndoAction {
     }
 
     /**
-     * USER_DELETE aksiyonunu geri alır.
-     * Yani daha önce silinmiş olan kullanıcıyı, eski user_id değeriyle tekrar veritabanına ekler.
+     * Undoes a user delete operation by restoring the deleted user.
      */
     private void undoUserDelete() {
         if (userDAO == null || userSnapshot == null) {
@@ -300,6 +354,9 @@ public class UndoAction {
     }
 
 
+    /**
+     * Undoes a user update by reverting to the previous state.
+     */
     private void undoUserUpdate() {
         if (userDAO == null || userSnapshot == null) {
             System.out.println("Cannot undo user update: missing DAO or previous state.");
@@ -312,6 +369,9 @@ public class UndoAction {
         }
     }
 
+    /**
+     * Undoes a password change by restoring the old password.
+     */
     private void undoPasswordChange() {
         if (userDAO == null || userId == null || oldPasswordHash == null) {
             System.out.println("Cannot undo password change: missing DAO, user ID or old password hash.");
@@ -323,11 +383,12 @@ public class UndoAction {
         }
     }
 
-    // ---------- CLONE YARDIMCILARI (DERİN KOPYA) ----------
+    // ---------- CLONE HELPERS (DEEP COPY) ----------
 
     /**
-     * Contact nesnesinin derin kopyasını üretir.
-     * Contact modelindeki alan adları farklıysa, setter/getter isimlerini buna göre düzelt.
+     * Creates a deep copy of a Contact object.
+     * @param original the Contact to clone
+     * @return a new Contact with the same values, or null if original is null
      */
     public static Contact cloneContact(Contact original) {
         if (original == null) {
@@ -347,13 +408,13 @@ public class UndoAction {
             copy.setBirthDate(birth);
         }
 
-        // Eğer Contact’ta başka alanlar varsa (createdAt, updatedAt vs.) buraya ekleyebilirsin.
         return copy;
     }
 
     /**
-     * User nesnesinin derin kopyasını üretir.
-     * User modelindeki alan adları farklıysa, setter/getter isimlerini buna göre düzelt.
+     * Creates a deep copy of a User object.
+     * @param original the User to clone
+     * @return a new User with the same values, or null if original is null
      */
     public static User cloneUser(User original) {
         if (original == null) {
