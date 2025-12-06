@@ -11,10 +11,10 @@ import java.time.format.ResolverStyle;
  */
 public class DateUtil {
 
-    // Format: Yıl-Ay-Gün (Örn: 2000-11-25)
-    // CRITICAL: ResolverStyle.STRICT modu, Java'nın otomatik yuvarlama yapmasını engeller.
-    // "2023-02-30" girilirse hata verir.
-    // Artık Yıl (Leap Year) hesabını otomatik yapar (2023-02-29'u reddeder, 2024-02-29'u kabul eder).
+    // Format: Year-Month-Day (e.g., 2000-11-25)
+    // CRITICAL: ResolverStyle.STRICT mode, prevents Java's automatic rounding.
+    // Throws error for invalid dates like "2023-02-30".
+    // Leap Year does automatic calculation (rejects 2023-02-29, accepts 2024-02-29).
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
 
     /**
@@ -36,25 +36,25 @@ public class DateUtil {
      */
     public static String checkDateValidity(String dateStr) {
         try {
-            // 1. Parse işlemi: Format ve Takvim kontrolü 
-            // (Artık yıl ve olmayan günler burada otomatik kontrol edilir, hata varsa catch'e düşer)
+            // 1. Parse : Format and Calendar check
+            // (Leap year and non-existent days are automatically checked here, if error occurs it falls into catch)
             LocalDate date = LocalDate.parse(dateStr, FORMATTER);
             LocalDate now = LocalDate.now();
             
-            // 2. Gelecek Tarih Kontrolü
+            // 2. Future Date Check
             if (date.isAfter(now)) {
                 return "Date cannot be in the future!";
             }
             
-            // 3. Tarih Limiti (1900 öncesi yasak)
+            // 3. Date Limit (Before 1900 not allowed)
             if (date.getYear() < 1900) {
                 return "Date is too old! Year must be 1900 or later.";
             }
 
-            return null; // Valid (Hata yok)
+            return null; // Valid (No error)
 
         } catch (DateTimeParseException e) {
-            // Format hatası veya takvimde olmayan gün (örn: 2023-02-30)
+            // Format error or non-existent day in calendar (e.g., 2023-02-30)
             return "Invalid date! Please ensure:\n" +
                    "- Format is yyyy-MM-dd (e.g. 1990-12-31)\n" +
                    "- Day exists in the calendar (e.g., No Feb 30)\n" +
