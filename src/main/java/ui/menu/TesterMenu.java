@@ -5,6 +5,7 @@ import java.util.Scanner;
 import model.User;
 import service.ContactService;
 import service.UserService;
+import undo.UndoManager;
 import util.ConsoleColors; // Renkler
 import util.InputHelper; // Güvenli Input
 
@@ -13,10 +14,13 @@ public class TesterMenu extends BaseMenu {
     private final ContactService contactService;
     private final UserService userService;
 
-    public TesterMenu(User currentUser, Scanner scanner) {
-        super(currentUser, scanner);
-        this.contactService = new ContactService();
-        this.userService = new UserService();
+    public TesterMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
+        super(currentUser, scanner, undoManager);
+        // UndoManager alan constructor'lar
+        this.contactService = new ContactService(undoManager);
+        this.userService = new UserService(undoManager);
+        // Eğer UserService tarafında UserDAO alan başka bir constructor kullanıyorsan:
+        // this.userService = new UserService(new UserDAO(), undoManager);
     }
 
     @Override
@@ -33,8 +37,8 @@ public class TesterMenu extends BaseMenu {
         System.out.println("│ 2 - List all contacts                                                │");
         System.out.println("│ 3 - Search contacts by selected field(s)                             │");
         System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
-        if (isUndoAvailable()) {
-            System.out.println("│ U - Undo last operation                                              │");
+        if (undoManager != null && undoManager.canUndo()) {
+            System.out.println("| 5 - Undo last operation |                                          │");
         }
         System.out.println("│ 0 - Logout                                                           │");
         System.out.println("└──────────────────────────────────────────────────────────────────────┘");
@@ -44,8 +48,8 @@ public class TesterMenu extends BaseMenu {
     protected void handleOption(String choice) {
         switch (choice) {
             case "1":
-                // [DÜZELTME] UserService'ten silinen metot yerine bunu kullanıyoruz
-                handleChangePassword();
+                // Tester kendi şifresini değiştirebiliyor
+                userService.changeOwnPasswordInteractive(currentUser, scanner);
                 break;
             case "2":
                 contactService.displayAllContacts();
@@ -57,40 +61,17 @@ public class TesterMenu extends BaseMenu {
             case "4":
                 contactService.sortContactsInteractive(scanner);
                 break;
-            case "0":
-                return;
+            case "5":
+                // Menüde 5 yazmıyorsa da kullanıcı elle girerse:
+                if (undoManager != null && undoManager.canUndo()) {
+                    handleUndo();
+                } else {
+                    System.out.println("\nThere is nothing to undo.");
+                }
+                break;
             default:
                 System.out.println(ConsoleColors.RED + "Invalid choice. Please select one of the options above."
                         + ConsoleColors.RESET);
-        }
-    }
-
-    // ==========================================
-    // ŞİFRE DEĞİŞTİRME (LOCAL IMPLEMENTATION)
-    // ==========================================
-    private void handleChangePassword() {
-        System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
-        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
-
-        // InputHelper ile güvenli okuma
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password (0 to cancel): ");
-        if (oldPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
-            return;
-        }
-
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password (0 to cancel): ");
-        if (newPass.equals("0")) {
-            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
-            return;
-        }
-
-        try {
-            // Saf backend metoduna gönderim
-            userService.changePassword(currentUser, oldPass, newPass);
-            System.out.println(ConsoleColors.GREEN + "Password updated successfully." + ConsoleColors.RESET);
-        } catch (Exception e) {
-            System.out.println(ConsoleColors.RED + "Error: " + e.getMessage() + ConsoleColors.RESET);
         }
     }
 }

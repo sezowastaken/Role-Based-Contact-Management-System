@@ -25,12 +25,14 @@ public abstract class BaseMenu {
 
     protected final User currentUser;
     protected final Scanner scanner;
-    private boolean undoAvailable;
+    protected final UndoManager undoManager;
 
-    protected BaseMenu(User currentUser, Scanner scanner) {
+    public BaseMenu(User currentUser, Scanner scanner, UndoManager undoManager) {
         this.currentUser = currentUser;
         this.scanner = scanner;
+        this.undoManager = undoManager;
     }
+
 
     /**
      * Main loop of the menu.
@@ -104,16 +106,12 @@ public abstract class BaseMenu {
         scanner.nextLine();
     }
 
-    /**
-     * Tries to clear the console screen. On unsupported terminals,
-     * it will simply behave like several empty lines.
-     */
-
-    protected boolean isUndoAvailable() {
-        return undoAvailable;
-    }
-
-    protected void setUndoAvailable(boolean undoAvailable) {
-        this.undoAvailable = undoAvailable;
+    protected void handleUndo() {
+        if (undoManager == null) {
+            System.out.println("\nUndo is not available in this session.");
+            return;
+        }
+        undoManager.undoLast();
+        pause();
     }
 }

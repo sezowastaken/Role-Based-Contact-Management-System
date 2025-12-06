@@ -81,7 +81,7 @@ public class ContactDAO {
 
         try {
             Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
             String firstName = normalizeName(contact.getFirstName());
             String lastName = normalizeName(contact.getLastName());
 
@@ -99,7 +99,17 @@ public class ContactDAO {
             }
 
             int affected = ps.executeUpdate();
-            return affected > 0;
+            if (affected == 0) {
+                return false;
+            }
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    contact.setContactId(keys.getInt(1));
+                }
+            }
+
+            return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -271,6 +281,32 @@ public class ContactDAO {
      * @param phonePart the phone number substring to search for
      * @param emailPart the email substring to search for
      * @return List of matching contacts
+     * Search by phone prefix and birth year.
+     * Matches phone numbers that start with the given prefix and birth year equals the given year.
+     */
+    public List<Contact> searchByPhonePrefixAndBirthYear(String phonePrefix, int year) {
+        List<Contact> results = new ArrayList<>();
+        String sql = "SELECT * FROM contacts WHERE phone_number LIKE ? AND YEAR(birth_date) = ?";
+
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, phonePrefix + "%");
+            ps.setInt(2, year);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToContact(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    /**
+     * Telefon ve email substring’ine göre arama yapar.
+     * phone_number LIKE %phonePart% AND email LIKE %emailPart%.
      */
     public List<Contact> searchByPhoneAndEmailContains(String phonePart, String emailPart) {
         List<Contact> results = new ArrayList<>();
