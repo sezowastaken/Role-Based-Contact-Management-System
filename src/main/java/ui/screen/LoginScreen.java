@@ -5,7 +5,6 @@ import java.util.Scanner;
 import model.Role;
 import model.User;
 import service.AuthService;
-import service.UserService;
 import undo.UndoManager;
 import ui.menu.BaseMenu;
 import ui.menu.TesterMenu;
@@ -49,7 +48,7 @@ public class LoginScreen {
             String username = InputHelper.readValidUsername(scanner, ConsoleColors.WHITE + "Username: " + ConsoleColors.RESET);
             if (username.equalsIgnoreCase("q")) {
                 InputHelper.clearScreen();
-                ui.screen.AsciiAnimator.runOutro();
+                AsciiAnimator.runOutro();
                 InputHelper.clearScreen();
                 System.out.println(ConsoleColors.GREEN + "\nExiting the application. See you next time!" + ConsoleColors.RESET);
                 System.exit(0);

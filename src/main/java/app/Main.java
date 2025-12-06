@@ -1,16 +1,8 @@
 package app;
 
-import dao.ContactDAO;
-import dao.UserDAO;
-import model.Contact;
-import model.User;
 import service.AuthService;
 import ui.screen.*;
-import service.UserService;
-import model.Role;
 
-import java.util.List;
-import java.nio.charset.Charset;
 
 /**
  * Main entry point for the Role-Based Contact Management System application.
