@@ -339,26 +339,19 @@ public class ContactService {
 
         boolean adding = true;
         while (adding) {
-            // First name with cancel check
-            System.out.print("First name (0 to cancel): ");
-            String firstInput = scanner.nextLine().trim();
-            if (firstInput.equals("0")) {
+
+            String first = InputHelper.readValidName(scanner, "First name (0 to cancel): ");
+            if (first.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
-            // Use InputHelper to validate and read (it will prompt)
-            String first = InputHelper.readValidName(scanner, "First name: ");
-
-            // Last name with cancel check  
-            System.out.print("Last name (0 to cancel): ");
-            String lastInput = scanner.nextLine().trim();
-            if (lastInput.equals("0")) {
+            
+            String last = InputHelper.readValidName(scanner, "Last name (0 to cancel): ");
+            if (last.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
-            String last = InputHelper.readValidName(scanner, "Last name: ");
 
-            // Nickname
             String nick = InputHelper.readLine(scanner, "Nickname (optional, 'skip', or 0 to cancel): ");
             if (nick.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
@@ -368,23 +361,18 @@ public class ContactService {
                 nick = null;
             }
 
-            // Phone
-            System.out.print("Phone number (0 to cancel) (+90) ");
-            String phoneInput = scanner.nextLine().trim();
-            if (phoneInput.equals("0")) {
+            
+            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number (0 to cancel) (+90) ");
+            if (phone.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
-            String phone = InputHelper.readValidPhoneTR(scanner, "Phone number: ");
 
-            // Email
-            System.out.print("Email (0 to cancel): ");
-            String emailInput = scanner.nextLine().trim();
-            if (emailInput.equals("0")) {
+            String email = InputHelper.readValidEmail(scanner, "Email (0 to cancel): ");
+            if (email.equals("0")) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
-            String email = InputHelper.readValidEmail(scanner, "Email: ");
 
             // LinkedIn
             String linkedin = InputHelper.readValidLinkedin(scanner, "LinkedIn URL (optional, 0 to cancel): ");
@@ -394,13 +382,11 @@ public class ContactService {
             }
 
             // Birth date
-            System.out.print("Birth date (0 to cancel) (" + DateUtil.getDateFormat() + "): ");
-            String dateInput = scanner.nextLine().trim();
-            if (dateInput.equals("0")) {
+            LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date (0 to cancel) ");
+            if (birthDate.equals(LocalDate.now())) {
                 System.out.println(ConsoleColors.YELLOW + "Add contact cancelled." + ConsoleColors.RESET);
                 return;
             }
-            LocalDate birthDate = InputHelper.readValidPastDate(scanner, "Birth date (" + DateUtil.getDateFormat() + "): ");
 
             // Preview
             System.out.println(ConsoleColors.WHITE + "\nContact preview:" + ConsoleColors.RESET);
@@ -439,6 +425,8 @@ public class ContactService {
                 if (!InputHelper.readYesNo(scanner, "Edit again?")) {
                     System.out.println(ConsoleColors.RED + "Add contact cancelled." + ConsoleColors.RESET);
                     adding = false;
+                }else{
+                    InputHelper.clearScreen();
                 }
             }
         }

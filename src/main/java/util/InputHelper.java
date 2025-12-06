@@ -119,6 +119,10 @@ public class InputHelper {
                 continue;
             }
 
+            if(input.equals("0")) {
+                return "0"; // Cancel için
+            }
+
             if (!input.matches("[\\p{L}çğıöşüÇĞİÖŞÜ '\\-]+")) {
                 System.out.println(ERR_PREFIX + "Name must contain only letters (no numbers).");
                 continue;
@@ -150,7 +154,9 @@ public class InputHelper {
             // İPUCU: print kullandık, println değil. İmleç yanında beklesin diye.
             System.out.print(prompt + " (+90) "); 
             String input = scanner.nextLine().trim();
-
+            if(input.equals("0")) {
+                return "0"; // Cancel için
+            }
             // Sadece rakamları ayıkla
             String clean = input.replaceAll("[^0-9]", "");
 
@@ -176,7 +182,9 @@ public class InputHelper {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
-            
+            if(input.equals("0")) {
+                return "0"; // Cancel için
+            }
             if (input.matches(regex)) {
                 return input;
             }
@@ -192,6 +200,9 @@ public class InputHelper {
             // Kullanıcıya DateUtil içindeki güncel formatı (yyyy-MM-dd) gösteriyoruz
             System.out.print(prompt + " (" + DateUtil.getDateFormat() + "): ");
             String input = scanner.nextLine().trim();
+            if(input.equals("0")) {
+                return LocalDate.now(); // Cancel için
+            }
             
             String error = DateUtil.checkDateValidity(input);
             if (error == null) {
