@@ -33,7 +33,6 @@ public abstract class BaseMenu {
         this.undoManager = undoManager;
     }
 
-
     /**
      * Main loop of the menu.
      * Shows the menu until the user chooses to logout (option "0").
@@ -108,7 +107,7 @@ public abstract class BaseMenu {
 
     protected void handleUndo() {
         if (undoManager == null) {
-            System.out.println("\nUndo is not available in this session.");
+            System.out.println(ConsoleColors.RED + "\nUndo is not available in this session." + ConsoleColors.RESET);
             return;
         }
         undoManager.undoLast();

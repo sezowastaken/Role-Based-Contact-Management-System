@@ -30,18 +30,33 @@ public class TesterMenu extends BaseMenu {
 
     @Override
     protected void printOptions() {
-        System.out.println("┌──────────────────────────────────────────────────────────────────────┐");
-        System.out.println("│                             TESTER MENU                              │");
+        System.out.println(
+                ConsoleColors.YELLOW + "┌──────────────────────────────────────────────────────────────────────┐");
+        System.out.println("│       " + ConsoleColors.WHITE + "                      TESTER MENU                      "
+                + ConsoleColors.YELLOW + "        │");
         System.out.println("├──────────────────────────────────────────────────────────────────────┤");
-        System.out.println("│ 1 - Change password                                                  │");
-        System.out.println("│ 2 - List all contacts                                                │");
-        System.out.println("│ 3 - Search contacts by selected field(s)                             │");
-        System.out.println("│ 4 - Sort results by selected field (ascending / descending)          │");
+        System.out.println(
+                "│ " + ConsoleColors.YELLOW + "1 - Change password                                "
+                        + ConsoleColors.YELLOW + "                  │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "2 - List all contacts            " + ConsoleColors.YELLOW
+                        + "                                    │");
+        System.out.println(
+                "│ " + ConsoleColors.WHITE + "3 - Search contacts by selected field(s)             "
+                        + ConsoleColors.YELLOW + "                │");
+        System.out.println(
+                "│" + ConsoleColors.WHITE + " 4 - Sort results by selected field (ascending / descending)     "
+                        + ConsoleColors.YELLOW + "     │");
         if (undoManager != null && undoManager.canUndo()) {
-            System.out.println("| 5 - Undo last operation |                                          │");
+            System.out.println("| " + ConsoleColors.WHITE
+                    + "5 - Undo last operation |                       " + ConsoleColors.YELLOW
+                    + "                   │");
         }
-        System.out.println("│ 0 - Logout                                                           │");
-        System.out.println("└──────────────────────────────────────────────────────────────────────┘");
+        System.out.println(
+                "│ " + ConsoleColors.RED + "0 - Logout              " + ConsoleColors.YELLOW
+                        + "                                             │");
+        System.out.println(
+                "└──────────────────────────────────────────────────────────────────────┘" + ConsoleColors.RESET);
     }
 
     @Override
@@ -66,7 +81,7 @@ public class TesterMenu extends BaseMenu {
                 if (undoManager != null && undoManager.canUndo()) {
                     handleUndo();
                 } else {
-                    System.out.println("\nThere is nothing to undo.");
+                    System.out.println(ConsoleColors.YELLOW + "\nThere is nothing to undo." + ConsoleColors.RESET);
                 }
                 break;
             default:
