@@ -72,9 +72,19 @@ public class ManagerMenu extends BaseMenu {
 
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
-        String oldPassword = InputHelper.readNonEmptyLine(scanner, "Enter old password: ");
-        String newPassword = InputHelper.readNonEmptyLine(scanner, "Enter new password: ");
+        String oldPassword = InputHelper.readNonEmptyLine(scanner, "Enter old password (0 to cancel): ");
+        if (oldPassword.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
+
+        String newPassword = InputHelper.readNonEmptyLine(scanner, "Enter new password (0 to cancel): ");
+        if (newPassword.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         try {
             userService.changePassword(currentUser, oldPassword, newPassword);
@@ -111,10 +121,16 @@ public class ManagerMenu extends BaseMenu {
 
     private void handleUpdateUser() {
         System.out.println(ConsoleColors.CYAN + "\n--- Update Existing User ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
         handleListUsers();
 
-        int userId = InputHelper.readIntInRange(scanner, "User ID to update: ", 1, Integer.MAX_VALUE);
+        int userId = InputHelper.readIntInRange(scanner, "User ID to update (0 to cancel): ", 0, Integer.MAX_VALUE);
+        if (userId == 0) {
+            System.out.println(ConsoleColors.YELLOW + "Update cancelled." + ConsoleColors.RESET);
+            return;
+        }
+        
         User target = userService.findUserById(userId);
 
         if (target == null) {
@@ -130,9 +146,23 @@ public class ManagerMenu extends BaseMenu {
             return;
         }
 
-        String newUsername = InputHelper.readNonEmptyLine(scanner, "New username: ");
-        String newFirstname = InputHelper.readValidName(scanner, "New first name: ");
-        String newLastname = InputHelper.readValidName(scanner, "New lastname: ");
+        String newUsername = InputHelper.readNonEmptyLine(scanner, "New username (0 to cancel): ");
+        if (newUsername.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Update cancelled." + ConsoleColors.RESET);
+            return;
+        }
+        
+        String newFirstname = InputHelper.readValidName(scanner, "New first name (0 to cancel): ");
+        if (newFirstname.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Update cancelled." + ConsoleColors.RESET);
+            return;
+        }
+        
+        String newLastname = InputHelper.readValidName(scanner, "New lastname (0 to cancel): ");
+        if (newLastname.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Update cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         Role role = selectRole();
         if (role == null)
@@ -148,12 +178,31 @@ public class ManagerMenu extends BaseMenu {
 
     private void handleAddUser() {
         System.out.println(ConsoleColors.CYAN + "\n--- Hire New User ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
-        String username = InputHelper.readNonEmptyLine(scanner, "Username: ");
-        String password = InputHelper.readNonEmptyLine(scanner, "Password: ");
+        String username = InputHelper.readNonEmptyLine(scanner, "Username (0 to cancel): ");
+        if (username.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Add user cancelled." + ConsoleColors.RESET);
+            return;
+        }
+        
+        String password = InputHelper.readNonEmptyLine(scanner, "Password (0 to cancel): ");
+        if (password.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Add user cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
-        String first = InputHelper.readValidName(scanner, "First name: ");
-        String last = InputHelper.readValidName(scanner, "Last name: ");
+        String first = InputHelper.readValidName(scanner, "First name (0 to cancel): ");
+        if (first.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Add user cancelled." + ConsoleColors.RESET);
+            return;
+        }
+        
+        String last = InputHelper.readValidName(scanner, "Last name (0 to cancel): ");
+        if (last.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Add user cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         Role role = selectRole();
         if (role == null)
@@ -169,10 +218,15 @@ public class ManagerMenu extends BaseMenu {
 
     private void handleDeleteUser() {
         System.out.println(ConsoleColors.RED + "\n--- Fire (Delete) User ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
         handleListUsers();
 
-        int id = InputHelper.readIntInRange(scanner, "User ID to delete: ", 1, Integer.MAX_VALUE);
+        int id = InputHelper.readIntInRange(scanner, "User ID to delete (0 to cancel): ", 0, Integer.MAX_VALUE);
+        if (id == 0) {
+            System.out.println(ConsoleColors.YELLOW + "Delete cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         // [DÜZELTME] getUserId() yerine getId() kullanıldı
         if (id == currentUser.getId()) {

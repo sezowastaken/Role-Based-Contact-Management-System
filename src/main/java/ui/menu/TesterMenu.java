@@ -70,10 +70,20 @@ public class TesterMenu extends BaseMenu {
     // ==========================================
     private void handleChangePassword() {
         System.out.println(ConsoleColors.CYAN + "\n--- Change Password ---" + ConsoleColors.RESET);
+        System.out.println(ConsoleColors.YELLOW + "Enter '0' at any time to cancel." + ConsoleColors.RESET);
 
         // InputHelper ile güvenli okuma
-        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password: ");
-        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password: ");
+        String oldPass = InputHelper.readNonEmptyLine(scanner, "Current Password (0 to cancel): ");
+        if (oldPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
+
+        String newPass = InputHelper.readNonEmptyLine(scanner, "New Password (0 to cancel): ");
+        if (newPass.equals("0")) {
+            System.out.println(ConsoleColors.YELLOW + "Password change cancelled." + ConsoleColors.RESET);
+            return;
+        }
 
         try {
             // Saf backend metoduna gönderim
